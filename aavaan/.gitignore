@@ -1,0 +1,32 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.nova
+/.vscode
+
+# uploaded files (keep directory structure with .gitkeep)
+/public/uploads/avatars/*
+/public/uploads/portfolios/*
+/public/uploads/reels/*
+!/public/uploads/avatars/.gitkeep
+!/public/uploads/portfolios/.gitkeep
+!/public/uploads/reels/.gitkeep
+
+# SQLite local DB
+/database/database.sqlite
+
+# macOS
+.DS_Store
