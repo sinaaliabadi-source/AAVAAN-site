@@ -10,13 +10,11 @@ class ArtistProfile extends Model
 {
     protected $fillable = [
         'user_id', 'username', 'field', 'city', 'birth_year', 'years_experience',
-        'bio', 'avatar', 'reel_video', 'reel_is_external',
-        'phone_contact', 'email_contact', 'is_active',
+        'bio', 'avatar', 'phone_contact', 'email_contact', 'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'reel_is_external' => 'boolean',
         'birth_year' => 'integer',
         'years_experience' => 'integer',
         'profile_views' => 'integer',
@@ -32,9 +30,14 @@ class ArtistProfile extends Model
         return $this->hasMany(WorkHistory::class)->orderByDesc('year');
     }
 
-    public function portfolioItems(): HasMany
+    public function portfolioImages(): HasMany
     {
-        return $this->hasMany(PortfolioItem::class)->orderBy('order');
+        return $this->hasMany(PortfolioImage::class)->orderBy('order');
+    }
+
+    public function portfolioVideos(): HasMany
+    {
+        return $this->hasMany(PortfolioVideo::class)->orderBy('order');
     }
 
     public function accessLogs(): HasMany
@@ -50,10 +53,9 @@ class ArtistProfile extends Model
         return asset('images/default-avatar.png');
     }
 
-    public function getReelUrlAttribute(): ?string
+    public function mainReel(): ?PortfolioVideo
     {
-        if (!$this->reel_video) return null;
-        if ($this->reel_is_external) return $this->reel_video;
-        return asset('uploads/reels/' . $this->reel_video);
+        return $this->portfolioVideos()->where('is_reel', true)->first()
+            ?? $this->portfolioVideos()->first();
     }
 }

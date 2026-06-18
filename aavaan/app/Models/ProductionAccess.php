@@ -5,17 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class ProductionAccess extends Model
 {
-    protected $fillable = [
-        'user_id', 'access_type', 'bundle_size', 'used_count', 'amount',
-        'payment_ref', 'payment_authority', 'payment_status', 'expires_at',
-    ];
+    protected $fillable = ['user_id', 'access_type', 'bundle_size', 'used_count', 'expires_at'];
 
     protected $casts = [
         'expires_at' => 'datetime',
-        'amount' => 'integer',
         'bundle_size' => 'integer',
         'used_count' => 'integer',
     ];
@@ -25,6 +22,11 @@ class ProductionAccess extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function payment(): MorphOne
+    {
+        return $this->morphOne(Payment::class, 'payable');
+    }
+
     public function logs(): HasMany
     {
         return $this->hasMany(ProductionAccessLog::class);
@@ -32,7 +34,7 @@ class ProductionAccess extends Model
 
     public function hasCredits(): bool
     {
-        return $this->payment_status === 'paid'
+        return $this->payment?->isPaid()
             && $this->used_count < $this->bundle_size
             && (!$this->expires_at || $this->expires_at->isFuture());
     }

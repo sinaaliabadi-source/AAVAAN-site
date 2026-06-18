@@ -8,12 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('production_accesses', function (Blueprint $table) {
+        Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->enum('access_type', ['single', 'bundle_5', 'bundle_10']);
-            $table->unsignedTinyInteger('bundle_size')->default(1);
-            $table->unsignedTinyInteger('used_count')->default(0);
+            $table->enum('plan', ['monthly', 'yearly']);
+            $table->enum('status', ['pending', 'active', 'expired'])->default('pending');
+            $table->timestamp('starts_at')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
@@ -21,6 +21,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('production_accesses');
+        Schema::dropIfExists('subscriptions');
     }
 };

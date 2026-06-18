@@ -31,12 +31,17 @@ class User extends Authenticatable
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(ArtistSubscription::class);
+        return $this->hasMany(Subscription::class);
     }
 
     public function productionAccesses(): HasMany
     {
         return $this->hasMany(ProductionAccess::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 
     public function isArtist(): bool
@@ -54,10 +59,10 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function activeSubscription(): ?ArtistSubscription
+    public function activeSubscription(): ?Subscription
     {
         return $this->subscriptions()
-            ->where('payment_status', 'paid')
+            ->where('status', 'active')
             ->where('expires_at', '>', now())
             ->latest('expires_at')
             ->first();
@@ -71,7 +76,7 @@ class User extends Authenticatable
     public function availableProductionAccess(): ?ProductionAccess
     {
         return $this->productionAccesses()
-            ->where('payment_status', 'paid')
+            ->whereHas('payment', fn($q) => $q->where('status', 'paid'))
             ->whereColumn('used_count', '<', 'bundle_size')
             ->where(function ($q) {
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
