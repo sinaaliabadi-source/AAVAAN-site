@@ -11,6 +11,9 @@ use App\Http\Controllers\ProductionDashboardController;
 use App\Http\Controllers\ProductionAccessController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
+Route::get('/payment/failed', fn() => view('payment.failed'))->name('payment.failed');
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/how-it-works', [PageController::class, 'howItWorks'])->name('how-it-works');

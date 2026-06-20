@@ -2,73 +2,83 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ArtistSubscription;
-use App\Services\PaymentService;
+use App\Contracts\PaymentGatewayInterface;
+use App\Exceptions\PaymentException;
+use App\Models\Payment;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
-use Exception;
 
 class ArtistSubscriptionController extends Controller
 {
-    public function __construct(private PaymentService $payment) {}
+    public function __construct(private PaymentGatewayInterface $gateway) {}
 
     public function index()
     {
-        $user = auth()->user();
+        $user         = auth()->user();
         $subscription = $user->activeSubscription();
-        $history = $user->subscriptions()->latest()->limit(10)->get();
-        $prices = config('aavaan.artist_subscription');
+        $history      = $user->subscriptions()->with('payment')->latest()->limit(10)->get();
+        $prices       = config('aavaan.artist_subscription');
+
         return view('dashboard.artist.subscription', compact('subscription', 'history', 'prices'));
     }
 
     public function pay(Request $request)
     {
         $validated = $request->validate(['plan' => 'required|in:monthly,yearly']);
-        $prices = config('aavaan.artist_subscription');
-        $amount = $validated['plan'] === 'yearly' ? $prices['yearly_price'] : $prices['monthly_price'];
-        $description = $validated['plan'] === 'yearly' ? 'اشتراک سالانه آوان' : 'اشتراک ماهانه آوان';
+        $prices    = config('aavaan.artist_subscription');
+        $plan      = $validated['plan'];
+        $amount    = $plan === 'yearly' ? $prices['yearly_price'] : $prices['monthly_price'];
+        $label     = $plan === 'yearly' ? 'سالانه' : 'ماهانه';
 
-        $sub = ArtistSubscription::create([
-            'user_id'        => auth()->id(),
-            'plan'           => $validated['plan'],
-            'amount'         => $amount,
-            'payment_status' => 'pending',
+        $sub = Subscription::create([
+            'user_id' => auth()->id(),
+            'plan'    => $plan,
+            'status'  => 'pending',
+        ]);
+
+        $payment = $sub->payment()->create([
+            'user_id' => auth()->id(),
+            'amount'  => $amount,
+            'gateway' => config('payment.driver', 'zarinpal'),
+            'status'  => 'pending',
         ]);
 
         try {
-            $result = $this->payment->request(
+            $result = $this->gateway->initiate(
                 $amount,
-                $description,
-                route('artist.subscription.callback') . '?sub=' . $sub->id
+                "اشتراک {$label} آوان",
+                route('artist.subscription.callback', ['payment' => $payment->id])
             );
-            $sub->update(['payment_authority' => $result['authority']]);
+            $payment->update(['authority' => $result['authority']]);
             return redirect($result['redirect_url']);
-        } catch (Exception $e) {
-            $sub->update(['payment_status' => 'failed']);
+        } catch (PaymentException $e) {
+            $payment->update(['status' => 'failed']);
             return back()->with('error', 'خطا در اتصال به درگاه پرداخت: ' . $e->getMessage());
         }
     }
 
     public function callback(Request $request)
     {
-        $sub = ArtistSubscription::findOrFail($request->query('sub'));
+        $payment = Payment::with('payable')->findOrFail($request->query('payment'));
+        $sub     = $payment->payable;
+
         if ($request->query('Status') !== 'OK') {
-            $sub->update(['payment_status' => 'failed']);
-            return redirect()->route('artist.subscription')->with('error', 'پرداخت لغو شد.');
+            $payment->update(['status' => 'failed']);
+            return redirect()->route('payment.failed')->with('error', 'پرداخت لغو یا ناموفق بود.');
         }
+
         try {
-            $refId = $this->payment->verify($sub->payment_authority, $sub->amount);
-            $duration = $sub->plan === 'yearly' ? 365 : 30;
-            $sub->update([
-                'payment_status' => 'paid',
-                'payment_ref'    => $refId,
-                'starts_at'      => now(),
-                'expires_at'     => now()->addDays($duration),
-            ]);
+            $refId = $this->gateway->verify($payment->authority, $payment->amount);
+            $payment->markPaid($refId);
+            $sub->activate();
             auth()->user()->artistProfile?->update(['is_active' => true]);
-            return redirect()->route('artist.subscription')->with('success', "پرداخت موفق. کد پیگیری: {$refId}");
-        } catch (Exception $e) {
-            $sub->update(['payment_status' => 'failed']);
-            return redirect()->route('artist.subscription')->with('error', 'خطا در تأیید پرداخت: ' . $e->getMessage());
+            return redirect()->route('payment.success')->with([
+                'ref_id'  => $refId,
+                'context' => 'اشتراک ' . ($sub->plan === 'yearly' ? 'سالانه' : 'ماهانه') . ' آوان',
+            ]);
+        } catch (PaymentException $e) {
+            $payment->update(['status' => 'failed']);
+            return redirect()->route('payment.failed')->with('error', $e->getMessage());
         }
     }
 }

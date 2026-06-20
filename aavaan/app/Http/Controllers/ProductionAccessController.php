@@ -2,77 +2,99 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\PaymentGatewayInterface;
+use App\Exceptions\PaymentException;
+use App\Models\ArtistProfile;
+use App\Models\Payment;
 use App\Models\ProductionAccess;
 use App\Models\ProductionAccessLog;
-use App\Models\ArtistProfile;
-use App\Services\PaymentService;
 use Illuminate\Http\Request;
-use Exception;
 
 class ProductionAccessController extends Controller
 {
-    public function __construct(private PaymentService $payment) {}
+    public function __construct(private PaymentGatewayInterface $gateway) {}
 
     public function index()
     {
-        $user = auth()->user();
-        $accesses = $user->productionAccesses()->where('payment_status', 'paid')->latest()->get();
+        $user     = auth()->user();
+        $accesses = $user->productionAccesses()
+            ->whereHas('payment', fn($q) => $q->where('status', 'paid'))
+            ->with('payment')
+            ->latest()
+            ->get();
         $prices = config('aavaan.production_access');
+
         return view('dashboard.production.access', compact('accesses', 'prices'));
     }
 
     public function buy(Request $request)
     {
         $validated = $request->validate(['access_type' => 'required|in:single,bundle_5,bundle_10']);
-        $prices = config('aavaan.production_access');
+        $prices    = config('aavaan.production_access');
         $bundleMap = ['single' => 1, 'bundle_5' => 5, 'bundle_10' => 10];
-        $priceMap  = ['single' => $prices['single_price'], 'bundle_5' => $prices['bundle_5_price'], 'bundle_10' => $prices['bundle_10_price']];
-        $type = $validated['access_type'];
+        $priceMap  = [
+            'single'    => $prices['single_price'],
+            'bundle_5'  => $prices['bundle_5_price'],
+            'bundle_10' => $prices['bundle_10_price'],
+        ];
+        $labelMap  = ['single' => 'تکی', 'bundle_5' => 'بسته ۵ عددی', 'bundle_10' => 'بسته ۱۰ عددی'];
+        $type      = $validated['access_type'];
 
         $access = ProductionAccess::create([
-            'user_id'        => auth()->id(),
-            'access_type'    => $type,
-            'bundle_size'    => $bundleMap[$type],
-            'amount'         => $priceMap[$type],
-            'payment_status' => 'pending',
+            'user_id'     => auth()->id(),
+            'access_type' => $type,
+            'bundle_size' => $bundleMap[$type],
+            'used_count'  => 0,
+        ]);
+
+        $payment = $access->payment()->create([
+            'user_id' => auth()->id(),
+            'amount'  => $priceMap[$type],
+            'gateway' => config('payment.driver', 'zarinpal'),
+            'status'  => 'pending',
         ]);
 
         try {
-            $result = $this->payment->request(
+            $result = $this->gateway->initiate(
                 $priceMap[$type],
-                "خرید دسترسی آوان ({$type})",
-                route('production.access.callback') . '?access=' . $access->id
+                "خرید دسترسی آوان — {$labelMap[$type]}",
+                route('production.access.callback', ['payment' => $payment->id])
             );
-            $access->update(['payment_authority' => $result['authority']]);
+            $payment->update(['authority' => $result['authority']]);
             return redirect($result['redirect_url']);
-        } catch (Exception $e) {
-            $access->update(['payment_status' => 'failed']);
+        } catch (PaymentException $e) {
+            $payment->update(['status' => 'failed']);
             return back()->with('error', 'خطا در اتصال به درگاه پرداخت: ' . $e->getMessage());
         }
     }
 
     public function callback(Request $request)
     {
-        $access = ProductionAccess::findOrFail($request->query('access'));
+        $payment = Payment::with('payable')->findOrFail($request->query('payment'));
+
         if ($request->query('Status') !== 'OK') {
-            $access->update(['payment_status' => 'failed']);
-            return redirect()->route('production.access')->with('error', 'پرداخت لغو شد.');
+            $payment->update(['status' => 'failed']);
+            return redirect()->route('payment.failed')->with('error', 'پرداخت لغو یا ناموفق بود.');
         }
+
         try {
-            $refId = $this->payment->verify($access->payment_authority, $access->amount);
-            $access->update(['payment_status' => 'paid', 'payment_ref' => $refId]);
-            return redirect()->route('production.search')->with('success', "پرداخت موفق. کد پیگیری: {$refId}");
-        } catch (Exception $e) {
-            $access->update(['payment_status' => 'failed']);
-            return redirect()->route('production.access')->with('error', 'خطا در تأیید پرداخت: ' . $e->getMessage());
+            $refId = $this->gateway->verify($payment->authority, $payment->amount);
+            $payment->markPaid($refId);
+            return redirect()->route('payment.success')->with([
+                'ref_id'  => $refId,
+                'context' => 'دسترسی تیم تولید آوان',
+            ]);
+        } catch (PaymentException $e) {
+            $payment->update(['status' => 'failed']);
+            return redirect()->route('payment.failed')->with('error', $e->getMessage());
         }
     }
 
     public function unlock(Request $request)
     {
-        $user = auth()->user();
+        $user      = auth()->user();
         $profileId = $request->input('artist_profile_id');
-        $profile = ArtistProfile::where('is_active', true)->findOrFail($profileId);
+        $profile   = ArtistProfile::where('is_active', true)->findOrFail($profileId);
 
         if (ProductionAccessLog::where('production_user_id', $user->id)->where('artist_profile_id', $profileId)->exists()) {
             return redirect()->route('profile.show', $profile->username)->with('info', 'این هنرمند قبلاً باز شده است.');
