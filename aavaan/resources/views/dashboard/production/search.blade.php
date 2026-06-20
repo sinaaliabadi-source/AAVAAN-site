@@ -1,21 +1,181 @@
 @extends('layouts.dashboard')
 @section('title', 'جستجوی هنرمند')
-@section('sidebar-nav')
-<a href="{{ route('production.dashboard') }}">خانه</a>
-<a href="{{ route('production.search') }}" class="active">جستجوی هنرمند</a>
-<a href="{{ route('production.saved') }}">فهرست‌های من</a>
-<a href="{{ route('production.access') }}">خرید دسترسی</a>
-@endsection
-@section('content')
-<h1 style="margin-bottom:1.5rem">جستجوی هنرمند</h1>
+@section('page-title', 'جستجوی هنرمند')
 
-<div class="card" style="margin-bottom:1.5rem">
+@push('styles')
+<style>
+    /* ── Filter form ── */
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: .9rem;
+        align-items: end;
+    }
+
+    /* ── Paywall banner ── */
+    .paywall-banner {
+        background: linear-gradient(135deg, var(--color-primary) 0%, #2d3e60 100%);
+        color: #fff;
+        border-radius: var(--radius);
+        padding: 1.5rem 2rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .paywall-banner-title {
+        font-family: 'YekanBakh', sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: .3rem;
+    }
+    .paywall-banner-desc { font-size: .85rem; color: #c8d0e0; line-height: 1.7; }
+    .paywall-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .4rem;
+        margin-top: .6rem;
+    }
+    .paywall-feature {
+        font-size: .78rem;
+        background: rgba(255,255,255,.12);
+        padding: .18rem .65rem;
+        border-radius: 999px;
+        color: #e0e8f5;
+    }
+
+    /* ── Artist cards grid ── */
+    .artists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 1.1rem;
+    }
+
+    /* ── Full card (access granted) ── */
+    .artist-card {
+        background: #fff;
+        border-radius: var(--radius);
+        border: 1px solid #ede8dc;
+        overflow: hidden;
+        box-shadow: 0 1px 4px rgba(31,42,68,.06);
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow .2s, transform .2s;
+    }
+    .artist-card:hover { box-shadow: 0 4px 16px rgba(31,42,68,.12); transform: translateY(-2px); }
+    .artist-card-img {
+        width: 100%; height: 160px;
+        object-fit: cover;
+        display: block;
+        flex-shrink: 0;
+    }
+    .artist-card-img-placeholder {
+        width: 100%; height: 160px;
+        background: var(--color-primary);
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'YekanBakh', sans-serif;
+        font-size: 3rem; font-weight: 800;
+        color: var(--color-accent);
+        flex-shrink: 0;
+    }
+    .artist-card-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+    .artist-card-name {
+        font-family: 'YekanBakh', sans-serif;
+        font-size: .95rem; font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: .3rem;
+    }
+    .artist-card-field {
+        display: inline-block;
+        background: #f5f0e8;
+        color: var(--color-primary);
+        font-size: .75rem;
+        font-weight: 600;
+        padding: .15rem .6rem;
+        border-radius: 999px;
+        margin-bottom: .4rem;
+    }
+    .artist-card-meta { font-size: .8rem; color: var(--color-muted); margin-bottom: .65rem; flex: 1; }
+    .artist-card-meta span + span::before { content: ' · '; }
+    .artist-card-actions { margin-top: auto; }
+
+    /* ── Locked card (paywall) ── */
+    .artist-card-locked .artist-card-img,
+    .artist-card-locked .artist-card-img-placeholder { filter: brightness(.92); }
+    .locked-bars { margin: .5rem 0 .7rem; }
+    .locked-bar {
+        height: 9px;
+        background: linear-gradient(90deg, #e8e3d8, #d5cfc4, #e8e3d8);
+        border-radius: 6px;
+        margin-bottom: .4rem;
+        filter: blur(2px);
+    }
+    .locked-badge {
+        display: inline-flex; align-items: center; gap: .35rem;
+        font-size: .78rem;
+        color: var(--color-muted);
+        background: #f0ede8;
+        border-radius: 999px;
+        padding: .22rem .75rem;
+        border: 1px solid #ddd9d0;
+    }
+
+    /* ── Credits badge ── */
+    .credits-bar {
+        background: #ecf5ec;
+        border: 1px solid #c3dfc3;
+        border-radius: 8px;
+        padding: .6rem 1rem;
+        margin-bottom: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        font-size: .87rem;
+        color: #2d5a2d;
+    }
+    .credits-bar strong { font-family: 'YekanBakh', sans-serif; font-weight: 800; font-size: 1.05rem; }
+
+    /* ── Results header ── */
+    .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: .5rem;
+    }
+    .results-count { font-size: .85rem; color: var(--color-muted); }
+
+    /* ── Pagination ── */
+    .pagination-wrap { margin-top: 1.5rem; }
+    .pagination-wrap nav { display: flex; justify-content: center; }
+
+    @media (max-width: 680px) {
+        .filter-grid { grid-template-columns: 1fr 1fr; }
+        .artists-grid { grid-template-columns: 1fr 1fr; }
+        .paywall-banner { flex-direction: column; }
+        .artist-card-img, .artist-card-img-placeholder { height: 130px; }
+    }
+    @media (max-width: 420px) {
+        .filter-grid { grid-template-columns: 1fr; }
+        .artists-grid { grid-template-columns: 1fr; }
+    }
+</style>
+@endpush
+
+@section('content')
+
+{{-- Filter form --}}
+<div class="card" style="margin-bottom:1.35rem">
+    <div class="card-title">🔍 فیلتر جستجو</div>
     <form method="GET" action="{{ route('production.search') }}">
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;align-items:end">
+        <div class="filter-grid">
             <div class="form-group" style="margin:0">
-                <label>رشته‌ی هنری</label>
+                <label>رشته هنری</label>
                 <select name="field" class="form-control">
-                    <option value="">همه</option>
+                    <option value="">همه رشته‌ها</option>
                     @foreach($fields as $f)
                         <option value="{{ $f }}" {{ request('field') === $f ? 'selected' : '' }}>{{ $f }}</option>
                     @endforeach
@@ -23,51 +183,158 @@
             </div>
             <div class="form-group" style="margin:0">
                 <label>شهر</label>
-                <input type="text" name="city" class="form-control" value="{{ request('city') }}" placeholder="تهران">
+                <input type="text" name="city" class="form-control" value="{{ request('city') }}" placeholder="مثال: تهران">
             </div>
             <div class="form-group" style="margin:0">
-                <label>حداقل تجربه (سال)</label>
-                <input type="number" name="experience_min" class="form-control" value="{{ request('experience_min') }}" min="0">
+                <label>سن از</label>
+                <input type="number" name="age_min" class="form-control" value="{{ request('age_min') }}" min="15" max="80" placeholder="مثال: ۲۵">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label>سن تا</label>
+                <input type="number" name="age_max" class="form-control" value="{{ request('age_max') }}" min="15" max="80" placeholder="مثال: ۴۵">
+            </div>
+            <div class="form-group" style="margin:0">
+                <label>حداقل سابقه (سال)</label>
+                <input type="number" name="experience_min" class="form-control" value="{{ request('experience_min') }}" min="0" max="50" placeholder="مثال: ۵">
             </div>
             <div class="form-group" style="margin:0">
                 <label>کلیدواژه</label>
-                <input type="text" name="keyword" class="form-control" value="{{ request('keyword') }}">
+                <input type="text" name="keyword" class="form-control" value="{{ request('keyword') }}" placeholder="نام، بیوگرافی ...">
             </div>
-            <button type="submit" class="btn btn-primary">جستجو</button>
+            <div style="display:flex;gap:.5rem;align-items:center">
+                <button type="submit" class="btn btn-primary btn-sm" style="flex:1">جستجو</button>
+                @if(request()->hasAny(['field','city','age_min','age_max','experience_min','keyword']))
+                    <a href="{{ route('production.search') }}" class="btn btn-ghost btn-sm" title="پاک کردن فیلترها">✕</a>
+                @endif
+            </div>
         </div>
     </form>
 </div>
 
-@if($access)
-<p style="font-size:.85rem;color:var(--color-success);margin-bottom:1rem">● {{ $access->remainingCredits() }} دسترسی باقی‌مانده</p>
-@endif
-
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem">
-    @forelse($artists as $artist)
-    @php $unlocked = in_array($artist->id, $unlockedIds); @endphp
-    <div class="card" style="position:relative">
-        <img src="{{ $artist->avatar_url }}" alt="{{ $artist->user->name }}"
-             style="width:100%;height:160px;object-fit:cover;border-radius:var(--radius);margin-bottom:.75rem">
-        <h4>{{ $artist->user->name }}</h4>
-        <p style="font-size:.85rem;color:var(--color-muted)">{{ $artist->field }} @if($artist->city) · {{ $artist->city }} @endif</p>
-        <p style="font-size:.82rem;color:var(--color-muted)">{{ $artist->years_experience }} سال تجربه</p>
-        <div style="margin-top:.75rem">
-            @if($unlocked)
-                <a href="{{ route('profile.show', $artist->username ?? $artist->id) }}" class="btn btn-primary" style="font-size:.82rem;padding:.4rem .8rem">مشاهده پروفایل</a>
-            @elseif($access)
-                <form action="{{ route('production.access.unlock') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="artist_profile_id" value="{{ $artist->id }}">
-                    <button type="submit" class="btn btn-accent" style="font-size:.82rem;padding:.4rem .8rem">🔓 باز کردن</button>
-                </form>
-            @else
-                <a href="{{ route('production.access') }}" class="btn btn-outline" style="font-size:.82rem;padding:.4rem .8rem">خرید دسترسی</a>
-            @endif
+{{-- Paywall banner — shown when user has no paid access --}}
+@if(!$hasPaidAccess)
+<div class="paywall-banner">
+    <div>
+        <div class="paywall-banner-title">🔒 برای مشاهده جزئیات کامل هنرمندان، دسترسی بخرید</div>
+        <div class="paywall-banner-desc">پس از خرید، تمام نتایج به‌صورت کامل و بدون محدودیت نمایش داده می‌شوند.</div>
+        <div class="paywall-features">
+            <span class="paywall-feature">📍 شهر و موقعیت</span>
+            <span class="paywall-feature">⏱ سابقه و تجربه</span>
+            <span class="paywall-feature">🎬 ویدیوی ریل</span>
+            <span class="paywall-feature">📞 اطلاعات تماس</span>
+            <span class="paywall-feature">📋 سوابق کاری</span>
         </div>
     </div>
+    <a href="{{ route('production.access') }}" class="btn btn-accent" style="white-space:nowrap">دسترسی به فهرست کامل</a>
+</div>
+@else
+    {{-- Credits info for users who have access --}}
+    @if($access && $access->remainingCredits() > 0)
+    <div class="credits-bar">
+        <span>💳</span>
+        <strong>{{ $access->remainingCredits() }}</strong>
+        <span>اعتبار باقی‌مانده — با هر «باز کردن» یک اعتبار استفاده می‌شود.</span>
+        <a href="{{ route('production.access') }}" class="btn btn-ghost btn-sm" style="margin-right:auto">افزایش اعتبار</a>
+    </div>
+    @elseif(!$access)
+    <div class="credits-bar" style="background:#fff3cd;border-color:#f0dda0;color:#7a5c00">
+        <span>⚠️</span>
+        <span>اعتبارهای شما تمام شده. می‌توانید نتایج را ببینید اما برای باز کردن هنرمند جدید نیاز به خرید اعتبار دارید.</span>
+        <a href="{{ route('production.access') }}" class="btn btn-accent btn-sm" style="margin-right:auto">خرید اعتبار</a>
+    </div>
+    @endif
+@endif
+
+{{-- Results header --}}
+<div class="results-header">
+    <span class="results-count">
+        {{ $artists->total() }} هنرمند یافت شد
+        @if(request()->hasAny(['field','city','age_min','age_max','experience_min','keyword']))
+            — نتایج فیلتر شده
+        @endif
+    </span>
+    @if($hasPaidAccess)
+        <span class="text-sm text-muted">{{ count($unlockedIds) }} هنرمند باز شده</span>
+    @endif
+</div>
+
+{{-- Artist cards --}}
+<div class="artists-grid">
+    @forelse($artists as $artist)
+    @php $unlocked = in_array($artist->id, $unlockedIds); @endphp
+
+    @if($hasPaidAccess)
+        {{-- ── FULL CARD (user has paid) ── --}}
+        <div class="artist-card">
+            @if($artist->avatar)
+                <img src="{{ $artist->avatar_url }}" alt="{{ $artist->user->name }}" class="artist-card-img">
+            @else
+                <div class="artist-card-img-placeholder">{{ mb_substr($artist->user->name, 0, 1) }}</div>
+            @endif
+            <div class="artist-card-body">
+                <div class="artist-card-name">{{ $artist->user->name }}</div>
+                <span class="artist-card-field">{{ $artist->field }}</span>
+                <div class="artist-card-meta">
+                    @if($artist->city)<span>📍 {{ $artist->city }}</span>@endif
+                    @if($artist->years_experience)<span>{{ $artist->years_experience }} سال تجربه</span>@endif
+                    @if($artist->birth_year)<span>متولد {{ $artist->birth_year }}</span>@endif
+                </div>
+                <div class="artist-card-actions">
+                    @if($unlocked)
+                        <a href="{{ route('profile.show', $artist->username) }}"
+                           class="btn btn-primary btn-sm btn-block">مشاهده پروفایل کامل</a>
+                    @elseif($access && $access->remainingCredits() > 0)
+                        <form action="{{ route('production.access.unlock') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="artist_profile_id" value="{{ $artist->id }}">
+                            <button type="submit" class="btn btn-accent btn-sm btn-block">🔓 باز کردن (۱ اعتبار)</button>
+                        </form>
+                    @else
+                        <a href="{{ route('production.access') }}"
+                           class="btn btn-outline btn-sm btn-block">خرید اعتبار برای باز کردن</a>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+    @else
+        {{-- ── LIMITED CARD (paywall active) ── --}}
+        <div class="artist-card artist-card-locked">
+            @if($artist->avatar)
+                <img src="{{ $artist->avatar_url }}" alt="" class="artist-card-img">
+            @else
+                <div class="artist-card-img-placeholder">{{ mb_substr($artist->user->name, 0, 1) }}</div>
+            @endif
+            <div class="artist-card-body">
+                <div class="artist-card-name">{{ $artist->user->name }}</div>
+                <span class="artist-card-field">{{ $artist->field }}</span>
+                <div class="locked-bars">
+                    <div class="locked-bar" style="width:75%"></div>
+                    <div class="locked-bar" style="width:55%"></div>
+                </div>
+                <div class="artist-card-actions">
+                    <span class="locked-badge">🔒 اطلاعات محدود</span>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @empty
-    <p style="color:var(--color-muted);grid-column:1/-1">هنرمندی با این مشخصات یافت نشد.</p>
+    <div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;color:var(--color-muted)">
+        <div style="font-size:2rem;margin-bottom:.75rem">🔍</div>
+        <p>هنرمندی با این مشخصات یافت نشد.</p>
+        @if(request()->hasAny(['field','city','age_min','age_max','experience_min','keyword']))
+            <a href="{{ route('production.search') }}" class="btn btn-ghost btn-sm" style="margin-top:.75rem">پاک کردن فیلترها</a>
+        @endif
+    </div>
     @endforelse
 </div>
-<div style="margin-top:1.5rem">{{ $artists->links() }}</div>
+
+{{-- Pagination --}}
+@if($artists->hasPages())
+<div class="pagination-wrap">
+    {{ $artists->links() }}
+</div>
+@endif
+
 @endsection
