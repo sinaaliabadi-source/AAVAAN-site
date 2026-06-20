@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'صفحه پیدا نشد — آوان')
+@section('title', 'دسترسی غیرمجاز — آوان')
 
 @push('styles')
 <style>
@@ -49,16 +49,18 @@
 @section('content')
 <section class="error-page">
     <div>
-        <div class="error-code">۴۰۴</div>
+        <div class="error-code">۴۰۳</div>
         <div class="error-divider"></div>
-        <h1 class="error-title">این صفحه وجود ندارد</h1>
+        <h1 class="error-title">دسترسی مجاز نیست</h1>
         <p class="error-desc">
-            صفحه‌ای که دنبالش می‌گشتید یافت نشد — شاید آدرس اشتباه باشد
-            یا صفحه جابجا شده باشد.
+            شما مجوز دسترسی به این بخش را ندارید.
+            در صورت نیاز وارد حساب کاربری خود شوید یا با پشتیبانی تماس بگیرید.
         </p>
         <div class="error-actions">
             <a href="{{ route('home') }}" class="btn btn-primary btn-lg">بازگشت به خانه</a>
-            <a href="{{ route('contact') }}" class="btn btn-outline btn-lg">تماس با ما</a>
+            @guest
+                <a href="{{ route('auth') }}" class="btn btn-accent btn-lg">ورود به حساب</a>
+            @endguest
         </div>
     </div>
 </section>

@@ -22,7 +22,7 @@ Route::get('/production', [PageController::class, 'production'])->name('producti
 Route::get('/pricing', [PageController::class, 'pricing'])->name('pricing');
 Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::post('/contact', [PageController::class, 'sendContact'])->name('contact.send');
+Route::post('/contact', [PageController::class, 'sendContact'])->name('contact.send')->middleware('throttle:contact');
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
@@ -31,12 +31,12 @@ Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('pro
 
 Route::middleware('guest')->group(function () {
     Route::get('/auth', [AuthController::class, 'index'])->name('auth');
-    Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
-    Route::post('/auth/register', [AuthController::class, 'register'])->name('auth.register');
+    Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login')->middleware('throttle:login');
+    Route::post('/auth/register', [AuthController::class, 'register'])->name('auth.register')->middleware('throttle:register');
     Route::get('/auth/forgot', [AuthController::class, 'forgotForm'])->name('auth.forgot');
-    Route::post('/auth/forgot', [AuthController::class, 'sendReset'])->name('auth.forgot.send');
+    Route::post('/auth/forgot', [AuthController::class, 'sendReset'])->name('auth.forgot.send')->middleware('throttle:forgot-password');
     Route::get('/auth/reset/{token}', [AuthController::class, 'resetForm'])->name('auth.reset');
-    Route::post('/auth/reset', [AuthController::class, 'resetPassword'])->name('auth.reset.do');
+    Route::post('/auth/reset', [AuthController::class, 'resetPassword'])->name('auth.reset.do')->middleware('throttle:forgot-password');
 });
 
 Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('auth');

@@ -7,10 +7,26 @@ use App\Models\PortfolioImage;
 use App\Models\PortfolioVideo;
 use App\Models\WorkHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ArtistDashboardController extends Controller
 {
+    private function safeUnlink(string $relativePath): void
+    {
+        $uploadsRoot = realpath(public_path('uploads'));
+        if (!$uploadsRoot) {
+            return;
+        }
+        $absolute = realpath(public_path('uploads/' . $relativePath));
+        if ($absolute && str_starts_with($absolute, $uploadsRoot . DIRECTORY_SEPARATOR) && is_file($absolute)) {
+            if (!unlink($absolute)) {
+                Log::warning("Failed to delete upload file: {$absolute}");
+            }
+        }
+    }
+
+
     public function index()
     {
         $user = auth()->user();
@@ -60,9 +76,9 @@ class ArtistDashboardController extends Controller
 
         if ($request->hasFile('avatar')) {
             $dir = public_path("uploads/{$user->id}");
-            if (!is_dir($dir)) mkdir($dir, 0755, true);
+            if (!is_dir($dir)) mkdir($dir, 0750, true);
             if ($profile?->avatar) {
-                @unlink(public_path('uploads/' . $profile->avatar));
+                $this->safeUnlink($profile->avatar);
             }
             $filename = Str::uuid() . '.' . $request->file('avatar')->extension();
             $request->file('avatar')->move($dir, $filename);
@@ -107,7 +123,7 @@ class ArtistDashboardController extends Controller
         ]);
 
         $dir = public_path("uploads/{$user->id}/portfolios");
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir)) mkdir($dir, 0750, true);
 
         $nextOrder = ($profile->portfolioImages()->max('order') ?? 0) + 1;
         $caption = $request->input('caption');
@@ -133,7 +149,7 @@ class ArtistDashboardController extends Controller
     {
         $item = PortfolioImage::findOrFail($id);
         if ($item->artistProfile->user_id !== auth()->id()) abort(403);
-        @unlink(public_path('uploads/' . $item->file_path));
+        $this->safeUnlink($item->file_path);
         $item->delete();
         return back()->with('success', 'تصویر حذف شد.');
     }
@@ -156,11 +172,11 @@ class ArtistDashboardController extends Controller
         ]);
 
         $dir = public_path("uploads/{$user->id}/reels");
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
+        if (!is_dir($dir)) mkdir($dir, 0750, true);
 
         $existingReel = $profile->portfolioVideos()->where('is_reel', true)->first();
         if ($existingReel) {
-            @unlink(public_path('uploads/' . $existingReel->file_path));
+            $this->safeUnlink($existingReel->file_path);
             $existingReel->delete();
         }
 
@@ -182,7 +198,7 @@ class ArtistDashboardController extends Controller
     {
         $reel = PortfolioVideo::findOrFail($id);
         if ($reel->artistProfile->user_id !== auth()->id()) abort(403);
-        @unlink(public_path('uploads/' . $reel->file_path));
+        $this->safeUnlink($reel->file_path);
         $reel->delete();
         return back()->with('success', 'ویدیوی ریل حذف شد.');
     }

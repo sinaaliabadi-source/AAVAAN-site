@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'صفحه پیدا نشد — آوان')
+@section('title', 'خطای سرور — آوان')
 
 @push('styles')
 <style>
@@ -32,7 +32,7 @@
     color: var(--color-muted);
     font-size: .95rem;
     line-height: 1.85;
-    max-width: 400px;
+    max-width: 440px;
     margin: 0 auto 2.25rem;
 }
 .error-divider {
@@ -49,16 +49,16 @@
 @section('content')
 <section class="error-page">
     <div>
-        <div class="error-code">۴۰۴</div>
+        <div class="error-code">۵۰۰</div>
         <div class="error-divider"></div>
-        <h1 class="error-title">این صفحه وجود ندارد</h1>
+        <h1 class="error-title">مشکلی در سرور پیش آمد</h1>
         <p class="error-desc">
-            صفحه‌ای که دنبالش می‌گشتید یافت نشد — شاید آدرس اشتباه باشد
-            یا صفحه جابجا شده باشد.
+            یک خطای داخلی رخ داده است. تیم آوان از این موضوع مطلع شده
+            و در حال بررسی است. لطفاً چند دقیقه دیگر دوباره تلاش کنید.
         </p>
         <div class="error-actions">
             <a href="{{ route('home') }}" class="btn btn-primary btn-lg">بازگشت به خانه</a>
-            <a href="{{ route('contact') }}" class="btn btn-outline btn-lg">تماس با ما</a>
+            <a href="{{ route('contact') }}" class="btn btn-outline btn-lg">گزارش مشکل</a>
         </div>
     </div>
 </section>
