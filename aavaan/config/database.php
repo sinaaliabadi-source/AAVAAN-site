@@ -62,10 +62,7 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
     ],
-    'migrations' => [
-        'table' => 'migrations',
-        'update_date_on_publish' => true,
-    ],
+    'migrations' => 'migrations',
     'redis' => [
         'client' => env('REDIS_CLIENT', 'phpredis'),
         'options' => [
