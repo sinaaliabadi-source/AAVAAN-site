@@ -50,8 +50,8 @@
             @foreach($history as $h)
             <tr style="border-bottom:1px solid #f0f0f0">
                 <td style="padding:.4rem">{{ $h->plan === 'monthly' ? 'ماهانه' : 'سالانه' }}</td>
-                <td style="padding:.4rem">{{ number_format($h->amount) }}</td>
-                <td style="padding:.4rem"><span style="color:{{ $h->payment_status === 'paid' ? 'var(--color-success)' : '#dc3545' }}">{{ $h->payment_status }}</span></td>
+                <td style="padding:.4rem">{{ $h->payment ? number_format($h->payment->amount) : '—' }}</td>
+                <td style="padding:.4rem"><span style="color:{{ $h->payment?->status === 'paid' ? 'var(--color-success)' : '#dc3545' }}">{{ $h->payment?->status ?? '—' }}</span></td>
                 <td style="padding:.4rem;color:var(--color-muted)">{{ $h->created_at->format('Y/m/d') }}</td>
             </tr>
             @endforeach

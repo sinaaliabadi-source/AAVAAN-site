@@ -1,6 +1,11 @@
-# راهنمای دیپلوی آوان روی هاست اشتراکی (cPanel / PHP 8.3)
+# راهنمای دیپلوی آوان روی هاست اشتراکی (cPanel / PHP 8.2+)
 
-> پیش‌نیاز: PHP 8.3+، MySQL 5.7+ یا MariaDB 10.3+، phpMyAdmin، دسترسی به File Manager یا FTP
+> **حداقل نسخه‌ی PHP: 8.2** (پروژه با Laravel 12.x قفل شده که PHP 8.2+ را پشتیبانی می‌کند)
+> پیش‌نیاز: PHP 8.2+، MySQL 5.7+ یا MariaDB 10.3+، phpMyAdmin، دسترسی به File Manager یا FTP
+
+> **نکته امنیتی PHP:** بسته‌های Symfony 8.x که توسط Laravel 13 کشیده می‌شوند از PHP 8.4 property hooks
+> استفاده می‌کنند و روی PHP 8.2 یا 8.3 کار نمی‌کنند. این پروژه به‌صورت عمدی روی Laravel 12.x
+> و Symfony 7.4.x قفل شده که با PHP 8.2 کاملاً سازگار هستند.
 
 ---
 
@@ -188,6 +193,7 @@ cd ~/aavaan && php artisan config:cache && php artisan route:cache && php artisa
 ## ۸. چک‌لیست نهایی قبل از روشن کردن سایت
 
 ### محیط و پیکربندی
+- [ ] هاست PHP نسخه‌ی **8.2 یا بالاتر** دارد (در cPanel → Software → PHP Version بررسی کنید)
 - [ ] `APP_DEBUG=false` در .env سرور
 - [ ] `APP_ENV=production` در .env سرور
 - [ ] `APP_KEY` پر شده (شروع با `base64:`)
