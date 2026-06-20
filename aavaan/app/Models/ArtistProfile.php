@@ -47,10 +47,9 @@ class ArtistProfile extends Model
 
     public function getAvatarUrlAttribute(): string
     {
-        if ($this->avatar) {
-            return asset('uploads/avatars/' . $this->avatar);
-        }
-        return asset('images/default-avatar.png');
+        return $this->avatar
+            ? asset('uploads/' . $this->avatar)
+            : asset('images/default-avatar.png');
     }
 
     public function mainReel(): ?PortfolioVideo

@@ -21,7 +21,7 @@ class PortfolioVideo extends Model
 
     public function getUrlAttribute(): string
     {
-        return asset('uploads/reels/' . $this->file_path);
+        return asset('uploads/' . $this->file_path);
     }
 
     public function getFormattedDurationAttribute(): ?string

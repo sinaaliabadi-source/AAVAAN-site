@@ -47,6 +47,8 @@ Route::middleware(['auth', 'role:artist'])
         Route::post('/profile', [ArtistDashboardController::class, 'updateProfile'])->name('profile.update');
         Route::post('/portfolio', [ArtistDashboardController::class, 'uploadPortfolio'])->name('portfolio.upload');
         Route::delete('/portfolio/{id}', [ArtistDashboardController::class, 'deletePortfolio'])->name('portfolio.delete');
+        Route::post('/reel', [ArtistDashboardController::class, 'uploadReel'])->name('reel.upload');
+        Route::delete('/reel/{id}', [ArtistDashboardController::class, 'deleteReel'])->name('reel.delete');
         Route::post('/work-history', [ArtistDashboardController::class, 'addWorkHistory'])->name('work-history.add');
         Route::delete('/work-history/{id}', [ArtistDashboardController::class, 'deleteWorkHistory'])->name('work-history.delete');
         Route::get('/subscription', [ArtistSubscriptionController::class, 'index'])->name('subscription');

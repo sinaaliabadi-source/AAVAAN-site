@@ -16,6 +16,6 @@ class PortfolioImage extends Model
 
     public function getUrlAttribute(): string
     {
-        return asset('uploads/portfolios/' . $this->file_path);
+        return asset('uploads/' . $this->file_path);
     }
 }
