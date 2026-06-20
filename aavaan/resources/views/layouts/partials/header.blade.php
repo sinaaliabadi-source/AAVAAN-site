@@ -1,8 +1,8 @@
 <header id="site-header" style="background:var(--color-primary);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18);">
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding-top:.9rem;padding-bottom:.9rem;">
 
-        <a href="{{ route('home') }}" style="font-family:'YekanBakh',Tahoma,sans-serif;font-size:1.55rem;font-weight:800;color:var(--color-accent);text-decoration:none;letter-spacing:-.5px;">
-            آوان
+        <a href="{{ route('home') }}" style="text-decoration:none;display:flex;align-items:center;" aria-label="آوان — صفحه اصلی">
+            @include('layouts.partials.logo', ['height' => '40px', 'variant' => 'light'])
         </a>
 
         <nav id="main-nav" style="display:flex;gap:1.6rem;align-items:center;">

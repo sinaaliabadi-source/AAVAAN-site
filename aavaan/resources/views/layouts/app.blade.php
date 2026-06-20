@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="@yield('meta-description', 'آوان — پلتفرم تخصصی کاستینگ هنرمندان ایران')">
     <title>@yield('title', 'آوان') — پلتفرم کاستینگ هنرمندان ایران</title>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="shortcut icon" href="{{ asset('favicon.svg') }}"  type="image/svg+xml">
     <style>
         @font-face {
             font-family: 'YekanBakh';

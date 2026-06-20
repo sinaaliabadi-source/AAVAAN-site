@@ -1,7 +1,9 @@
 <footer style="background: var(--color-primary); color: #aaa; padding: 3rem 0; margin-top: 4rem;">
     <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
         <div>
-            <h3 style="color: var(--color-accent); margin-bottom: 1rem;">آوان</h3>
+            <a href="{{ route('home') }}" style="text-decoration:none;display:inline-flex;align-items:center;margin-bottom:.9rem;" aria-label="آوان — صفحه اصلی">
+                @include('layouts.partials.logo', ['height' => '36px', 'variant' => 'light'])
+            </a>
             <p style="font-size: 0.9rem;">پلتفرم تخصصی کاستینگ هنرمندان ایران</p>
         </div>
         <div>
