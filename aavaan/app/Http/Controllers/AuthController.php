@@ -25,12 +25,15 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email'    => 'required|string|max:200',
             'password' => 'required|string',
+        ], [
+            'email.required'    => 'ایمیل یا شماره موبایل الزامی است.',
+            'password.required' => 'رمز عبور الزامی است.',
         ]);
 
         $field = filter_var($credentials['email'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
         if (!Auth::attempt([$field => $credentials['email'], 'password' => $credentials['password']], $request->boolean('remember'))) {
-            return back()->withErrors(['email' => 'ایمیل/شماره یا رمز عبور اشتباه است.'])->withInput();
+            return back()->withErrors(['email' => 'ایمیل/شماره موبایل یا رمز عبور اشتباه است.'])->withInput();
         }
 
         $request->session()->regenerate();
@@ -46,10 +49,25 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', PasswordRule::min(8)],
             'role'     => 'required|in:artist,production',
             'field'    => 'required_if:role,artist|nullable|string|max:100',
+        ], [
+            'name.required'      => 'نام الزامی است.',
+            'name.max'           => 'نام نباید بیشتر از ۱۰۰ کاراکتر باشد.',
+            'email.email'        => 'فرمت ایمیل صحیح نیست.',
+            'email.unique'       => 'این ایمیل قبلاً در آوان ثبت شده است.',
+            'phone.unique'       => 'این شماره موبایل قبلاً در آوان ثبت شده است.',
+            'phone.max'          => 'شماره موبایل نباید بیشتر از ۱۵ رقم باشد.',
+            'password.required'  => 'رمز عبور الزامی است.',
+            'password.min'       => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
+            'password.confirmed' => 'تکرار رمز عبور با رمز وارد‌شده مطابقت ندارد.',
+            'role.required'      => 'لطفاً نوع حساب خود را انتخاب کنید.',
+            'role.in'            => 'نوع حساب انتخاب‌شده معتبر نیست.',
+            'field.required_if'  => 'رشته هنری برای هنرمندان الزامی است.',
         ]);
 
         if (empty($validated['email']) && empty($validated['phone'])) {
-            return back()->withErrors(['email' => 'ایمیل یا شماره موبایل الزامی است.'])->withInput();
+            return back()
+                ->withErrors(['email' => 'حداقل یکی از ایمیل یا شماره موبایل الزامی است.'])
+                ->withInput();
         }
 
         $user = User::create([
@@ -70,7 +88,11 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return $this->redirectToDashboard();
+        return $user->isArtist()
+            ? redirect()->route('artist.profile')
+                ->with('success', 'خوش آمدید! پروفایل خود را تکمیل کنید تا در نتایج جستجو ظاهر شوید.')
+            : redirect()->route('production.dashboard')
+                ->with('success', 'خوش آمدید به آوان!');
     }
 
     public function logout(Request $request)
