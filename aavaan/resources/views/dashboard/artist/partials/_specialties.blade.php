@@ -24,7 +24,7 @@
     @php
         $spPhotos     = $specialty->media->where('type', 'photo');
         $spVideos     = $specialty->media->where('type', 'video_link');
-        $attrDefs     = $specialty->category->attributeDefinitions;
+        $attrDefs     = $specialty->category->effectiveAttributeDefinitions();
         $attrs        = $specialty->attributes ?? [];
     @endphp
 
@@ -334,20 +334,24 @@
             <form action="{{ route('artist.specialties.store') }}" method="POST">
                 @csrf
 
-                {{-- Category selector --}}
+                {{-- Category selector — leaf categories grouped by parent --}}
                 <div class="form-group">
                     <label>دسته‌بندی تخصص <span class="req">*</span></label>
                     <select name="category_id" class="form-control" required
                             @change="setCategory($event.target.value)">
                         <option value="">انتخاب کنید…</option>
-                        @foreach($categories as $cat)
-                            @if(!$usedCategoryIds->contains($cat->id))
-                            <option value="{{ $cat->id }}">{{ $cat->name_fa }}</option>
-                            @else
-                            <option value="{{ $cat->id }}" disabled style="color:#aaa">
-                                {{ $cat->name_fa }} (قبلاً اضافه شده)
-                            </option>
-                            @endif
+                        @foreach($categories->groupBy('parent_id') as $parentId => $children)
+                        <optgroup label="{{ $children->first()->parent->name_fa }}">
+                            @foreach($children as $cat)
+                                @if(!$usedCategoryIds->contains($cat->id))
+                                <option value="{{ $cat->id }}">{{ $cat->name_fa }}</option>
+                                @else
+                                <option value="{{ $cat->id }}" disabled style="color:#aaa">
+                                    {{ $cat->name_fa }} (قبلاً اضافه شده)
+                                </option>
+                                @endif
+                            @endforeach
+                        </optgroup>
                         @endforeach
                     </select>
                 </div>

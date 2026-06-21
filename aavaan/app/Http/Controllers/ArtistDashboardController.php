@@ -50,33 +50,52 @@ class ArtistDashboardController extends Controller
 
         $fields = config('aavaan.artistic_fields');
 
-        // Specialties with their category (and attribute definitions) and media
+        // Specialties with their category (own + parent attribute definitions) and media
         $specialties = $user->artistSpecialties()
-            ->with(['category.attributeDefinitions' => fn($q) => $q->orderBy('sort_order'), 'media' => fn($q) => $q->orderBy('sort_order')])
+            ->with([
+                'category.attributeDefinitions'            => fn($q) => $q->orderBy('sort_order'),
+                'category.parent.attributeDefinitions'     => fn($q) => $q->orderBy('sort_order'),
+                'media'                                     => fn($q) => $q->orderBy('sort_order'),
+            ])
             ->get();
 
         $usedCategoryIds = $specialties->pluck('category_id');
 
-        // All root categories for the "add new specialty" dropdown
-        $categories = SpecialtyCategory::where('is_active', true)
-            ->whereNull('parent_id')
+        // Leaf categories grouped by parent for the "add new specialty" dropdown
+        $categories = SpecialtyCategory::whereNotNull('parent_id')
+            ->where('is_active', true)
+            ->with('parent')
+            ->orderBy('parent_id')
             ->orderBy('sort_order')
             ->get();
 
-        // All attribute definitions grouped by category_id for Alpine.js (lightweight projection)
-        $definitionsByCategory = SpecialtyAttributeDefinition::orderBy('sort_order')
-            ->get()
-            ->groupBy('category_id')
-            ->map(fn($defs) => $defs->map(fn($d) => [
-                'key'         => $d->key,
-                'label_fa'    => $d->label_fa,
-                'field_type'  => $d->field_type,
-                'options'     => $d->options,
-                'is_required' => (bool) $d->is_required,
-                'is_premium'  => (bool) $d->is_premium,
-                'visibility'  => $d->visibility,
-            ])->values()->all())
-            ->all();
+        // Build definitionsByCategory for Alpine.js:
+        // Map each category ID (root + leaf) to its effective attribute definitions.
+        $parents = SpecialtyCategory::whereNull('parent_id')
+            ->with([
+                'attributeDefinitions' => fn($q) => $q->orderBy('sort_order'),
+                'children',
+            ])
+            ->get();
+
+        $definitionsByCategory = [];
+        $defMapper = fn($d) => [
+            'key'         => $d->key,
+            'label_fa'    => $d->label_fa,
+            'field_type'  => $d->field_type,
+            'options'     => $d->options,
+            'is_required' => (bool) $d->is_required,
+            'is_premium'  => (bool) $d->is_premium,
+            'visibility'  => $d->visibility,
+        ];
+
+        foreach ($parents as $parent) {
+            $defsArray = $parent->attributeDefinitions->map($defMapper)->values()->all();
+            $definitionsByCategory[$parent->id] = $defsArray;
+            foreach ($parent->children as $child) {
+                $definitionsByCategory[$child->id] = $defsArray;
+            }
+        }
 
         $premiumProfile = $user->artistProfilePremium;
 

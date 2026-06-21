@@ -461,7 +461,7 @@
 
             {{-- Attribute values --}}
             @php
-            $defs    = $spec->category->attributeDefinitions;
+            $defs    = $spec->category->effectiveAttributeDefinitions();
             $attrs   = $spec->attributes ?? [];
             $hasVals = false;
             @endphp

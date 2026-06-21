@@ -206,10 +206,14 @@
                 <select name="category_id" class="form-control"
                         @change="setCategory($event.target.value)">
                     <option value="">همه تخصص‌ها</option>
-                    @foreach($categories as $cat)
+                    @foreach($categories->groupBy('parent_id') as $parentId => $children)
+                    <optgroup label="{{ $children->first()->parent->name_fa }}">
+                        @foreach($children as $cat)
                         <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
                             {{ $cat->name_fa }}
                         </option>
+                        @endforeach
+                    </optgroup>
                     @endforeach
                 </select>
             </div>

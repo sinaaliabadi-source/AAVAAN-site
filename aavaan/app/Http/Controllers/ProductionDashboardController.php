@@ -39,22 +39,35 @@ class ProductionDashboardController extends Controller
             ->whereHas('payment', fn($q) => $q->where('status', 'paid'))
             ->exists();
 
-        // Categories + definitions for Alpine.js dynamic filter rendering
-        $categories = SpecialtyCategory::where('is_active', true)
-            ->whereNull('parent_id')
+        // Leaf categories for the specialty filter dropdown
+        $categories = SpecialtyCategory::whereNotNull('parent_id')
+            ->where('is_active', true)
+            ->with('parent')
+            ->orderBy('parent_id')
             ->orderBy('sort_order')
             ->get();
 
-        $definitionsByCategory = SpecialtyAttributeDefinition::orderBy('sort_order')
-            ->get()
-            ->groupBy('category_id')
-            ->map(fn($defs) => $defs->map(fn($d) => [
+        // Build definitionsByCategory: each category ID → effective definitions
+        $parents = SpecialtyCategory::whereNull('parent_id')
+            ->with([
+                'attributeDefinitions' => fn($q) => $q->orderBy('sort_order'),
+                'children',
+            ])
+            ->get();
+
+        $definitionsByCategory = [];
+        foreach ($parents as $parent) {
+            $defsArray = $parent->attributeDefinitions->map(fn($d) => [
                 'key'        => $d->key,
                 'label_fa'   => $d->label_fa,
                 'field_type' => $d->field_type,
                 'options'    => $d->options,
-            ])->values()->all())
-            ->all();
+            ])->values()->all();
+            $definitionsByCategory[$parent->id] = $defsArray;
+            foreach ($parent->children as $child) {
+                $definitionsByCategory[$child->id] = $defsArray;
+            }
+        }
 
         $query = ArtistProfile::with('user')->where('is_active', true);
 

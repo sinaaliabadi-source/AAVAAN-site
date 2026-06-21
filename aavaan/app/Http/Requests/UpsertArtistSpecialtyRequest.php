@@ -36,7 +36,8 @@ class UpsertArtistSpecialtyRequest extends FormRequest
      */
     private function buildAttributeRules(int $categoryId): array
     {
-        $definitions = SpecialtyAttributeDefinition::where('category_id', $categoryId)->get();
+        $category    = SpecialtyCategory::with(['attributeDefinitions', 'parent.attributeDefinitions'])->find($categoryId);
+        $definitions = $category ? $category->effectiveAttributeDefinitions() : collect();
         $rules       = [];
 
         foreach ($definitions as $def) {

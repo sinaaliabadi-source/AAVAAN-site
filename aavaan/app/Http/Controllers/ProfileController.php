@@ -39,8 +39,9 @@ class ProfileController extends Controller
 
         $specialties = $profile->user->artistSpecialties()
             ->with([
-                'category.attributeDefinitions' => fn($q) => $q->orderBy('sort_order'),
-                'media'                          => fn($q) => $q->orderBy('sort_order'),
+                'category.attributeDefinitions'        => fn($q) => $q->orderBy('sort_order'),
+                'category.parent.attributeDefinitions' => fn($q) => $q->orderBy('sort_order'),
+                'media'                                 => fn($q) => $q->orderBy('sort_order'),
             ])
             ->orderByDesc('is_primary')
             ->orderBy('id')

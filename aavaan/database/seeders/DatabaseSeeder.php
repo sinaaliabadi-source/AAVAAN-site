@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SpecialtyCategoriesSeeder::class,
             SpecialtyAttributeDefinitionsSeeder::class,
+            SpecialtySubcategoriesSeeder::class,
         ]);
     }
 }
