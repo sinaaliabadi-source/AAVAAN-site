@@ -9,7 +9,9 @@ class SpecialtyCategoriesSeeder extends Seeder
 {
     public function run(): void
     {
+        if (DB::getDriverName() === 'mysql') DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table('specialty_categories')->truncate();
+        if (DB::getDriverName() === 'mysql') DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         $categories = [
             [

@@ -9,7 +9,9 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
 {
     public function run(): void
     {
+        if (DB::getDriverName() === 'mysql') DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table('specialty_attribute_definitions')->truncate();
+        if (DB::getDriverName() === 'mysql') DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         $rows = [];
         $sortOrder = 0;
