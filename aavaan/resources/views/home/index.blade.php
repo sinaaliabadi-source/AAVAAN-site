@@ -142,23 +142,44 @@
 .how-link a { color: var(--color-accent); font-weight: 600; font-size: .95rem; }
 .how-link a:hover { text-decoration: underline; }
 
-/* ===== Fields ===== */
+/* ===== Fields / Categories ===== */
 .fields-section { padding: 4.5rem 0; background: #fff; }
-.fields-wrap { display: flex; flex-wrap: wrap; gap: .7rem; justify-content: center; max-width: 800px; margin: 0 auto; }
-.field-pill {
-    display: inline-block;
-    padding: .45rem 1.1rem;
-    border-radius: 999px;
-    background: var(--color-bg);
-    color: var(--color-primary);
-    font-size: .88rem;
-    font-weight: 600;
-    border: 1.5px solid rgba(31,42,68,.15);
-    transition: background .2s, color .2s, border-color .2s;
-    cursor: default;
-    user-select: none;
+.cat-groups-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    max-width: 860px;
+    margin: 0 auto 1.75rem;
 }
-.field-pill:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+.cat-group-card {
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.5rem;
+    border: 1.5px solid rgba(31,42,68,.1);
+}
+.cat-group-title {
+    font-family: 'YekanBakh', Tahoma, sans-serif;
+    font-size: .9rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: .85rem;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+.cat-pills { display: flex; flex-wrap: wrap; gap: .45rem; }
+.cat-pill {
+    display: inline-block;
+    padding: .3rem .85rem;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--color-primary);
+    font-size: .82rem;
+    font-weight: 600;
+    border: 1.5px solid rgba(31,42,68,.12);
+    transition: background .2s, color .2s, border-color .2s;
+}
+.cat-pill:hover { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
 
 /* ===== Featured Artists ===== */
 .featured-section { padding: 5rem 0; background: var(--color-bg); }
@@ -236,6 +257,7 @@
     .how-cols { grid-template-columns: 1fr; gap: 2rem; }
     .artists-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
     .pricing-card .pc-btns { flex-direction: column; }
+    .cat-groups-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
     .home-hero { padding: 4.5rem 0 3.5rem; }
@@ -330,11 +352,23 @@
 <section class="fields-section">
     <div class="container">
         <h2 class="section-title">رشته‌های هنری</h2>
-        <p class="section-sub">آوان همه‌ی حوزه‌های هنری را پوشش می‌دهد</p>
-        <div class="fields-wrap">
-            @foreach(['بازیگری','کارگردانی','فیلمبرداری','تصویربرداری','موسیقی','طراحی صحنه','طراحی لباس','گریم','تدوین','صداگذاری','نویسندگی','تئاتر','رقص و کوریوگرافی'] as $f)
-                <span class="field-pill">{{ $f }}</span>
+        <p class="section-sub">آوان همه‌ی {{ $allCategories->count() }} حوزه‌ی هنری را پوشش می‌دهد</p>
+        <div class="cat-groups-grid">
+            @foreach($categoryGroups as $group)
+            <div class="cat-group-card">
+                <div class="cat-group-title">
+                    {{ $group['icon'] }} {{ $group['label'] }}
+                </div>
+                <div class="cat-pills">
+                    @foreach($group['categories'] as $cat)
+                        <span class="cat-pill">{{ $cat->name_fa }}</span>
+                    @endforeach
+                </div>
+            </div>
             @endforeach
+        </div>
+        <div style="text-align:center">
+            <a href="{{ route('artists') }}" class="btn btn-outline btn-sm">مشاهده همه رشته‌ها ←</a>
         </div>
     </div>
 </section>

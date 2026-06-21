@@ -3,9 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArtistProfile;
+use App\Models\SpecialtyCategory;
 
 class HomeController extends Controller
 {
+    private const CATEGORY_GROUPS = [
+        ['label' => 'اجرا',               'icon' => '🎭', 'slugs' => ['acting','stunt','music','animation','games','coaching']],
+        ['label' => 'خلق محتوا',           'icon' => '🎬', 'slugs' => ['directing','writing','production-design','costume','makeup','photography']],
+        ['label' => 'فنی و تولید',         'icon' => '🎛️', 'slugs' => ['cinematography','lighting','sound','editing','vfx']],
+        ['label' => 'مدیریت و پشتیبانی',  'icon' => '📋', 'slugs' => ['production-management','casting','pr-marketing','crew','translation']],
+    ];
+
     public function index()
     {
         $featuredArtists = ArtistProfile::with('user')
@@ -14,6 +22,16 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
-        return view('home.index', compact('featuredArtists'));
+        $allCategories = SpecialtyCategory::where('is_active', true)
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->get();
+
+        $categoryGroups = collect(self::CATEGORY_GROUPS)->map(function ($group) use ($allCategories) {
+            $group['categories'] = $allCategories->whereIn('slug', $group['slugs'])->values();
+            return $group;
+        });
+
+        return view('home.index', compact('featuredArtists', 'categoryGroups', 'allCategories'));
     }
 }

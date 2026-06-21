@@ -168,7 +168,27 @@
 @section('content')
 
 {{-- Filter form --}}
-<div class="card" style="margin-bottom:1.35rem">
+<div class="card" style="margin-bottom:1.35rem"
+     x-data="{
+         catId: '{{ request('category_id', '') }}',
+         allDefs: @json($definitionsByCategory),
+         savedAttr: @json((array) request('attr', [])),
+         searchableTypes: ['number','select','multiselect','boolean'],
+         get defs() {
+             if (!this.catId) return [];
+             return (this.allDefs[this.catId] ?? [])
+                 .filter(d => this.searchableTypes.includes(d.field_type));
+         },
+         numVal(key, side) {
+             var a = this.savedAttr[key];
+             return (a && a[side]) ? a[side] : '';
+         },
+         selectVal(key) { return this.savedAttr[key] || ''; },
+         isChecked(key, val) {
+             var a = this.savedAttr[key];
+             return Array.isArray(a) && a.indexOf(val) !== -1;
+         }
+     }">
     <div class="card-title">🔍 فیلتر جستجو</div>
     <form method="GET" action="{{ route('production.search') }}">
         <div class="filter-grid">
@@ -178,6 +198,18 @@
                     <option value="">همه رشته‌ها</option>
                     @foreach($fields as $f)
                         <option value="{{ $f }}" {{ request('field') === $f ? 'selected' : '' }}>{{ $f }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group" style="margin:0">
+                <label>دسته تخصصی</label>
+                <select name="category_id" class="form-control"
+                        @change="setCategory($event.target.value)">
+                    <option value="">همه تخصص‌ها</option>
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                            {{ $cat->name_fa }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -203,9 +235,75 @@
             </div>
             <div style="display:flex;gap:.5rem;align-items:center">
                 <button type="submit" class="btn btn-primary btn-sm" style="flex:1">جستجو</button>
-                @if(request()->hasAny(['field','city','age_min','age_max','experience_min','keyword']))
+                @if(request()->hasAny(['field','city','age_min','age_max','experience_min','keyword','category_id','attr']))
                     <a href="{{ route('production.search') }}" class="btn btn-ghost btn-sm" title="پاک کردن فیلترها">✕</a>
                 @endif
+            </div>
+        </div>
+
+        {{-- Dynamic specialty attribute filters --}}
+        <div x-show="defs.length > 0" x-cloak
+             style="margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid #ede8dc">
+            <div style="font-size:.82rem;font-weight:600;color:var(--color-primary);margin-bottom:.85rem">
+                🎯 فیلترهای تخصصی
+            </div>
+            <div class="filter-grid">
+                <template x-for="def in defs" :key="def.key">
+                    <div class="form-group" style="margin:0">
+                        <label x-text="def.label_fa"></label>
+
+                        {{-- Number: range min/max --}}
+                        <template x-if="def.field_type === 'number'">
+                            <div style="display:flex;gap:.4rem;align-items:center">
+                                <input type="number" :name="'attr['+def.key+'][min]'"
+                                       class="form-control" placeholder="از"
+                                       :value="numVal(def.key, 'min')"
+                                       style="min-width:0" dir="ltr">
+                                <span style="color:var(--color-muted);font-size:.8rem">تا</span>
+                                <input type="number" :name="'attr['+def.key+'][max]'"
+                                       class="form-control" placeholder="تا"
+                                       :value="numVal(def.key, 'max')"
+                                       style="min-width:0" dir="ltr">
+                            </div>
+                        </template>
+
+                        {{-- Select --}}
+                        <template x-if="def.field_type === 'select'">
+                            <select :name="'attr['+def.key+']'" class="form-control">
+                                <option value="">همه</option>
+                                <template x-for="opt in (def.options || [])" :key="opt.value">
+                                    <option :value="opt.value"
+                                            :selected="selectVal(def.key) === opt.value"
+                                            x-text="opt.label"></option>
+                                </template>
+                            </select>
+                        </template>
+
+                        {{-- Multiselect --}}
+                        <template x-if="def.field_type === 'multiselect'">
+                            <div style="display:flex;flex-direction:column;gap:.3rem;max-height:140px;overflow-y:auto;border:1.5px solid #d5cfc4;border-radius:7px;padding:.4rem .6rem;background:#fdfaf6">
+                                <template x-for="opt in (def.options || [])" :key="opt.value">
+                                    <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-size:.82rem">
+                                        <input type="checkbox"
+                                               :name="'attr['+def.key+'][]'"
+                                               :value="opt.value"
+                                               :checked="isChecked(def.key, opt.value)">
+                                        <span x-text="opt.label"></span>
+                                    </label>
+                                </template>
+                            </div>
+                        </template>
+
+                        {{-- Boolean --}}
+                        <template x-if="def.field_type === 'boolean'">
+                            <select :name="'attr['+def.key+']'" class="form-control">
+                                <option value="">فرقی نمی‌کند</option>
+                                <option value="1" :selected="selectVal(def.key) === '1'">بله</option>
+                                <option value="0" :selected="selectVal(def.key) === '0'">خیر</option>
+                            </select>
+                        </template>
+                    </div>
+                </template>
             </div>
         </div>
     </form>

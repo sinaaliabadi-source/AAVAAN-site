@@ -407,23 +407,14 @@
             <h2>چندرشته‌ای بودن</h2>
             <p>
                 آوان فقط برای سینما نیست. ما پلتفرمی هستیم برای تمام دنیای هنر —
-                هر رشته‌ای که در آن انسان‌ها خلق می‌کنند و نیاز به دیده‌شدن دارند.
+                {{ $categories->count() }} رشته‌ی تخصصی که هر کدام جایگاه خودشان را در آوان دارند.
             </p>
         </div>
 
         <div class="disciplines-wrap">
-            <span class="discipline-tag"><span>🎬</span> سینما</span>
-            <span class="discipline-tag"><span>🎭</span> تئاتر</span>
-            <span class="discipline-tag"><span>🎵</span> موسیقی</span>
-            <span class="discipline-tag"><span>📺</span> تلویزیون</span>
-            <span class="discipline-tag"><span>🎨</span> طراحی صحنه</span>
-            <span class="discipline-tag"><span>💄</span> گریم</span>
-            <span class="discipline-tag"><span>✂️</span> تدوین</span>
-            <span class="discipline-tag"><span>💃</span> رقص و حرکت</span>
-            <span class="discipline-tag"><span>📸</span> عکاسی هنری</span>
-            <span class="discipline-tag"><span>🎤</span> دوبله و صداپیشگی</span>
-            <span class="discipline-tag"><span>🖌️</span> هنرهای تجسمی</span>
-            <span class="discipline-tag"><span>✨</span> و بیشتر...</span>
+            @foreach($categories as $cat)
+                <span class="discipline-tag">{{ $cat->name_fa }}</span>
+            @endforeach
         </div>
     </div>
 </section>

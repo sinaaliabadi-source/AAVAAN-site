@@ -37,6 +37,15 @@ class ProfileController extends Controller
             }
         }
 
-        return view('profile.show', compact('profile', 'hasAccess', 'canUnlock', 'isSelf'));
+        $specialties = $profile->user->artistSpecialties()
+            ->with([
+                'category.attributeDefinitions' => fn($q) => $q->orderBy('sort_order'),
+                'media'                          => fn($q) => $q->orderBy('sort_order'),
+            ])
+            ->orderByDesc('is_primary')
+            ->orderBy('id')
+            ->get();
+
+        return view('profile.show', compact('profile', 'hasAccess', 'canUnlock', 'isSelf', 'specialties'));
     }
 }

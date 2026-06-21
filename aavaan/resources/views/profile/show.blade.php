@@ -214,6 +214,101 @@
     }
     #lightbox-close:hover { background: rgba(255,255,255,.3); }
 
+    /* ── Specialties tabs ── */
+    .spec-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .4rem;
+        margin-bottom: 1.25rem;
+        border-bottom: 2px solid #ede8dc;
+        padding-bottom: .5rem;
+    }
+    .spec-tab-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: .45rem .9rem;
+        border-radius: 6px 6px 0 0;
+        font-family: 'YekanBakh', Tahoma, sans-serif;
+        font-size: .88rem;
+        font-weight: 600;
+        color: var(--color-muted);
+        position: relative;
+        transition: color .15s, background .15s;
+    }
+    .spec-tab-btn:hover { color: var(--color-primary); background: #f5f0e8; }
+    .spec-tab-btn.active { color: var(--color-accent); }
+    .spec-tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        right: 0; left: 0;
+        height: 2px;
+        background: var(--color-accent);
+        border-radius: 2px 2px 0 0;
+    }
+    .primary-dot {
+        display: inline-block;
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: var(--color-accent);
+        vertical-align: middle;
+        margin-right: .25rem;
+        margin-bottom: .1rem;
+    }
+    .spec-panel { display: none; }
+    .spec-panel.active { display: block; }
+    .spec-attr-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: .6rem 1.5rem;
+        margin-bottom: 1.1rem;
+    }
+    .spec-attr-row { font-size: .88rem; }
+    .spec-attr-key { color: var(--color-muted); font-size: .8rem; margin-bottom: .1rem; }
+    .spec-attr-val { color: var(--color-primary); font-weight: 600; }
+    .prod-only-badge {
+        font-size: .72rem;
+        background: #fef3cd;
+        color: #7a5c00;
+        border: 1px solid #f0dda0;
+        padding: .1rem .45rem;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: .2rem;
+    }
+    .spec-photos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: .6rem;
+        margin-bottom: 1.1rem;
+    }
+    .spec-photo-item {
+        aspect-ratio: 4/3;
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: zoom-in;
+        position: relative;
+    }
+    .spec-photo-item img { width:100%; height:100%; object-fit:cover; transition: transform .25s; }
+    .spec-photo-item:hover img { transform: scale(1.05); }
+    .aparat-embed-wrap {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #000;
+        margin-bottom: 1.1rem;
+    }
+    .aparat-embed-wrap iframe {
+        position: absolute;
+        top: 0; right: 0;
+        width: 100%; height: 100%;
+        border: none;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 640px) {
         .profile-hero { flex-direction: column; align-items: center; text-align: center; }
@@ -221,6 +316,7 @@
         .access-cta { flex-direction: column; }
         .wh-table th:nth-child(3),
         .wh-table td:nth-child(3) { display: none; }
+        .spec-attr-grid { grid-template-columns: 1fr 1fr; }
     }
 </style>
 @endpush
@@ -284,6 +380,177 @@
     <div class="section-card">
         <div class="section-title">👤 بیوگرافی</div>
         <p style="line-height:2;color:var(--color-text);white-space:pre-line">{{ $profile->bio }}</p>
+    </div>
+    @endif
+
+    {{-- Specialties accordion --}}
+    @if($specialties->count())
+    @php
+    $catIconMap = [
+        'acting'=>'🎭','stunt'=>'🤸','directing'=>'🎬','writing'=>'✍️',
+        'cinematography'=>'📷','lighting'=>'💡','sound'=>'🎙️','music'=>'🎵',
+        'editing'=>'🎞️','vfx'=>'✨','production-design'=>'🏛️','costume'=>'👗',
+        'makeup'=>'💄','photography'=>'📸','production-management'=>'📋',
+        'casting'=>'👥','pr-marketing'=>'📣','animation'=>'🐲',
+        'games'=>'🎮','crew'=>'🤝','coaching'=>'👨‍🏫','translation'=>'🌐',
+    ];
+
+    // Inline helper: return human-readable value from def + raw value
+    $displayVal = function($value, $def) {
+        if ($value === null || $value === '') return null;
+        $type = $def->field_type;
+        if ($type === 'boolean')    return $value ? 'بله' : 'خیر';
+        if ($type === 'select') {
+            $opt = collect($def->options ?? [])->firstWhere('value', $value);
+            return $opt['label'] ?? $value;
+        }
+        if ($type === 'multiselect') {
+            if (empty($value)) return null;
+            return collect($value)->map(function($v) use ($def) {
+                $o = collect($def->options ?? [])->firstWhere('value', $v);
+                return $o['label'] ?? $v;
+            })->join('، ');
+        }
+        return $value;
+    };
+
+    // Extract Aparat embed URL from raw aparat.com/v/{hash} URL
+    $aparatEmbed = function(string $url): ?string {
+        if (preg_match('/aparat\.com\/v\/([A-Za-z0-9]+)/i', $url, $m)) {
+            return "https://www.aparat.com/video/video/embed/videohash/{$m[1]}/vt/frame";
+        }
+        return null;
+    };
+    @endphp
+    <div class="section-card">
+        <div class="section-title">🎯 تخصص‌ها</div>
+
+        {{-- Tabs (hidden when only one specialty) --}}
+        @if($specialties->count() > 1)
+        <div class="spec-tabs" id="spec-tabs">
+            @foreach($specialties as $i => $spec)
+            <button class="spec-tab-btn {{ $i === 0 ? 'active' : '' }}"
+                    onclick="switchSpecTab({{ $i }})" type="button">
+                {{ $catIconMap[$spec->category->slug] ?? '🎯' }}
+                {{ $spec->category->name_fa }}
+                @if($spec->is_primary)<span class="primary-dot" title="تخصص اصلی"></span>@endif
+            </button>
+            @endforeach
+        </div>
+        @endif
+
+        @foreach($specialties as $i => $spec)
+        <div class="spec-panel {{ ($i === 0 || $specialties->count() === 1) ? 'active' : '' }}" data-spec-idx="{{ $i }}">
+
+            {{-- Header when single specialty --}}
+            @if($specialties->count() === 1)
+            <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap">
+                <span style="font-size:1.4rem">{{ $catIconMap[$spec->category->slug] ?? '🎯' }}</span>
+                <strong style="font-size:1rem;color:var(--color-primary)">{{ $spec->category->name_fa }}</strong>
+                @if($spec->is_primary)
+                    <span style="font-size:.75rem;background:var(--color-accent);color:#fff;padding:.15rem .6rem;border-radius:999px">تخصص اصلی</span>
+                @endif
+            </div>
+            @endif
+
+            @if($spec->years_experience)
+            <p style="font-size:.85rem;color:var(--color-muted);margin-bottom:.9rem">
+                ⏱ {{ $spec->years_experience }} سال سابقه در این تخصص
+            </p>
+            @endif
+
+            {{-- Attribute values --}}
+            @php
+            $defs    = $spec->category->attributeDefinitions;
+            $attrs   = $spec->attributes ?? [];
+            $hasVals = false;
+            @endphp
+            @if($defs->count())
+            <div class="spec-attr-grid">
+                @foreach($defs as $def)
+                @php
+                $isProdOnly = $def->visibility === 'production_team_only';
+                $val        = $attrs[$def->key] ?? null;
+                $displayed  = $displayVal($val, $def);
+                @endphp
+
+                @if($isProdOnly && !($hasAccess || $isSelf))
+                    {{-- Only show lock placeholder if field was explicitly set --}}
+                    @if($val !== null && $val !== '' && $val !== [])
+                    <div class="spec-attr-row">
+                        <div class="spec-attr-key">{{ $def->label_fa }}</div>
+                        <span class="prod-only-badge">🔒 فقط تیم تولید با دسترسی</span>
+                    </div>
+                    @php $hasVals = true; @endphp
+                    @endif
+                @elseif($displayed !== null && $displayed !== '')
+                    <div class="spec-attr-row">
+                        <div class="spec-attr-key">{{ $def->label_fa }}</div>
+                        @if($def->field_type === 'file_link')
+                            @php $embedUrl = $aparatEmbed((string)$val); @endphp
+                            @if($embedUrl)
+                                <div class="spec-attr-val" style="margin-top:.3rem">
+                                    <a href="{{ $val }}" target="_blank" rel="noopener" style="color:var(--color-accent);font-size:.82rem">مشاهده در آپارات ↗</a>
+                                </div>
+                            @else
+                                <div class="spec-attr-val">{{ $displayed }}</div>
+                            @endif
+                        @else
+                            <div class="spec-attr-val">{{ $displayed }}</div>
+                        @endif
+                    </div>
+                    @php $hasVals = true; @endphp
+                @endif
+                @endforeach
+            </div>
+            @endif
+
+            {{-- Aparat video_link attributes (file_link field type — shown as embed) --}}
+            @foreach($defs->where('field_type', 'file_link') as $def)
+            @php
+            $isProdOnly = $def->visibility === 'production_team_only';
+            $rawUrl     = $attrs[$def->key] ?? null;
+            $embedUrl   = $rawUrl ? $aparatEmbed((string)$rawUrl) : null;
+            @endphp
+            @if($embedUrl && ($hasAccess || $isSelf || !$isProdOnly))
+            <div style="margin-bottom:1.1rem">
+                <div style="font-size:.82rem;color:var(--color-muted);margin-bottom:.5rem">🎬 {{ $def->label_fa }}</div>
+                <div class="aparat-embed-wrap">
+                    <iframe src="{{ $embedUrl }}" allowfullscreen loading="lazy"></iframe>
+                </div>
+            </div>
+            @endif
+            @endforeach
+
+            {{-- Specialty photos --}}
+            @php $photos = $spec->media->where('type', 'photo'); @endphp
+            @if($photos->count())
+            <div style="font-size:.82rem;color:var(--color-muted);margin-bottom:.5rem">🖼 نمونه‌کار این تخصص</div>
+            <div class="spec-photos-grid">
+                @foreach($photos as $photo)
+                <div class="spec-photo-item" data-src="{{ asset('uploads/' . $photo->file_path) }}">
+                    <img src="{{ asset('uploads/' . $photo->file_path) }}"
+                         alt="{{ $artistName }} — {{ $spec->category->name_fa }}" loading="lazy">
+                </div>
+                @endforeach
+            </div>
+            @endif
+
+            {{-- Specialty video links (Aparat embeds) --}}
+            @php $videoLinks = $spec->media->where('type', 'video_link'); @endphp
+            @if($videoLinks->count())
+            <div style="font-size:.82rem;color:var(--color-muted);margin-bottom:.5rem">🎬 ویدیوها</div>
+            @foreach($videoLinks as $vl)
+            @if($vl->aparat_embed_url)
+            <div class="aparat-embed-wrap">
+                <iframe src="{{ $vl->aparat_embed_url }}" allowfullscreen loading="lazy"></iframe>
+            </div>
+            @endif
+            @endforeach
+            @endif
+
+        </div>
+        @endforeach
     </div>
     @endif
 
@@ -419,12 +686,21 @@
 
 @push('scripts')
 <script>
+function switchSpecTab(idx) {
+    document.querySelectorAll('.spec-tab-btn').forEach(function(b, i) {
+        b.classList.toggle('active', i === idx);
+    });
+    document.querySelectorAll('.spec-panel').forEach(function(p, i) {
+        p.classList.toggle('active', i === idx);
+    });
+}
+
 (function () {
     var lb      = document.getElementById('lightbox');
     var lbImg   = document.getElementById('lightbox-img');
     var lbClose = document.getElementById('lightbox-close');
 
-    document.querySelectorAll('.gallery-item').forEach(function (el) {
+    document.querySelectorAll('.gallery-item, .spec-photo-item').forEach(function (el) {
         el.addEventListener('click', function () {
             lbImg.src = el.dataset.src;
             lbImg.alt = el.dataset.caption || '';

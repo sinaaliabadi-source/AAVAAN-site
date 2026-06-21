@@ -4,13 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\Faq;
 use App\Models\ContactMessage;
+use App\Models\SpecialtyCategory;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    public function about()    { return view('pages.about'); }
+    public function about()
+    {
+        $categories = SpecialtyCategory::where('is_active', true)
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->get();
+        return view('pages.about', compact('categories'));
+    }
+
     public function howItWorks() { return view('pages.how-it-works'); }
-    public function artists()  { return view('pages.artists'); }
+
+    public function artists()
+    {
+        $categoryCount = SpecialtyCategory::where('is_active', true)->whereNull('parent_id')->count();
+        return view('pages.artists', compact('categoryCount'));
+    }
+
     public function production() { return view('pages.production'); }
     public function terms()    { return view('pages.terms'); }
     public function privacy()  { return view('pages.privacy'); }

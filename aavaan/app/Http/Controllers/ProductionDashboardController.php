@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArtistProfile;
+use App\Models\ArtistSpecialty;
 use App\Models\ProductionAccessLog;
+use App\Models\SpecialtyAttributeDefinition;
+use App\Models\SpecialtyCategory;
 use Illuminate\Http\Request;
 
 class ProductionDashboardController extends Controller
@@ -36,6 +39,23 @@ class ProductionDashboardController extends Controller
             ->whereHas('payment', fn($q) => $q->where('status', 'paid'))
             ->exists();
 
+        // Categories + definitions for Alpine.js dynamic filter rendering
+        $categories = SpecialtyCategory::where('is_active', true)
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->get();
+
+        $definitionsByCategory = SpecialtyAttributeDefinition::orderBy('sort_order')
+            ->get()
+            ->groupBy('category_id')
+            ->map(fn($defs) => $defs->map(fn($d) => [
+                'key'        => $d->key,
+                'label_fa'   => $d->label_fa,
+                'field_type' => $d->field_type,
+                'options'    => $d->options,
+            ])->values()->all())
+            ->all();
+
         $query = ArtistProfile::with('user')->where('is_active', true);
 
         if ($request->filled('field'))          $query->where('field', $request->field);
@@ -51,13 +71,63 @@ class ProductionDashboardController extends Controller
             });
         }
 
+        // Specialty category + attribute filter
+        if ($request->filled('category_id')) {
+            $catId      = (int) $request->category_id;
+            $attrInput  = $request->input('attr', []);
+            $defsForCat = collect($definitionsByCategory[$catId] ?? [])->keyBy('key');
+
+            $specialties = ArtistSpecialty::where('category_id', $catId)->get();
+
+            $attrFilters = collect($attrInput)->filter(function ($v) {
+                return $v !== null && $v !== '' && $v !== [];
+            });
+
+            if ($attrFilters->isNotEmpty()) {
+                $specialties = $specialties->filter(function ($spec) use ($attrFilters, $defsForCat) {
+                    foreach ($attrFilters as $key => $filterVal) {
+                        $def     = $defsForCat[$key] ?? null;
+                        if (!$def) continue;
+                        $attrVal = $spec->attributes[$key] ?? null;
+
+                        switch ($def['field_type']) {
+                            case 'number':
+                                $min = isset($filterVal['min']) && $filterVal['min'] !== '' ? (float)$filterVal['min'] : null;
+                                $max = isset($filterVal['max']) && $filterVal['max'] !== '' ? (float)$filterVal['max'] : null;
+                                if ($attrVal === null) return false;
+                                if ($min !== null && (float)$attrVal < $min) return false;
+                                if ($max !== null && (float)$attrVal > $max) return false;
+                                break;
+                            case 'select':
+                                if ($filterVal !== '' && $attrVal !== $filterVal) return false;
+                                break;
+                            case 'multiselect':
+                                $filterArr = array_filter((array)$filterVal);
+                                if (!empty($filterArr) && empty(array_intersect((array)($attrVal ?? []), $filterArr))) {
+                                    return false;
+                                }
+                                break;
+                            case 'boolean':
+                                if ($filterVal !== '' && (bool)$attrVal !== ($filterVal === '1')) return false;
+                                break;
+                        }
+                    }
+                    return true;
+                });
+            }
+
+            $matchingUserIds = $specialties->pluck('user_id');
+            $query->whereHas('user', fn($q) => $q->whereIn('id', $matchingUserIds));
+        }
+
         $artists     = $query->paginate(20)->withQueryString();
         $unlockedIds = ProductionAccessLog::where('production_user_id', $user->id)
             ->pluck('artist_profile_id')
             ->toArray();
 
         return view('dashboard.production.search', compact(
-            'artists', 'unlockedIds', 'fields', 'access', 'hasPaidAccess'
+            'artists', 'unlockedIds', 'fields', 'access', 'hasPaidAccess',
+            'categories', 'definitionsByCategory'
         ));
     }
 
