@@ -11,6 +11,10 @@ use App\Http\Controllers\ArtistProfilePremiumController;
 use App\Http\Controllers\ArtistSubscriptionController;
 use App\Http\Controllers\ProductionDashboardController;
 use App\Http\Controllers\ProductionAccessController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminSettingsController;
+use App\Http\Controllers\Admin\AdminSearchController;
+use App\Http\Controllers\Admin\AdminActivityLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
@@ -73,6 +77,51 @@ Route::middleware(['auth', 'role:artist'])
         Route::get('/subscription/callback', [ArtistSubscriptionController::class, 'callback'])->name('subscription.callback');
     });
 
+// ═══════════════════════════════════════════════════
+// Admin Panel
+// ═══════════════════════════════════════════════════
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Global search
+        Route::get('/search', [AdminSearchController::class, 'index'])->name('search');
+
+        // General settings (super_admin only)
+        Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings');
+        Route::put('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+
+        // Activity logs
+        Route::get('/activity-logs', [AdminActivityLogController::class, 'index'])->name('activity-logs');
+
+        // Placeholder route for future phases
+        Route::get('/placeholder', fn() => view('admin.placeholder'))->name('placeholder');
+
+        // Future phase stubs (kept so sidebar links resolve, not 404)
+        // Phase 2
+        Route::get('/users', fn() => view('admin.placeholder'))->name('users.index');
+        Route::get('/users/{id}', fn() => view('admin.placeholder'))->name('users.show');
+        // Phase 3
+        Route::get('/subscriptions', fn() => view('admin.placeholder'))->name('subscriptions.index');
+        Route::get('/payments', fn() => view('admin.placeholder'))->name('payments.index');
+        // Phase 4
+        Route::get('/moderation', fn() => view('admin.placeholder'))->name('moderation.index');
+        Route::get('/reports/violations', fn() => view('admin.placeholder'))->name('reports.violations');
+        // Phase 5
+        Route::get('/content', fn() => view('admin.placeholder'))->name('content.index');
+        // Phase 6
+        Route::get('/tickets', fn() => view('admin.placeholder'))->name('tickets.index');
+        Route::get('/notifications', fn() => view('admin.placeholder'))->name('notifications.index');
+        // Phase 7
+        Route::get('/reports', fn() => view('admin.placeholder'))->name('reports.index');
+        Route::get('/backup', fn() => view('admin.placeholder'))->name('backup.index');
+    });
+
+// ═══════════════════════════════════════════════════
+// Production Dashboard
+// ═══════════════════════════════════════════════════
 Route::middleware(['auth', 'role:production'])
     ->prefix('dashboard/production')
     ->name('production.')
