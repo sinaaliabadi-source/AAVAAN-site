@@ -1,11 +1,11 @@
-# راهنمای دیپلوی آوان روی هاست اشتراکی (cPanel / PHP 8.2+)
+# راهنمای دیپلوی آوان روی هاست اشتراکی (cPanel / PHP 8.1+)
 
-> **حداقل نسخه‌ی PHP: 8.2** (پروژه با Laravel 12.x قفل شده که PHP 8.2+ را پشتیبانی می‌کند)
-> پیش‌نیاز: PHP 8.2+، MySQL 5.7+ یا MariaDB 10.3+، phpMyAdmin، دسترسی به File Manager یا FTP
+> **حداقل نسخه‌ی PHP: 8.1** (پروژه با Laravel 10.x و Symfony 6.4.x قفل شده که PHP 8.1+ را پشتیبانی می‌کند)
+> پیش‌نیاز: PHP 8.1+، MySQL 5.7+ یا MariaDB 10.3+، phpMyAdmin، دسترسی به File Manager یا FTP
 
-> **نکته امنیتی PHP:** بسته‌های Symfony 8.x که توسط Laravel 13 کشیده می‌شوند از PHP 8.4 property hooks
-> استفاده می‌کنند و روی PHP 8.2 یا 8.3 کار نمی‌کنند. این پروژه به‌صورت عمدی روی Laravel 12.x
-> و Symfony 7.4.x قفل شده که با PHP 8.2 کاملاً سازگار هستند.
+> **نکته سازگاری PHP:** این پروژه به‌صورت عمدی روی Laravel 10.x و Symfony 6.4.x قفل شده
+> و `config.platform.php = 8.1.30` در `composer.json` تنظیم است تا composer هیچ‌گاه
+> پکیجی که PHP 8.2+ می‌خواهد نصب نکند. با PHP 8.1.30 (irwebspace/DirectAdmin) کاملاً سازگار است.
 
 ---
 
@@ -193,7 +193,7 @@ cd ~/aavaan && php artisan config:cache && php artisan route:cache && php artisa
 ## ۸. چک‌لیست نهایی قبل از روشن کردن سایت
 
 ### محیط و پیکربندی
-- [ ] هاست PHP نسخه‌ی **8.2 یا بالاتر** دارد (در cPanel → Software → PHP Version بررسی کنید)
+- [ ] هاست PHP نسخه‌ی **8.1 یا بالاتر** دارد (در cPanel → Software → PHP Version بررسی کنید)
 - [ ] `APP_DEBUG=false` در .env سرور
 - [ ] `APP_ENV=production` در .env سرور
 - [ ] `APP_KEY` پر شده (شروع با `base64:`)
@@ -240,7 +240,6 @@ cd ~/aavaan && php artisan config:cache && php artisan route:cache && php artisa
 
 ### امنیت
 - [ ] آدرس `https://` فعال است (SSL گواهی‌نامه نصب شده)
-- [ ] صفحه‌ی `/up` پاسخ `200 OK` می‌دهد (health check لاراول)
 - [ ] صفحه‌ی خطای ۴۰۴ با برند آوان نمایش داده می‌شود
 - [ ] با وارد کردن آدرس اشتباه، stack trace نمایش نمی‌دهد (APP_DEBUG=false)
 
