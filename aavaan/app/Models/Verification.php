@@ -19,12 +19,9 @@ class Verification extends Model
         'user_id', 'type', 'status', 'reviewed_at', 'notes',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'reviewed_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'reviewed_at' => 'datetime',
+    ];
 
     public function user(): BelongsTo
     {

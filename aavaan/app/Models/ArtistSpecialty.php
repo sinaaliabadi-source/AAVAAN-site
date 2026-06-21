@@ -12,13 +12,10 @@ class ArtistSpecialty extends Model
         'user_id', 'category_id', 'is_primary', 'years_experience', 'attributes',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'is_primary'  => 'boolean',
-            'attributes'  => 'array',
-        ];
-    }
+    protected $casts = [
+        'is_primary' => 'boolean',
+        'attributes' => 'array',
+    ];
 
     public function user(): BelongsTo
     {

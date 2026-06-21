@@ -20,14 +20,11 @@ class SpecialtyAttributeDefinition extends Model
         'options', 'is_required', 'is_premium', 'visibility', 'sort_order',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'options'     => 'array',
-            'is_required' => 'boolean',
-            'is_premium'  => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'options'     => 'array',
+        'is_required' => 'boolean',
+        'is_premium'  => 'boolean',
+    ];
 
     public function category(): BelongsTo
     {

@@ -22,18 +22,15 @@ class ArtistProfilePremium extends Model
         'youtube_url', 'vimeo_url', 'website_url',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'willing_to_travel'       => 'boolean',
-            'willing_long_stay'       => 'boolean',
-            'international_collaboration' => 'boolean',
-            'awards'                  => 'array',
-            'memberships'             => 'array',
-            'show_day_rate'           => 'boolean',
-            'available_from_date'     => 'date',
-        ];
-    }
+    protected $casts = [
+        'willing_to_travel'           => 'boolean',
+        'willing_long_stay'           => 'boolean',
+        'international_collaboration' => 'boolean',
+        'awards'                      => 'array',
+        'memberships'                 => 'array',
+        'show_day_rate'               => 'boolean',
+        'available_from_date'         => 'date',
+    ];
 
     public function user(): BelongsTo
     {

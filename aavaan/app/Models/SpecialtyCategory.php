@@ -13,12 +13,9 @@ class SpecialtyCategory extends Model
         'slug', 'name_fa', 'parent_id', 'sort_order', 'icon', 'is_active',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'is_active' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
     public function parent(): BelongsTo
     {
