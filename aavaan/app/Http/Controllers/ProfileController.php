@@ -16,14 +16,20 @@ class ProfileController extends Controller
             'portfolioVideos',
         ])
             ->where('username', $username)
-            ->where('is_active', true)
             ->firstOrFail();
 
-        $profile->increment('profile_views');
+        $isSelf = auth()->check() && auth()->id() === $profile->user_id;
 
-        $hasAccess  = false;
-        $canUnlock  = false;
-        $isSelf     = auth()->check() && auth()->id() === $profile->user_id;
+        if (!$profile->is_active && !$isSelf) {
+            abort(404);
+        }
+
+        if (!$isSelf) {
+            $profile->increment('profile_views');
+        }
+
+        $hasAccess = false;
+        $canUnlock = false;
 
         if ($isSelf) {
             $hasAccess = true;

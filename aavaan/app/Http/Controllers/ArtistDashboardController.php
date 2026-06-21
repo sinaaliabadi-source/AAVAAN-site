@@ -140,7 +140,7 @@ class ArtistDashboardController extends Controller
 
         if ($request->hasFile('avatar')) {
             $dir = public_path("uploads/{$user->id}");
-            if (!is_dir($dir)) mkdir($dir, 0750, true);
+            if (!is_dir($dir)) mkdir($dir, 0755, true);
             if ($profile?->avatar) {
                 $this->safeUnlink($profile->avatar);
             }
@@ -187,7 +187,7 @@ class ArtistDashboardController extends Controller
         ]);
 
         $dir = public_path("uploads/{$user->id}/portfolios");
-        if (!is_dir($dir)) mkdir($dir, 0750, true);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
 
         $nextOrder = ($profile->portfolioImages()->max('order') ?? 0) + 1;
         $caption = $request->input('caption');
@@ -236,7 +236,7 @@ class ArtistDashboardController extends Controller
         ]);
 
         $dir = public_path("uploads/{$user->id}/reels");
-        if (!is_dir($dir)) mkdir($dir, 0750, true);
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
 
         $existingReel = $profile->portfolioVideos()->where('is_reel', true)->first();
         if ($existingReel) {

@@ -167,12 +167,18 @@
 
 @section('content')
 
+{{-- Inject large JSON payloads separately to avoid HTML-attribute encoding issues --}}
+<script>
+window.__productionSearchDefs  = @json($definitionsByCategory);
+window.__productionSearchSaved = @json((array) request('attr', []));
+</script>
+
 {{-- Filter form --}}
 <div class="card" style="margin-bottom:1.35rem"
      x-data="{
-         catId: '{{ request('category_id', '') }}',
-         allDefs: @json($definitionsByCategory),
-         savedAttr: @json((array) request('attr', [])),
+         catId: {{ (int) request('category_id', 0) }} || '',
+         allDefs: window.__productionSearchDefs,
+         savedAttr: window.__productionSearchSaved,
          searchableTypes: ['number','select','multiselect','boolean'],
          get defs() {
              if (!this.catId) return [];

@@ -125,7 +125,7 @@ class ArtistSpecialtyController extends Controller
 
             $user     = auth()->user();
             $dir      = public_path("uploads/{$user->id}/specialties/{$specialty->id}");
-            if (!is_dir($dir)) mkdir($dir, 0750, true);
+            if (!is_dir($dir)) mkdir($dir, 0755, true);
 
             $filename = Str::uuid() . '.jpg';
             $destPath = "{$dir}/{$filename}";
