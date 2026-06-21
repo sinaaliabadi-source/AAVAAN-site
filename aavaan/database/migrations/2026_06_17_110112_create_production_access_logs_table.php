@@ -16,7 +16,7 @@ return new class extends Migration
             $table->timestamp('accessed_at')->useCurrent();
             $table->timestamps();
 
-            $table->unique(['production_user_id', 'artist_profile_id']);
+          + $table->unique(['production_user_id', 'artist_profile_id'], 'prod_access_logs_user_artist_unique');
         });
     }
 
