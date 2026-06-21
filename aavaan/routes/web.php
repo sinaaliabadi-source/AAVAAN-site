@@ -6,6 +6,8 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArtistDashboardController;
+use App\Http\Controllers\ArtistSpecialtyController;
+use App\Http\Controllers\ArtistProfilePremiumController;
 use App\Http\Controllers\ArtistSubscriptionController;
 use App\Http\Controllers\ProductionDashboardController;
 use App\Http\Controllers\ProductionAccessController;
@@ -54,6 +56,18 @@ Route::middleware(['auth', 'role:artist'])
         Route::delete('/reel/{id}', [ArtistDashboardController::class, 'deleteReel'])->name('reel.delete');
         Route::post('/work-history', [ArtistDashboardController::class, 'addWorkHistory'])->name('work-history.add');
         Route::delete('/work-history/{id}', [ArtistDashboardController::class, 'deleteWorkHistory'])->name('work-history.delete');
+
+        // Specialty routes — delete media before the wildcard {specialty} routes to avoid collision
+        Route::delete('/specialties/media/{media}', [ArtistSpecialtyController::class, 'deleteMedia'])->name('specialties.media.delete');
+        Route::post('/specialties', [ArtistSpecialtyController::class, 'store'])->name('specialties.store');
+        Route::put('/specialties/{specialty}', [ArtistSpecialtyController::class, 'update'])->name('specialties.update');
+        Route::delete('/specialties/{specialty}', [ArtistSpecialtyController::class, 'destroy'])->name('specialties.destroy');
+        Route::post('/specialties/{specialty}/primary', [ArtistSpecialtyController::class, 'setPrimary'])->name('specialties.primary');
+        Route::post('/specialties/{specialty}/media', [ArtistSpecialtyController::class, 'uploadMedia'])->name('specialties.media.upload');
+
+        // Premium profile
+        Route::post('/profile-premium', [ArtistProfilePremiumController::class, 'upsert'])->name('profile-premium.update');
+
         Route::get('/subscription', [ArtistSubscriptionController::class, 'index'])->name('subscription');
         Route::post('/subscription/pay', [ArtistSubscriptionController::class, 'pay'])->name('subscription.pay');
         Route::get('/subscription/callback', [ArtistSubscriptionController::class, 'callback'])->name('subscription.callback');

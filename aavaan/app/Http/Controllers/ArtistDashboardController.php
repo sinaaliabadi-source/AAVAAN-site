@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArtistProfile;
+use App\Models\ArtistSpecialtyMedia;
 use App\Models\PortfolioImage;
 use App\Models\PortfolioVideo;
+use App\Models\SpecialtyAttributeDefinition;
+use App\Models\SpecialtyCategory;
 use App\Models\WorkHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -40,11 +43,53 @@ class ArtistDashboardController extends Controller
     public function profile()
     {
         $user = auth()->user();
+
         $profile = $user->artistProfile()
             ->with(['workHistories', 'portfolioImages', 'portfolioVideos'])
             ->first();
+
         $fields = config('aavaan.artistic_fields');
-        return view('dashboard.artist.profile', compact('user', 'profile', 'fields'));
+
+        // Specialties with their category (and attribute definitions) and media
+        $specialties = $user->artistSpecialties()
+            ->with(['category.attributeDefinitions' => fn($q) => $q->orderBy('sort_order'), 'media' => fn($q) => $q->orderBy('sort_order')])
+            ->get();
+
+        $usedCategoryIds = $specialties->pluck('category_id');
+
+        // All root categories for the "add new specialty" dropdown
+        $categories = SpecialtyCategory::where('is_active', true)
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->get();
+
+        // All attribute definitions grouped by category_id for Alpine.js (lightweight projection)
+        $definitionsByCategory = SpecialtyAttributeDefinition::orderBy('sort_order')
+            ->get()
+            ->groupBy('category_id')
+            ->map(fn($defs) => $defs->map(fn($d) => [
+                'key'         => $d->key,
+                'label_fa'    => $d->label_fa,
+                'field_type'  => $d->field_type,
+                'options'     => $d->options,
+                'is_required' => (bool) $d->is_required,
+                'is_premium'  => (bool) $d->is_premium,
+                'visibility'  => $d->visibility,
+            ])->values()->all())
+            ->all();
+
+        $premiumProfile = $user->artistProfilePremium;
+
+        $totalPhotos = ArtistSpecialtyMedia::whereHas(
+            'artistSpecialty',
+            fn($q) => $q->where('user_id', $user->id)
+        )->where('type', 'photo')->count();
+
+        return view('dashboard.artist.profile', compact(
+            'user', 'profile', 'fields',
+            'specialties', 'categories', 'usedCategoryIds', 'definitionsByCategory',
+            'premiumProfile', 'totalPhotos'
+        ));
     }
 
     public function updateProfile(Request $request)

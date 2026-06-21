@@ -251,6 +251,12 @@
     </div>
 </div>
 
+{{-- 5. تخصص‌های من --}}
+@include('dashboard.artist.partials._specialties')
+
+{{-- 6. اطلاعات تکمیلی حرفه‌ای --}}
+@include('dashboard.artist.partials._premium_profile')
+
 {{-- 4. سوابق کاری --}}
 <div class="card" id="work-history">
     <div class="card-title">📋 سوابق کاری</div>

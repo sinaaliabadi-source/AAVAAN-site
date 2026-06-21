@@ -37,22 +37,22 @@ class UpsertArtistSpecialtyRequest extends FormRequest
     private function buildAttributeRules(int $categoryId): array
     {
         $definitions = SpecialtyAttributeDefinition::where('category_id', $categoryId)->get();
-
-        $rules = [];
+        $rules       = [];
 
         foreach ($definitions as $def) {
             $fieldKey = "attributes.{$def->key}";
-            $fieldRules = [];
 
-            if ($def->is_required) {
-                $fieldRules[] = 'required';
+            if ($def->field_type === 'multiselect') {
+                $rules[$fieldKey] = $def->is_required ? ['required', 'array'] : ['nullable', 'array'];
+                $options = collect($def->options ?? [])->pluck('value')->filter()->values()->all();
+                if (!empty($options)) {
+                    $rules[$fieldKey . '.*'] = [Rule::in($options)];
+                }
             } else {
-                $fieldRules[] = 'nullable';
+                $fieldRules = $def->is_required ? ['required'] : ['nullable'];
+                $fieldRules = array_merge($fieldRules, $this->rulesForFieldType($def));
+                $rules[$fieldKey] = $fieldRules;
             }
-
-            $fieldRules = array_merge($fieldRules, $this->rulesForFieldType($def));
-
-            $rules[$fieldKey] = $fieldRules;
         }
 
         return $rules;
@@ -72,32 +72,16 @@ class UpsertArtistSpecialtyRequest extends FormRequest
                 'max:500',
                 'regex:/^https:\/\/(www\.)?aparat\.com\/v\/[A-Za-z0-9]+/',
             ],
-            'select' => $this->selectRule($def, false),
-            'multiselect' => $this->multiSelectRule($def),
+            'select' => $this->selectRule($def),
             default       => ['string', 'max:500'],
         };
     }
 
-    private function selectRule(SpecialtyAttributeDefinition $def, bool $multi): array
+    private function selectRule(SpecialtyAttributeDefinition $def): array
     {
         $options = collect($def->options ?? [])->pluck('value')->filter()->values()->all();
 
-        if (empty($options)) {
-            return ['string'];
-        }
-
-        return [Rule::in($options)];
-    }
-
-    private function multiSelectRule(SpecialtyAttributeDefinition $def): array
-    {
-        $options = collect($def->options ?? [])->pluck('value')->filter()->values()->all();
-
-        if (empty($options)) {
-            return ['array'];
-        }
-
-        return ['array', Rule::in($options)];
+        return empty($options) ? ['string'] : [Rule::in($options)];
     }
 
     public function messages(): array
