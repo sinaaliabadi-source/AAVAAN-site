@@ -44,6 +44,31 @@ class User extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
+    public function artistSpecialties(): HasMany
+    {
+        return $this->hasMany(ArtistSpecialty::class);
+    }
+
+    public function primarySpecialty(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ArtistSpecialty::class)->where('is_primary', true);
+    }
+
+    public function artistProfilePremium(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ArtistProfilePremium::class);
+    }
+
+    public function verifications(): HasMany
+    {
+        return $this->hasMany(Verification::class);
+    }
+
+    public function analyticsEvents(): HasMany
+    {
+        return $this->hasMany(AnalyticsEvent::class, 'artist_id');
+    }
+
     public function isArtist(): bool
     {
         return $this->role === 'artist';
