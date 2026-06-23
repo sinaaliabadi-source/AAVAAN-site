@@ -564,6 +564,10 @@
                class="{{ request()->routeIs('admin.activity-logs') ? 'active' : '' }}">
                 <span class="nav-icon">📋</span> لاگ فعالیت
             </a>
+            <a href="{{ route('admin.email.index') }}"
+               class="{{ request()->routeIs('admin.email.*') ? 'active' : '' }}">
+                <span class="nav-icon">✉️</span> ارسال ایمیل
+            </a>
             <a href="{{ route('admin.settings') }}"
                class="{{ request()->routeIs('admin.settings') ? 'active' : '' }}">
                 <span class="nav-icon">⚙️</span> تنظیمات عمومی
