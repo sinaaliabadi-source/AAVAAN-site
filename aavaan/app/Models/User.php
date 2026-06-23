@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -105,5 +106,14 @@ class User extends Authenticatable
             })
             ->latest()
             ->first();
+    }
+
+    /**
+     * Send the password reset notification using our custom notification
+     * that points to route 'auth.reset' instead of the missing 'password.reset'.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
