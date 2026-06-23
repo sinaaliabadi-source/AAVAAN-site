@@ -12,7 +12,7 @@ class AdminArtistController extends Controller {
 
     public function index(Request $request) {
         abort_unless(auth()->user()->role === 'admin', 403);
-        $query = ArtistProfile::with(['user', 'artistSpecialties.category']);
+        $query = ArtistProfile::with(['user']);
         if ($request->status === 'active') $query->where('is_active', true);
         elseif ($request->status === 'inactive') $query->where('is_active', false);
         if ($request->city) $query->where('city', $request->city);
