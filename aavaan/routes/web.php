@@ -16,6 +16,14 @@ use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminSearchController;
 use App\Http\Controllers\Admin\AdminActivityLogController;
 use App\Http\Controllers\Admin\AdminEmailController;
+use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminArtistController;
+use App\Http\Controllers\Admin\AdminVerificationController;
+use App\Http\Controllers\Admin\AdminProductionController;
+use App\Http\Controllers\Admin\AdminSubscriptionController;
+use App\Http\Controllers\Admin\AdminPaymentController;
+use App\Http\Controllers\Admin\AdminDiscountController;
+use App\Http\Controllers\Admin\AdminSystemSettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
@@ -90,36 +98,71 @@ Route::middleware(['auth', 'admin'])
         // Global search
         Route::get('/search', [AdminSearchController::class, 'index'])->name('search');
 
-        // General settings (super_admin only)
+        // Users
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::post('/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
+        Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+        Route::post('/users/{id}/restore', [AdminUserController::class, 'restore'])->name('users.restore');
+
+        // Artists
+        Route::get('/artists', [AdminArtistController::class, 'index'])->name('artists.index');
+        Route::get('/artists/{id}/edit', [AdminArtistController::class, 'edit'])->name('artists.edit');
+        Route::put('/artists/{id}', [AdminArtistController::class, 'update'])->name('artists.update');
+
+        // Verifications
+        Route::get('/verifications', [AdminVerificationController::class, 'index'])->name('verifications.index');
+        Route::post('/verifications/{id}/approve', [AdminVerificationController::class, 'approve'])->name('verifications.approve');
+        Route::post('/verifications/{id}/reject', [AdminVerificationController::class, 'reject'])->name('verifications.reject');
+
+        // Production teams
+        Route::get('/production-teams', [AdminProductionController::class, 'index'])->name('production.index');
+        Route::get('/production-teams/{id}', [AdminProductionController::class, 'show'])->name('production.show');
+
+        // Subscriptions
+        Route::get('/subscriptions', [AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
+        Route::get('/subscriptions/{id}', [AdminSubscriptionController::class, 'show'])->name('subscriptions.show');
+        Route::post('/subscriptions/{id}/cancel', [AdminSubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+        Route::post('/subscriptions/{id}/extend', [AdminSubscriptionController::class, 'extend'])->name('subscriptions.extend');
+
+        // Payments
+        Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
+        Route::get('/payments/export', [AdminPaymentController::class, 'export'])->name('payments.export');
+
+        // Discount codes
+        Route::get('/discount-codes', [AdminDiscountController::class, 'index'])->name('discounts.index');
+        Route::get('/discount-codes/create', [AdminDiscountController::class, 'create'])->name('discounts.create');
+        Route::post('/discount-codes', [AdminDiscountController::class, 'store'])->name('discounts.store');
+        Route::get('/discount-codes/generate-code', [AdminDiscountController::class, 'generateCode'])->name('discounts.generate-code');
+        Route::get('/discount-codes/{id}/edit', [AdminDiscountController::class, 'edit'])->name('discounts.edit');
+        Route::put('/discount-codes/{id}', [AdminDiscountController::class, 'update'])->name('discounts.update');
+        Route::post('/discount-codes/{id}/toggle', [AdminDiscountController::class, 'toggle'])->name('discounts.toggle');
+
+        // System Settings (pricing/limits)
+        Route::get('/system-settings', [AdminSystemSettingController::class, 'index'])->name('system-settings.index');
+        Route::put('/system-settings', [AdminSystemSettingController::class, 'update'])->name('system-settings.update');
+
+        // General settings (contact info, social, SEO)
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings');
         Route::put('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
 
-        // Email
+        // Email / Notifications
         Route::get('/email', [AdminEmailController::class, 'index'])->name('email.index');
         Route::post('/email', [AdminEmailController::class, 'send'])->name('email.send');
 
         // Activity logs
         Route::get('/activity-logs', [AdminActivityLogController::class, 'index'])->name('activity-logs');
 
-        // Placeholder route for future phases
+        // Placeholder
         Route::get('/placeholder', fn() => view('admin.placeholder'))->name('placeholder');
 
-        // Future phase stubs (kept so sidebar links resolve, not 404)
-        // Phase 2
-        Route::get('/users', fn() => view('admin.placeholder'))->name('users.index');
-        Route::get('/users/{id}', fn() => view('admin.placeholder'))->name('users.show');
-        // Phase 3
-        Route::get('/subscriptions', fn() => view('admin.placeholder'))->name('subscriptions.index');
-        Route::get('/payments', fn() => view('admin.placeholder'))->name('payments.index');
-        // Phase 4
+        // Legacy stubs kept for future phases
         Route::get('/moderation', fn() => view('admin.placeholder'))->name('moderation.index');
         Route::get('/reports/violations', fn() => view('admin.placeholder'))->name('reports.violations');
-        // Phase 5
         Route::get('/content', fn() => view('admin.placeholder'))->name('content.index');
-        // Phase 6
         Route::get('/tickets', fn() => view('admin.placeholder'))->name('tickets.index');
         Route::get('/notifications', fn() => view('admin.placeholder'))->name('notifications.index');
-        // Phase 7
         Route::get('/reports', fn() => view('admin.placeholder'))->name('reports.index');
         Route::get('/backup', fn() => view('admin.placeholder'))->name('backup.index');
     });

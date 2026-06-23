@@ -492,84 +492,46 @@
 
         <nav class="sidebar-nav">
             <div class="sidebar-section-title">داشبورد</div>
-            <a href="{{ route('admin.dashboard') }}"
-               class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <span class="nav-icon">📊</span> نمای کلی
             </a>
 
             <div class="sidebar-section-title">مدیریت کاربران</div>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">👤</span> کاربران / هنرمندان
-                <span class="nav-badge">فاز ۲</span>
+            <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                <span class="nav-icon">👤</span> کاربران
             </a>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
+            <a href="{{ route('admin.artists.index') }}" class="{{ request()->routeIs('admin.artists.*') ? 'active' : '' }}">
+                <span class="nav-icon">🎭</span> هنرمندان
+            </a>
+            <a href="{{ route('admin.production.index') }}" class="{{ request()->routeIs('admin.production.*') ? 'active' : '' }}">
                 <span class="nav-icon">🎬</span> تیم‌های تولید
-                <span class="nav-badge">فاز ۲</span>
             </a>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
+            <a href="{{ route('admin.verifications.index') }}" class="{{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}">
                 <span class="nav-icon">✅</span> تأیید تخصص
-                <span class="nav-badge">فاز ۲</span>
             </a>
 
             <div class="sidebar-section-title">اشتراک و مالی</div>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">⭐</span> پلن‌های اشتراک
-                <span class="nav-badge">فاز ۳</span>
+            <a href="{{ route('admin.subscriptions.index') }}" class="{{ request()->routeIs('admin.subscriptions.*') ? 'active' : '' }}">
+                <span class="nav-icon">⭐</span> اشتراک‌ها
             </a>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
+            <a href="{{ route('admin.payments.index') }}" class="{{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                 <span class="nav-icon">💳</span> پرداخت‌ها
-                <span class="nav-badge">فاز ۳</span>
             </a>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
+            <a href="{{ route('admin.discounts.index') }}" class="{{ request()->routeIs('admin.discounts.*') ? 'active' : '' }}">
                 <span class="nav-icon">🎫</span> کدهای تخفیف
-                <span class="nav-badge">فاز ۳</span>
-            </a>
-
-            <div class="sidebar-section-title">محتوا و بررسی</div>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">🔍</span> صف بررسی محتوا
-                <span class="nav-badge">فاز ۴</span>
-            </a>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">🚨</span> گزارش‌های تخلف
-                <span class="nav-badge">فاز ۴</span>
-            </a>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">📝</span> مدیریت محتوا (CMS)
-                <span class="nav-badge">فاز ۵</span>
-            </a>
-
-            <div class="sidebar-section-title">پشتیبانی</div>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">🎫</span> تیکتینگ
-                <span class="nav-badge">فاز ۶</span>
-            </a>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">🔔</span> سیستم اعلان
-                <span class="nav-badge">فاز ۶</span>
-            </a>
-
-            <div class="sidebar-section-title">گزارش‌ها</div>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">📈</span> گزارش‌گیری پیشرفته
-                <span class="nav-badge">فاز ۷</span>
-            </a>
-            <a href="{{ route('admin.placeholder') }}" class="coming-soon">
-                <span class="nav-icon">💾</span> پشتیبان‌گیری
-                <span class="nav-badge">فاز ۷</span>
             </a>
 
             <div class="sidebar-section-title">سیستم</div>
-            <a href="{{ route('admin.activity-logs') }}"
-               class="{{ request()->routeIs('admin.activity-logs') ? 'active' : '' }}">
+            <a href="{{ route('admin.activity-logs') }}" class="{{ request()->routeIs('admin.activity-logs') ? 'active' : '' }}">
                 <span class="nav-icon">📋</span> لاگ فعالیت
             </a>
-            <a href="{{ route('admin.email.index') }}"
-               class="{{ request()->routeIs('admin.email.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.email.index') }}" class="{{ request()->routeIs('admin.email.*') ? 'active' : '' }}">
                 <span class="nav-icon">✉️</span> ارسال ایمیل
             </a>
-            <a href="{{ route('admin.settings') }}"
-               class="{{ request()->routeIs('admin.settings') ? 'active' : '' }}">
+            <a href="{{ route('admin.system-settings.index') }}" class="{{ request()->routeIs('admin.system-settings.*') ? 'active' : '' }}">
+                <span class="nav-icon">🔧</span> تنظیمات قیمت‌گذاری
+            </a>
+            <a href="{{ route('admin.settings') }}" class="{{ request()->routeIs('admin.settings') ? 'active' : '' }}">
                 <span class="nav-icon">⚙️</span> تنظیمات عمومی
             </a>
         </nav>
