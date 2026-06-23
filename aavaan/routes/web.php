@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\AdminSubscriptionController;
 use App\Http\Controllers\Admin\AdminPaymentController;
 use App\Http\Controllers\Admin\AdminDiscountController;
 use App\Http\Controllers\Admin\AdminSystemSettingController;
+use App\Http\Controllers\Admin\AdminReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
@@ -157,13 +158,25 @@ Route::middleware(['auth', 'admin'])
         // Placeholder
         Route::get('/placeholder', fn() => view('admin.placeholder'))->name('placeholder');
 
+        // Reports
+        Route::get('/reports',                                        [AdminReportController::class, 'dashboard'])->name('reports.index');
+        Route::get('/reports/chart-data',                             [AdminReportController::class, 'chartData'])->name('reports.chart-data');
+        Route::get('/reports/subscriptions',                          [AdminReportController::class, 'subscriptions'])->name('reports.subscriptions');
+        Route::get('/reports/subscriptions/export',                   [AdminReportController::class, 'exportSubscriptions'])->name('reports.subscriptions.export');
+        Route::get('/reports/production-access',                      [AdminReportController::class, 'productionAccess'])->name('reports.production-access');
+        Route::get('/reports/production-access/export',               [AdminReportController::class, 'exportProductionAccess'])->name('reports.production-access.export');
+        Route::get('/reports/discounts',                              [AdminReportController::class, 'discounts'])->name('reports.discounts');
+        Route::get('/reports/discounts/{id}',                         [AdminReportController::class, 'discountShow'])->name('reports.discounts.show');
+        Route::get('/reports/users',                                  [AdminReportController::class, 'users'])->name('reports.users');
+        Route::get('/reports/export',                                 [AdminReportController::class, 'exportPage'])->name('reports.export');
+        Route::get('/reports/export/download',                        [AdminReportController::class, 'exportDownload'])->name('reports.export.download');
+
         // Legacy stubs kept for future phases
         Route::get('/moderation', fn() => view('admin.placeholder'))->name('moderation.index');
         Route::get('/reports/violations', fn() => view('admin.placeholder'))->name('reports.violations');
         Route::get('/content', fn() => view('admin.placeholder'))->name('content.index');
         Route::get('/tickets', fn() => view('admin.placeholder'))->name('tickets.index');
         Route::get('/notifications', fn() => view('admin.placeholder'))->name('notifications.index');
-        Route::get('/reports', fn() => view('admin.placeholder'))->name('reports.index');
         Route::get('/backup', fn() => view('admin.placeholder'))->name('backup.index');
     });
 

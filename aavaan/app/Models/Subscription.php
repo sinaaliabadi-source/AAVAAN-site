@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Subscription extends Model
@@ -23,6 +24,11 @@ class Subscription extends Model
     public function payment(): MorphOne
     {
         return $this->morphOne(Payment::class, 'payable');
+    }
+
+    public function discountUse(): HasOne
+    {
+        return $this->hasOne(DiscountCodeUse::class);
     }
 
     public function isActive(): bool

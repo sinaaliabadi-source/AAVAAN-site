@@ -521,6 +521,26 @@
                 <span class="nav-icon">🎫</span> کدهای تخفیف
             </a>
 
+            <div class="sidebar-section-title">گزارش‌ها</div>
+            <a href="{{ route('admin.reports.index') }}" class="{{ request()->routeIs('admin.reports.index') ? 'active' : '' }}">
+                <span class="nav-icon">📈</span> داشبورد گزارش‌ها
+            </a>
+            <a href="{{ route('admin.reports.subscriptions') }}" class="{{ request()->routeIs('admin.reports.subscriptions') ? 'active' : '' }}">
+                <span class="nav-icon">📋</span> اشتراک‌های هنرمندان
+            </a>
+            <a href="{{ route('admin.reports.production-access') }}" class="{{ request()->routeIs('admin.reports.production-access') ? 'active' : '' }}">
+                <span class="nav-icon">🎬</span> دسترسی تیم تولید
+            </a>
+            <a href="{{ route('admin.reports.discounts') }}" class="{{ request()->routeIs('admin.reports.discounts*') ? 'active' : '' }}">
+                <span class="nav-icon">🎫</span> کدهای تخفیف
+            </a>
+            <a href="{{ route('admin.reports.users') }}" class="{{ request()->routeIs('admin.reports.users') ? 'active' : '' }}">
+                <span class="nav-icon">👥</span> رشد کاربران
+            </a>
+            <a href="{{ route('admin.reports.export') }}" class="{{ request()->routeIs('admin.reports.export') ? 'active' : '' }}">
+                <span class="nav-icon">📥</span> خروجی سراسری
+            </a>
+
             <div class="sidebar-section-title">سیستم</div>
             <a href="{{ route('admin.activity-logs') }}" class="{{ request()->routeIs('admin.activity-logs') ? 'active' : '' }}">
                 <span class="nav-icon">📋</span> لاگ فعالیت
