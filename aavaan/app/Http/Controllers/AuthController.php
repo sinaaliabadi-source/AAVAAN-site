@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\ArtistProfile;
+use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 
@@ -87,6 +89,15 @@ class AuthController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
+
+        // Send welcome email (silently — don't fail registration if mail fails)
+        if ($user->email) {
+            try {
+                Mail::to($user->email)->send(new WelcomeMail($user));
+            } catch (\Throwable) {
+                // Mail failure must never break registration
+            }
+        }
 
         return $user->isArtist()
             ? redirect()->route('artist.profile')
