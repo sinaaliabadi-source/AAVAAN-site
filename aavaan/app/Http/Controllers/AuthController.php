@@ -123,7 +123,8 @@ class AuthController extends Controller
     {
         $request->validate(['email' => 'required|email']);
         $status = Password::sendResetLink($request->only('email'));
-        return $status === Password::ResetLinkSent
+        // Laravel 10: compare against the string value, not a class constant
+        return $status === 'passwords.sent'
             ? back()->with('success', 'لینک بازیابی رمز به ایمیل شما ارسال شد.')
             : back()->withErrors(['email' => 'آدرس ایمیل یافت نشد.']);
     }
@@ -149,7 +150,8 @@ class AuthController extends Controller
             }
         );
 
-        return $status === Password::PasswordReset
+        // Laravel 10: compare against the string value, not a class constant
+        return $status === 'passwords.reset'
             ? redirect()->route('home')->with('success', 'رمز عبور با موفقیت تغییر کرد.')
             : back()->withErrors(['email' => __($status)]);
     }
