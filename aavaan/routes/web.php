@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminSearchController;
 use App\Http\Controllers\Admin\AdminActivityLogController;
+use App\Http\Controllers\Admin\AdminEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
@@ -92,6 +93,10 @@ Route::middleware(['auth', 'admin'])
         // General settings (super_admin only)
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings');
         Route::put('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+
+        // Email
+        Route::get('/email', [AdminEmailController::class, 'index'])->name('email.index');
+        Route::post('/email', [AdminEmailController::class, 'send'])->name('email.send');
 
         // Activity logs
         Route::get('/activity-logs', [AdminActivityLogController::class, 'index'])->name('activity-logs');
