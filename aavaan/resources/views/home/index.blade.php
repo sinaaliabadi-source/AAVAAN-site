@@ -249,7 +249,16 @@
     display: block;
 }
 .artist-card h3 { font-size: .97rem; color: var(--color-primary); margin-bottom: .3rem; }
-.artist-card .field-tag { color: var(--color-accent); font-size: .84rem; font-weight: 600; margin-bottom: .9rem; }
+.artist-card .field-tag {
+    display: inline-block;
+    background: #f5f0e8;
+    color: var(--color-primary);
+    font-size: .8rem;
+    font-weight: 600;
+    padding: .15rem .7rem;
+    border-radius: 999px;
+    margin-bottom: .9rem;
+}
 .artists-empty { text-align: center; color: var(--color-muted); padding: 3rem 0; grid-column: 1 / -1; font-size: 1rem; }
 
 /* ===== Pricing Summary ===== */
@@ -265,7 +274,7 @@
 .pricing-card .pc-badge {
     display: inline-block;
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-primary);
     font-size: .78rem;
     font-weight: 700;
     padding: .2rem .75rem;
@@ -289,10 +298,10 @@
     font-family: 'YekanBakh', Tahoma, sans-serif;
     font-weight: 900;
     font-size: clamp(1.6rem, 4vw, 2.4rem);
-    color: #fff;
+    color: var(--color-primary);
     margin-bottom: 1rem;
 }
-.final-cta p { color: rgba(255,255,255,.85); margin-bottom: 2rem; font-size: 1.05rem; }
+.final-cta p { color: rgba(31,42,68,.82); margin-bottom: 2rem; font-size: 1.05rem; }
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {

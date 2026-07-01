@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="pricing-card" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
-                <span class="pc-badge" style="background:var(--color-primary);">{{ __('home.pricing_production_badge') }}</span>
+                <span class="pc-badge" style="background:var(--color-primary);color:#fff;">{{ __('home.pricing_production_badge') }}</span>
                 <h3>{{ __('home.pricing_production_title') }}</h3>
                 <p class="pc-desc">{{ __('home.pricing_production_desc') }}</p>
                 <div class="pc-price">{{ __('home.pricing_production_price') }} <span>{{ __('home.pricing_production_period') }}</span></div>

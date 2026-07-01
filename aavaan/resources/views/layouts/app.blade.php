@@ -58,6 +58,15 @@
         a:hover { text-decoration: underline; }
         img { max-width: 100%; display: block; }
 
+        /* دسترس‌پذیری: حالت فوکوس برای پیمایش با کیبورد */
+        a:focus-visible,
+        button:focus-visible,
+        .btn:focus-visible,
+        .form-control:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 2px;
+        }
+
         .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
 
         .btn {
@@ -78,7 +87,8 @@
         .btn:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.12); text-decoration: none; }
         .btn:active { transform: translateY(0); }
         .btn-primary  { background: var(--color-primary); color: #fff; }
-        .btn-accent   { background: var(--color-accent);  color: #fff; }
+        /* متن لاجوردی روی طلایی — کنتراست خواناتر و هماهنگ‌تر با برند */
+        .btn-accent   { background: var(--color-accent);  color: var(--color-primary); font-weight: 700; }
         .btn-outline  { background: transparent; border-color: var(--color-primary); color: var(--color-primary); }
         .btn-outline:hover { background: var(--color-primary); color: #fff; }
         .btn-success  { background: var(--color-success); color: #fff; }

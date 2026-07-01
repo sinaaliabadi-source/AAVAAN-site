@@ -1,4 +1,8 @@
-<footer style="background: var(--color-primary); color: #aaa; padding: 3rem 0; margin-top: 4rem;">
+<style>
+    #site-footer a { transition: color .2s; }
+    #site-footer .footer-links a:hover { color: var(--color-accent) !important; text-decoration: none; }
+</style>
+<footer id="site-footer" style="background: var(--color-primary); color: #aaa; padding: 3rem 0; margin-top: 4rem;">
     <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
         <div>
             <a href="{{ route('home') }}" style="text-decoration:none;display:inline-flex;align-items:center;margin-bottom:.9rem;" aria-label="آوان — صفحه اصلی">
@@ -8,7 +12,7 @@
         </div>
         <div>
             <h4 style="color: #fff; margin-bottom: 1rem;">دسترسی سریع</h4>
-            <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
+            <ul class="footer-links" style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
                 <li><a href="{{ route('about') }}" style="color: #aaa;">درباره ما</a></li>
                 <li><a href="{{ route('how-it-works') }}" style="color: #aaa;">نحوه کار</a></li>
                 <li><a href="{{ route('faq') }}" style="color: #aaa;">سوالات متداول</a></li>
@@ -16,7 +20,7 @@
         </div>
         <div>
             <h4 style="color: #fff; margin-bottom: 1rem;">قانونی</h4>
-            <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
+            <ul class="footer-links" style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
                 <li><a href="{{ route('terms') }}" style="color: #aaa;">شرایط استفاده</a></li>
                 <li><a href="{{ route('privacy') }}" style="color: #aaa;">حریم خصوصی</a></li>
             </ul>

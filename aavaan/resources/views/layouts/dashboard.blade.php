@@ -159,8 +159,8 @@
         }
         .btn-primary { background: var(--color-primary); color: #fff; }
         .btn-primary:hover { background: #2a3a5c; }
-        .btn-accent { background: var(--color-accent); color: #fff; }
-        .btn-accent:hover { background: #b8913d; }
+        .btn-accent { background: var(--color-accent); color: var(--color-primary); font-weight: 700; }
+        .btn-accent:hover { background: #b8913d; color: var(--color-primary); }
         .btn-outline { background: transparent; border: 1.5px solid var(--color-primary); color: var(--color-primary); }
         .btn-outline:hover { background: var(--color-primary); color: #fff; }
         .btn-danger { background: #c0392b; color: #fff; }
