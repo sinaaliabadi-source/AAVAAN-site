@@ -117,17 +117,37 @@
         var gCountries = svg.append('g').attr('class', 'countries');
         var gPins      = svg.append('g').attr('class', 'pins');
 
-        // محدوده‌ی نقشه: ایران و همسایه‌ها (ترکیه، عراق، ارمنستان، آذربایجان،
-        // ترکمنستان، افغانستان، پاکستان، کشورهای حاشیه خلیج فارس)
-        var viewport = {
-            type: 'Feature',
-            geometry: {
-                type: 'Polygon',
-                coordinates: [[[40, 23], [72, 23], [72, 42], [40, 42], [40, 23]]]
-            }
+        // فقط ایران و کشورهای مجاور نمایش داده می‌شوند؛ بقیه‌ی جهان رندر نمی‌شود.
+        // کلید تشخیص: کد ISO3 (feature.id) و در صورت نبود، نام کشور.
+        var NEIGHBOR_IDS = {
+            IRN: 1, // ایران
+            TUR: 1, // ترکیه
+            IRQ: 1, // عراق
+            AFG: 1, // افغانستان
+            PAK: 1, // پاکستان
+            TKM: 1, // ترکمنستان
+            AZE: 1, // آذربایجان
+            ARM: 1, // ارمنستان
+            KWT: 1, // کویت
+            ARE: 1, // امارات
+            OMN: 1, // عمان
+            SAU: 1  // عربستان
+        };
+        var NEIGHBOR_NAMES = {
+            'Iran': 1, 'Turkey': 1, 'Iraq': 1, 'Afghanistan': 1, 'Pakistan': 1,
+            'Turkmenistan': 1, 'Azerbaijan': 1, 'Armenia': 1, 'Kuwait': 1,
+            'United Arab Emirates': 1, 'Oman': 1, 'Saudi Arabia': 1
         };
 
-        var projection = d3.geoMercator();
+        function isVisible(d) {
+            return !!(NEIGHBOR_IDS[d.id] || (d.properties && NEIGHBOR_NAMES[d.properties.name]));
+        }
+
+        // پروجکشن ثابت روی مرکز ایران تا کل کادر را پر کند.
+        var projection = d3.geoMercator()
+            .center([53.7, 32.4])
+            .scale(1200)
+            .translate([width / 2, height / 2]);
         var path = d3.geoPath(projection);
 
         function isIran(d) {
@@ -137,10 +157,8 @@
         function done() { if (loadingEl) loadingEl.remove(); }
 
         d3.json(geoUrl).then(function (world) {
-            projection.fitExtent([[20, 20], [width - 20, height - 20]], viewport);
-
             gCountries.selectAll('path')
-                .data(world.features)
+                .data(world.features.filter(isVisible))
                 .join('path')
                 .attr('class', 'country')
                 .attr('d', path)
