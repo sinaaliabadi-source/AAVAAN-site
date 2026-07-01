@@ -28,5 +28,15 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('contact', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());
         });
+
+        // هنرباز — حداکثر ۳ ثبت‌نام از هر IP در ساعت
+        RateLimiter::for('honarbaz-register', function (Request $request) {
+            return Limit::perHour(3)->by($request->ip());
+        });
+
+        // هنرباز — حداکثر ۵ درخواست رأی از هر IP در روز
+        RateLimiter::for('honarbaz-vote', function (Request $request) {
+            return Limit::perDay(5)->by($request->ip());
+        });
     }
 }

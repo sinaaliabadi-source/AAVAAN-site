@@ -329,6 +329,7 @@
 </div>
 
 @include('home.partials._hero')
+@include('home.partials._honarbaz_banner')
 @include('home.partials._map')
 @include('home.partials._why')
 @include('home.partials._audience')

@@ -12,6 +12,8 @@ use App\Http\Controllers\ArtistProfilePremiumController;
 use App\Http\Controllers\ArtistSubscriptionController;
 use App\Http\Controllers\ProductionDashboardController;
 use App\Http\Controllers\ProductionAccessController;
+use App\Http\Controllers\HonarbazController;
+use App\Http\Controllers\Admin\HonarbazAdminController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminSettingsController;
 use App\Http\Controllers\Admin\AdminSearchController;
@@ -52,6 +54,19 @@ Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// ═══════════════════════════════════════════════════
+// هنرباز — برنامه استعدادیابی کودکان (عمومی)
+// ═══════════════════════════════════════════════════
+Route::get('/honarbaz', [HonarbazController::class, 'landing'])->name('honarbaz.landing');
+Route::get('/honarbaz/register', [HonarbazController::class, 'registerForm'])->name('honarbaz.register');
+Route::post('/honarbaz/register', [HonarbazController::class, 'registerSubmit'])
+    ->name('honarbaz.register.submit')->middleware('throttle:honarbaz-register');
+Route::get('/honarbaz/contestants', [HonarbazController::class, 'contestants'])->name('honarbaz.contestants');
+Route::post('/honarbaz/vote', [HonarbazController::class, 'vote'])
+    ->name('honarbaz.vote')->middleware('throttle:honarbaz-vote');
+Route::post('/honarbaz/vote/verify', [HonarbazController::class, 'verifyVote'])
+    ->name('honarbaz.vote.verify')->middleware('throttle:honarbaz-vote');
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
 
 Route::middleware('guest')->group(function () {
@@ -160,6 +175,17 @@ Route::middleware(['auth', 'admin'])
         // Email / Notifications
         Route::get('/email', [AdminEmailController::class, 'index'])->name('email.index');
         Route::post('/email', [AdminEmailController::class, 'send'])->name('email.send');
+
+        // هنرباز — مدیریت برنامه استعدادیابی
+        Route::prefix('honarbaz')->name('honarbaz.')->group(function () {
+            Route::get('/', [HonarbazAdminController::class, 'index'])->name('index');
+            Route::get('/registrations', [HonarbazAdminController::class, 'registrations'])->name('registrations');
+            Route::post('/registrations/{id}/status', [HonarbazAdminController::class, 'updateStatus'])->name('status');
+            Route::get('/votes', [HonarbazAdminController::class, 'votes'])->name('votes');
+            Route::get('/export', [HonarbazAdminController::class, 'export'])->name('export');
+            Route::get('/settings', [HonarbazAdminController::class, 'settings'])->name('settings');
+            Route::post('/settings', [HonarbazAdminController::class, 'updateSettings'])->name('settings.update');
+        });
 
         // Activity logs
         Route::get('/activity-logs', [AdminActivityLogController::class, 'index'])->name('activity-logs');

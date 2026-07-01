@@ -541,6 +541,20 @@
                 <span class="nav-icon">📥</span> خروجی سراسری
             </a>
 
+            <div class="sidebar-section-title">🎭 هنرباز</div>
+            <a href="{{ route('admin.honarbaz.index') }}" class="{{ request()->routeIs('admin.honarbaz.index') ? 'active' : '' }}">
+                <span class="nav-icon">📊</span> داشبورد هنرباز
+            </a>
+            <a href="{{ route('admin.honarbaz.registrations') }}" class="{{ request()->routeIs('admin.honarbaz.registrations') ? 'active' : '' }}">
+                <span class="nav-icon">📝</span> ثبت‌نام‌ها
+            </a>
+            <a href="{{ route('admin.honarbaz.votes') }}" class="{{ request()->routeIs('admin.honarbaz.votes') ? 'active' : '' }}">
+                <span class="nav-icon">🗳️</span> رأی‌گیری
+            </a>
+            <a href="{{ route('admin.honarbaz.settings') }}" class="{{ request()->routeIs('admin.honarbaz.settings') ? 'active' : '' }}">
+                <span class="nav-icon">⚙️</span> تنظیمات هنرباز
+            </a>
+
             <div class="sidebar-section-title">سیستم</div>
             <a href="{{ route('admin.activity-logs') }}" class="{{ request()->routeIs('admin.activity-logs') ? 'active' : '' }}">
                 <span class="nav-icon">📋</span> لاگ فعالیت

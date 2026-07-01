@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SpecialtyCategoriesSeeder::class,
             SpecialtyAttributeDefinitionsSeeder::class,
             SpecialtySubcategoriesSeeder::class,
+            HonarbazSeeder::class,
         ]);
     }
 }
