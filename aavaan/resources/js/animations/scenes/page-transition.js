@@ -1,43 +1,51 @@
 import { gsap } from '../core/gsap-init.js';
 
-// تغییر صفحه نرم — fade کوتاه هنگام ورود و خروج از صفحه
-export function initPageTransition() {
-    if (typeof document === 'undefined') return;
+export function initPageTransitions() {
+    // Overlay برای transition
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed; inset: 0;
+        background: #1F2A44;
+        transform: translateY(100%);
+        z-index: 9999;
+        pointer-events: none;
+    `;
+    document.body.appendChild(overlay);
 
-    // ورود نرم صفحه
-    gsap.from('main', {
-        opacity: 0,
-        duration: 0.5,
-        ease: 'avan-ease',
+    // ورود صفحه
+    gsap.to(overlay, {
+        translateY: '-100%',
+        duration: 0.7,
+        ease: 'power3.inOut',
+        onComplete: () => overlay.remove(),
     });
 
-    // خروج نرم هنگام کلیک روی لینک‌های داخلی
-    document.addEventListener('click', (e) => {
-        const link = e.target.closest('a[href]');
-        if (!link) return;
+    // خروج از صفحه (قبل از navigation)
+    document.querySelectorAll('a[href]:not([target="_blank"]):not([data-no-transition])').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
 
-        const url = link.getAttribute('href');
-        // فقط لینک‌های داخلی (نه دانلود، نه tab جدید، نه anchor)
-        if (
-            !url ||
-            url.startsWith('#') ||
-            url.startsWith('mailto:') ||
-            url.startsWith('tel:') ||
-            link.target === '_blank' ||
-            link.hasAttribute('download') ||
-            link.hostname !== window.location.hostname
-        ) {
-            return;
-        }
+            // فقط لینک‌های داخلی همین دامنه
+            if (link.hostname && link.hostname !== window.location.hostname) return;
+            if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
+            if (link.hasAttribute('download')) return;
 
-        e.preventDefault();
-        gsap.to('main', {
-            opacity: 0,
-            duration: 0.3,
-            ease: 'avan-ease',
-            onComplete: () => {
-                window.location.href = url;
-            },
+            e.preventDefault();
+
+            const newOverlay = document.createElement('div');
+            newOverlay.style.cssText = overlay.style.cssText;
+            newOverlay.style.transform = 'translateY(100%)';
+            document.body.appendChild(newOverlay);
+
+            gsap.to(newOverlay, {
+                translateY: '0%',
+                duration: 0.5,
+                ease: 'power3.inOut',
+                onComplete: () => {
+                    window.location.href = href;
+                },
+            });
         });
     });
 }

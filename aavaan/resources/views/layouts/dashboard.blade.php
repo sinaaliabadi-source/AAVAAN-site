@@ -250,8 +250,10 @@
     </style>
     @stack('styles')
     <style>[x-cloak] { display: none !important; }</style>
+    {{-- انیمیشن‌های داشبورد — بدون Alpine (Alpine جداگانه از CDN بارگذاری می‌شود) --}}
+    @vite('resources/js/dashboard.js')
 </head>
-<body>
+<body data-page="{{ optional(request()->route())->getName() }}">
 <div class="layout">
     <aside class="sidebar">
         <div class="sidebar-logo">

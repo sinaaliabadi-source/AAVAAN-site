@@ -55,6 +55,7 @@
 
     /* ── Full card (access granted) ── */
     .artist-card {
+        position: relative;
         background: #fff;
         border-radius: var(--radius);
         border: 1px solid #ede8dc;
@@ -65,6 +66,15 @@
         transition: box-shadow .2s, transform .2s;
     }
     .artist-card:hover { box-shadow: 0 4px 16px rgba(31,42,68,.12); transform: translateY(-2px); }
+    .artist-card-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius);
+        background: linear-gradient(160deg, rgba(201,162,75,.14), rgba(31,42,68,.06));
+        opacity: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
     .artist-card-img {
         width: 100%; height: 160px;
         object-fit: cover;
@@ -373,9 +383,10 @@ window.__productionSearchSaved = @json((array) request('attr', []));
 
     @if($hasPaidAccess)
         {{-- ── FULL CARD (user has paid) ── --}}
-        <div class="artist-card">
+        <div class="artist-card" data-animate="artist-card">
+            <span class="artist-card-overlay" data-card-overlay aria-hidden="true"></span>
             @if($artist->avatar)
-                <img src="{{ $artist->avatar_url }}" alt="{{ $artist->user->name }}" class="artist-card-img">
+                <img src="{{ $artist->avatar_url }}" alt="{{ $artist->user->name }}" class="artist-card-img" data-card-img>
             @else
                 <div class="artist-card-img-placeholder">{{ mb_substr($artist->user->name, 0, 1) }}</div>
             @endif
@@ -407,9 +418,10 @@ window.__productionSearchSaved = @json((array) request('attr', []));
 
     @else
         {{-- ── LIMITED CARD (paywall active) ── --}}
-        <div class="artist-card artist-card-locked">
+        <div class="artist-card artist-card-locked" data-animate="artist-card">
+            <span class="artist-card-overlay" data-card-overlay aria-hidden="true"></span>
             @if($artist->avatar)
-                <img src="{{ $artist->avatar_url }}" alt="" class="artist-card-img">
+                <img src="{{ $artist->avatar_url }}" alt="" class="artist-card-img" data-card-img>
             @else
                 <div class="artist-card-img-placeholder">{{ mb_substr($artist->user->name, 0, 1) }}</div>
             @endif

@@ -327,12 +327,12 @@
     {{-- Hero --}}
     <div class="profile-hero">
         @if($profile->avatar)
-            <img src="{{ $profile->avatar_url }}" alt="{{ $artistName }}" class="profile-avatar">
+            <img src="{{ $profile->avatar_url }}" alt="{{ $artistName }}" class="profile-avatar" data-aos="zoom-in" data-aos-duration="600">
         @else
-            <div class="profile-avatar-placeholder">{{ mb_substr($artistName, 0, 1) }}</div>
+            <div class="profile-avatar-placeholder" data-aos="zoom-in" data-aos-duration="600">{{ mb_substr($artistName, 0, 1) }}</div>
         @endif
 
-        <div class="profile-meta">
+        <div class="profile-meta" data-aos="fade-right" data-aos-duration="600">
             <h1 class="profile-name">{{ $artistName }}</h1>
 
             @if($fieldLabel)
@@ -362,7 +362,7 @@
 
     {{-- Reel video --}}
     @if($reel)
-    <div class="section-card">
+    <div class="section-card" data-aos="fade-up" data-aos-once="true">
         <div class="section-title">🎬 ویدیوی ریل</div>
         <video controls class="reel-video" src="{{ $reel->url }}" preload="metadata">
             مرورگر شما پخش ویدیو را پشتیبانی نمی‌کند.
@@ -422,7 +422,7 @@
         return null;
     };
     @endphp
-    <div class="section-card">
+    <div class="section-card" data-aos="fade-left" data-aos-duration="600">
         <div class="section-title">🎯 تخصص‌ها</div>
 
         {{-- Tabs (hidden when only one specialty) --}}
@@ -515,7 +515,7 @@
             @if($embedUrl && ($hasAccess || $isSelf || !$isProdOnly))
             <div style="margin-bottom:1.1rem">
                 <div style="font-size:.82rem;color:var(--color-muted);margin-bottom:.5rem">🎬 {{ $def->label_fa }}</div>
-                <div class="aparat-embed-wrap">
+                <div class="aparat-embed-wrap" data-aos="fade-up" data-aos-once="true">
                     <iframe src="{{ $embedUrl }}" allowfullscreen loading="lazy"></iframe>
                 </div>
             </div>
@@ -542,7 +542,7 @@
             <div style="font-size:.82rem;color:var(--color-muted);margin-bottom:.5rem">🎬 ویدیوها</div>
             @foreach($videoLinks as $vl)
             @if($vl->aparat_embed_url)
-            <div class="aparat-embed-wrap">
+            <div class="aparat-embed-wrap" data-aos="fade-up" data-aos-once="true">
                 <iframe src="{{ $vl->aparat_embed_url }}" allowfullscreen loading="lazy"></iframe>
             </div>
             @endif
@@ -565,7 +565,7 @@
         </div>
         <div class="gallery-grid">
             @foreach($images as $img)
-            <div class="gallery-item" data-src="{{ $img->url }}" data-caption="{{ $img->caption }}">
+            <div class="gallery-item" data-src="{{ $img->url }}" data-caption="{{ $img->caption }}" data-aos="fade-up" data-aos-delay="{{ $loop->index * 80 }}">
                 <img src="{{ $img->url }}" alt="{{ $img->caption ?: $artistName . ' نمونه‌کار' }}" loading="lazy">
             </div>
             @endforeach

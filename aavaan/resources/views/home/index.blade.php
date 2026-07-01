@@ -19,6 +19,15 @@
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23C9A24B' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/svg%3E");
     pointer-events: none;
 }
+.hero-bg-deco {
+    position: absolute;
+    inset: -10% 0 auto 0;
+    height: 130%;
+    background: radial-gradient(circle at 30% 20%, rgba(201,162,75,.14), transparent 55%),
+                radial-gradient(circle at 75% 60%, rgba(201,162,75,.10), transparent 50%);
+    pointer-events: none;
+    will-change: transform;
+}
 .home-hero h1 {
     font-family: 'YekanBakh', Tahoma, sans-serif;
     font-weight: 900;
@@ -189,6 +198,7 @@
     gap: 1.5rem;
 }
 .artist-card {
+    position: relative;
     background: #fff;
     border-radius: var(--radius);
     padding: 1.6rem 1rem;
@@ -197,6 +207,14 @@
     transition: transform .2s, box-shadow .2s;
 }
 .artist-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+.artist-card-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+    background: linear-gradient(160deg, rgba(201,162,75,.12), rgba(31,42,68,.06));
+    opacity: 0;
+    pointer-events: none;
+}
 .artist-card img {
     width: 84px;
     height: 84px;
@@ -269,13 +287,14 @@
 @section('content')
 
 {{-- ===== ۱. Hero ===== --}}
-<section class="home-hero">
+<section class="home-hero" data-animate="hero">
+    <div class="hero-bg-deco" data-hero-bg aria-hidden="true"></div>
     <div class="container">
-        <h1>هر هنرمندی، آوانی برای درخشیدن دارد.</h1>
-        <p>آوان جایی‌ست که عوامل و هنرمندانِ سینما، تئاتر، موسیقی و دیگر هنرها پروفایل خود را می‌سازند و تیم‌های تولید، دقیق‌ترین فهرست کست را از میان آن‌ها پیدا می‌کنند.</p>
+        <h1 data-hero-title>هر هنرمندی، آوانی برای درخشیدن دارد.</h1>
+        <p data-hero-subtitle>آوان جایی‌ست که عوامل و هنرمندانِ سینما، تئاتر، موسیقی و دیگر هنرها پروفایل خود را می‌سازند و تیم‌های تولید، دقیق‌ترین فهرست کست را از میان آن‌ها پیدا می‌کنند.</p>
         <div class="hero-btns">
-            <a href="{{ route('auth') }}?role=artist" class="btn btn-accent btn-lg">ثبت‌نام به‌عنوان هنرمند</a>
-            <a href="{{ route('auth') }}?role=production" class="btn btn-outline-white btn-lg">ورود برای تیم‌های تولید</a>
+            <a href="{{ route('auth') }}?role=artist" class="btn btn-accent btn-lg" data-hero-cta data-magnetic>ثبت‌نام به‌عنوان هنرمند</a>
+            <a href="{{ route('auth') }}?role=production" class="btn btn-outline-white btn-lg" data-hero-cta data-magnetic>ورود برای تیم‌های تولید</a>
         </div>
     </div>
 </section>
@@ -286,17 +305,17 @@
         <h2 class="section-title">چرا آوان؟</h2>
         <p class="section-sub">سه دلیل که هنرمندان و تیم‌های تولید آوان را انتخاب می‌کنند</p>
         <div class="grid-3">
-            <div class="why-card">
+            <div class="why-card" data-aos="fade-up" data-aos-delay="100" data-aos-duration="800">
                 <span class="icon">🎭</span>
                 <h3>پروفایل کامل و نمونه‌کار</h3>
                 <p>از تصویر و بیوگرافی تا ویدیوی ریل — همه چیز در یک پروفایل</p>
             </div>
-            <div class="why-card">
+            <div class="why-card" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
                 <span class="icon">🔍</span>
                 <h3>دیده‌شدن توسط تیم‌های تولید</h3>
                 <p>هزاران کارگردان، تهیه‌کننده و مدیر تولید جستجو می‌کنند</p>
             </div>
-            <div class="why-card">
+            <div class="why-card" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
                 <span class="icon">🌐</span>
                 <h3>برای همه‌ی رشته‌های هنری</h3>
                 <p>سینما، تئاتر، موسیقی، طراحی صحنه، گریم و بیشتر</p>
@@ -311,7 +330,7 @@
         <h2 class="section-title">چگونه کار می‌کند؟</h2>
         <p class="section-sub">مسیر ساده برای هنرمندان و تیم‌های تولید</p>
         <div class="how-cols">
-            <div>
+            <div data-aos="fade-right" data-aos-duration="800">
                 <div class="how-col-title">🎭 هنرمند</div>
                 <div class="how-step">
                     <div class="how-step-num">۱</div>
@@ -326,7 +345,7 @@
                     <p>انتخاب اشتراک و فعال‌شدن در فهرست کست</p>
                 </div>
             </div>
-            <div>
+            <div data-aos="fade-left" data-aos-duration="800" data-aos-delay="150">
                 <div class="how-col-title">🎬 تیم تولید</div>
                 <div class="how-step">
                     <div class="how-step-num">۱</div>
@@ -352,7 +371,7 @@
 <section class="fields-section">
     <div class="container">
         <h2 class="section-title">رشته‌های هنری</h2>
-        <p class="section-sub">آوان همه‌ی {{ $allCategories->count() }} حوزه‌ی هنری را پوشش می‌دهد</p>
+        <p class="section-sub">آوان همه‌ی <span data-counter="{{ $allCategories->count() }}">{{ $allCategories->count() }}</span> حوزه‌ی هنری را پوشش می‌دهد</p>
         <div class="cat-groups-grid">
             @foreach($categoryGroups as $group)
             <div class="cat-group-card">
@@ -380,8 +399,9 @@
         <p class="section-sub">نمونه‌ای از پروفایل‌های فعال در آوان</p>
         <div class="artists-grid">
             @forelse($featuredArtists as $artist)
-                <div class="artist-card">
-                    <img src="{{ $artist->avatar_url }}" alt="{{ $artist->user->name }}">
+                <div class="artist-card" data-animate="artist-card">
+                    <span class="artist-card-overlay" data-card-overlay aria-hidden="true"></span>
+                    <img src="{{ $artist->avatar_url }}" alt="{{ $artist->user->name }}" data-card-img>
                     <h3>{{ $artist->user->name }}</h3>
                     <p class="field-tag">{{ $artist->field }}</p>
                     <a href="{{ route('profile.show', $artist->username ?? $artist->id) }}" class="btn btn-primary btn-sm">مشاهده پروفایل</a>
@@ -399,7 +419,7 @@
         <h2 class="section-title">تعرفه‌ها</h2>
         <p class="section-sub">ساده، شفاف و مناسب برای همه</p>
         <div class="grid-2">
-            <div class="pricing-card">
+            <div class="pricing-card" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
                 <span class="pc-badge">هنرمند</span>
                 <h3>اشتراک هنرمند</h3>
                 <p class="pc-desc">پروفایل کامل، نمونه‌کار، ویدیوی ریل و حضور در فهرست کست تیم‌های تولید سراسر کشور.</p>
@@ -409,7 +429,7 @@
                     <a href="{{ route('auth') }}?role=artist" class="btn btn-outline btn-sm">ثبت‌نام رایگان</a>
                 </div>
             </div>
-            <div class="pricing-card">
+            <div class="pricing-card" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
                 <span class="pc-badge" style="background:var(--color-primary);">تیم تولید</span>
                 <h3>بسته‌های دسترسی تولید</h3>
                 <p class="pc-desc">جستجو رایگان — فقط برای دسترسی به اطلاعات تماس و فهرست نهایی کست هزینه بدهید.</p>
@@ -429,8 +449,8 @@
         <h2>آوانِ شما رسیده — همین حالا شروع کنید</h2>
         <p>هنرمند هستید یا تیم تولید؟ هر دو راه به آوان ختم می‌شود.</p>
         <div class="hero-btns">
-            <a href="{{ route('auth') }}?role=artist" class="btn btn-white btn-lg">ثبت‌نام به‌عنوان هنرمند</a>
-            <a href="{{ route('auth') }}?role=production" class="btn btn-outline-white btn-lg">ورود برای تیم‌های تولید</a>
+            <a href="{{ route('auth') }}?role=artist" class="btn btn-white btn-lg" data-magnetic>ثبت‌نام به‌عنوان هنرمند</a>
+            <a href="{{ route('auth') }}?role=production" class="btn btn-outline-white btn-lg" data-magnetic>ورود برای تیم‌های تولید</a>
         </div>
     </div>
 </section>
