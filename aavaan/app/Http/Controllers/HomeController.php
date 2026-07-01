@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ArtistProfile;
 use App\Models\SpecialtyCategory;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -14,11 +15,20 @@ class HomeController extends Controller
         ['label' => 'مدیریت و پشتیبانی',  'icon' => '📋', 'slugs' => ['production-management','casting','pr-marketing','crew','translation']],
     ];
 
-    public function index()
+    public function index(Request $request)
     {
+        // زبان از پیش‌فرض مسیر (/fa، /en) تعیین می‌شود؛ پیش‌فرض فارسی.
+        $locale = $request->route()->defaults['locale'] ?? config('app.locale', 'fa');
+        if (! in_array($locale, ['fa', 'en'], true)) {
+            $locale = 'fa';
+        }
+        app()->setLocale($locale);
+
+        // هنرمندان برگزیده: فعال‌ترین/پربازدیدترین پروفایل‌ها (اولویت نمایش واقعی)
         $featuredArtists = ArtistProfile::with('user')
             ->where('is_active', true)
-            ->inRandomOrder()
+            ->orderByDesc('profile_views')
+            ->orderByDesc('created_at')
             ->limit(6)
             ->get();
 
@@ -32,6 +42,6 @@ class HomeController extends Controller
             return $group;
         });
 
-        return view('home.index', compact('featuredArtists', 'categoryGroups', 'allCategories'));
+        return view('home.index', compact('featuredArtists', 'categoryGroups', 'allCategories', 'locale'));
     }
 }

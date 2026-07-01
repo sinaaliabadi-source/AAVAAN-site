@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TalentDensityController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
@@ -30,7 +31,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
 Route::get('/payment/failed', fn() => view('payment.failed'))->name('payment.failed');
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// صفحه‌ی اصلی — دوزبانه و سئو-دوست با مسیرهای مجزا برای هر زبان.
+// «/» به‌صورت پیش‌فرض فارسی است تا همه‌ی لینک‌های route('home') موجود سالم بمانند.
+Route::get('/', [HomeController::class, 'index'])->defaults('locale', 'fa')->name('home');
+Route::get('/fa', [HomeController::class, 'index'])->defaults('locale', 'fa')->name('home.fa');
+Route::get('/en', [HomeController::class, 'index'])->defaults('locale', 'en')->name('home.en');
+
+// API — تراکم هنرمندان فعال به تفکیک شهر (برای نقشه‌ی صفحه‌ی اصلی)
+Route::get('/api/talent-density', [TalentDensityController::class, 'index'])->name('api.talent-density');
+
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/how-it-works', [PageController::class, 'howItWorks'])->name('how-it-works');
 Route::get('/artists', [PageController::class, 'artists'])->name('artists');
