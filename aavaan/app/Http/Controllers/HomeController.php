@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArtistProfile;
-use App\Models\Program;
 use App\Models\SpecialtyCategory;
 use Illuminate\Http\Request;
 
@@ -43,11 +42,6 @@ class HomeController extends Controller
             return $group;
         });
 
-        // برنامه فعال هنرباز برای بنر اعلان صفحه اصلی (در صورت وجود و فعال بودن).
-        $honarbaz = Program::where('slug', config('honarbaz.program_slug'))
-            ->where('status', 'active')
-            ->first();
-
-        return view('home.index', compact('featuredArtists', 'categoryGroups', 'allCategories', 'locale', 'honarbaz'));
+        return view('home.index', compact('featuredArtists', 'categoryGroups', 'allCategories', 'locale'));
     }
 }

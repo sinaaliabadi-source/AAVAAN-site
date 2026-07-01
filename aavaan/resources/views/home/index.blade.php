@@ -29,53 +29,7 @@
 .lang-switch:hover { background: rgba(255,255,255,.22); border-color: #fff; color: #fff; text-decoration: none; }
 
 /* ===== Hero ===== */
-.home-hero {
-    background: linear-gradient(135deg, var(--color-primary) 0%, #2d3e60 100%);
-    padding: 7rem 0 6rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-.home-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23C9A24B' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/svg%3E");
-    pointer-events: none;
-}
-.hero-bg-deco {
-    position: absolute;
-    inset: -10% 0 auto 0;
-    height: 130%;
-    background: radial-gradient(circle at 30% 20%, rgba(201,162,75,.14), transparent 55%),
-                radial-gradient(circle at 75% 60%, rgba(201,162,75,.10), transparent 50%);
-    pointer-events: none;
-    will-change: transform;
-}
-.home-hero h1 {
-    font-family: 'YekanBakh', Tahoma, sans-serif;
-    font-weight: 900;
-    font-size: clamp(2rem, 5vw, 3.4rem);
-    color: var(--color-accent);
-    margin-bottom: 1.5rem;
-    line-height: 1.25;
-    position: relative;
-}
-.home-hero p {
-    color: rgba(255,255,255,.88);
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
-    max-width: 700px;
-    margin: 0 auto 2.5rem;
-    line-height: 1.9;
-    position: relative;
-}
-.hero-btns {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    position: relative;
-}
+/* استایل‌های Hero اکنون در partials/_hero.blade.php تعریف شده‌اند (اسلایدر Swiper). */
 .btn-outline-white {
     background: transparent;
     border: 2px solid rgba(255,255,255,.6);
@@ -329,7 +283,6 @@
 </div>
 
 @include('home.partials._hero')
-@include('home.partials._honarbaz_banner')
 @include('home.partials._map')
 @include('home.partials._why')
 @include('home.partials._audience')

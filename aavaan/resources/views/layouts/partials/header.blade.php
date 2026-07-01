@@ -13,6 +13,7 @@
         </nav>
 
         <div style="display:flex;gap:.75rem;align-items:center;">
+            <a href="{{ route('honarbaz.landing') }}" class="honarbaz-nav-btn">🎭 هنرباز</a>
             @auth
                 @if(auth()->user()->isArtist())
                     <a href="{{ route('artist.dashboard') }}" class="btn btn-accent btn-sm">پنل هنرمند</a>
@@ -36,6 +37,7 @@
         <a href="{{ route('how-it-works') }}" style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">نحوه کار</a>
         <a href="{{ route('pricing') }}"      style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">تعرفه‌ها</a>
         <a href="{{ route('blog') }}"         style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">وبلاگ</a>
+        <a href="{{ route('honarbaz.landing') }}" class="honarbaz-nav-btn" style="display:inline-block;margin:.75rem 0;">🎭 هنرباز</a>
         @auth
             @if(auth()->user()->isArtist())
                 <a href="{{ route('artist.dashboard') }}" style="display:block;color:var(--color-accent);padding:.5rem 0;">پنل هنرمند</a>
@@ -52,6 +54,29 @@
 @media (max-width: 768px) {
     #main-nav { display: none !important; }
     #nav-toggle { display: block !important; }
+}
+
+.honarbaz-nav-btn {
+    background: linear-gradient(135deg, #C9A24B, #e6b84f);
+    color: #1F2A44;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    animation: pulse-gold 2s infinite;
+}
+.honarbaz-nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(201,162,75,0.5);
+    color: #1F2A44;
+    text-decoration: none;
+}
+@keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201,162,75,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(201,162,75,0); }
 }
 </style>
 <script>
