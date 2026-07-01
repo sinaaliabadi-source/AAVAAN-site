@@ -149,9 +149,10 @@
             .grid-2, .grid-3 { grid-template-columns: 1fr; }
         }
     </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body>
+<body data-page="{{ optional(request()->route())->getName() }}">
 @include('layouts.partials.header')
 
 <main>

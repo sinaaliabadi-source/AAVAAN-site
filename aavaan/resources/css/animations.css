@@ -1,0 +1,38 @@
+/* پایه‌ی انیمیشن‌های CSS برای المان‌هایی که JS ندارند */
+
+/* Fade در حالت پیش‌فرض — GSAP این را override می‌کند */
+[data-animate="hero"] > * {
+    will-change: transform, opacity;
+}
+
+[data-animate="artist-card"] {
+    will-change: transform;
+    overflow: hidden;
+}
+
+[data-animate="artist-card"] [data-card-img] {
+    transition: transform 0.4s ease;
+}
+
+[data-animate="artist-card"] [data-card-overlay] {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* دکمه مغناطیسی */
+[data-magnetic] {
+    will-change: transform;
+    display: inline-block;
+}
+
+/* کاهش انیمیشن برای کاربرانی که reduced motion خواسته‌اند */
+@media (prefers-reduced-motion: reduce) {
+    [data-animate],
+    [data-magnetic],
+    [data-aos] {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+}
