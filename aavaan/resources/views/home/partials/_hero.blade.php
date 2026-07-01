@@ -82,9 +82,9 @@
     .hero-slide-inner { position: relative; z-index: 1; }
 
     .hero-logo {
-        width: 120px;
+        width: 220px;
         height: auto;
-        margin: 0 auto 1.75rem;
+        margin: 0 auto 24px;
         display: block;
     }
     .hero-motif {
@@ -139,7 +139,7 @@
     }
 
     @media (max-width: 640px) {
-        .hero-logo { width: 96px; }
+        .hero-logo { width: 100%; max-width: 280px; }
     }
 </style>
 @endpush
