@@ -61,7 +61,7 @@ return [
     'pricing_artist_badge'   => 'هنرمند',
     'pricing_artist_title'   => 'اشتراک هنرمند',
     'pricing_artist_desc'    => 'پروفایل کامل، نمونه‌کار، ویدیوی ریل و حضور در فهرست کست تیم‌های تولید سراسر کشور.',
-    'pricing_artist_price'   => 'از ۹۹,۰۰۰ تومان',
+    'pricing_artist_price'   => 'از ۲۰۰,۰۰۰ تومان',
     'pricing_artist_period'  => '/ ماهانه',
     'pricing_production_badge' => 'تیم تولید',
     'pricing_production_title' => 'بسته‌های دسترسی تولید',

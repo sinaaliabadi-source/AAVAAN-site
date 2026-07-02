@@ -33,7 +33,7 @@ class ProductionDashboardController extends Controller
     public function search(Request $request)
     {
         $user   = auth()->user();
-        $fields = config('aavaan.artistic_fields');
+        $fields = SpecialtyCategory::fieldOptions();
         $access = $user->availableProductionAccess();
         $hasPaidAccess = $user->productionAccesses()
             ->whereHas('payment', fn($q) => $q->where('status', 'paid'))
@@ -77,11 +77,10 @@ class ProductionDashboardController extends Controller
         if ($request->filled('age_min'))        $query->where('birth_year', '<=', now()->year - (int) $request->age_min);
         if ($request->filled('age_max'))        $query->where('birth_year', '>=', now()->year - (int) $request->age_max);
         if ($request->filled('keyword')) {
+            // کستینگ ناشناس: جستجوی کلیدواژه فقط روی بیوگرافی انجام می‌شود، نه نام واقعی هنرمند،
+            // تا تیم تولید نتواند پیش از خرید دسترسی هویت هنرمند را از طریق نام حدس/تأیید کند.
             $kw = $request->keyword;
-            $query->where(function ($q) use ($kw) {
-                $q->where('bio', 'like', "%{$kw}%")
-                  ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$kw}%"));
-            });
+            $query->where('bio', 'like', "%{$kw}%");
         }
 
         // Specialty category + attribute filter

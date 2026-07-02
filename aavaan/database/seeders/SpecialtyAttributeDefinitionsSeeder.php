@@ -493,6 +493,25 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('eztitles', 'EZTitles'),
         ]);
 
+        // ─── 23. رقص و کوریوگرافی ──────────────────────────────────────────
+        $addField(23, 'sub_specialty', 'زیرتخصص', 'select', true, [
+            $opt('choreographer', 'طراح رقص/کوریوگراف'),
+            $opt('dancer', 'رقصنده/مجری حرکات موزون'),
+            $opt('ballet', 'باله'),
+            $opt('folk_ritual', 'رقص آیینی و محلی'),
+            $opt('modern_contemporary', 'مدرن و معاصر'),
+            $opt('movement_coach', 'مربی حرکت و بدن'),
+        ]);
+        $addField(23, 'dance_styles', 'سبک‌های تخصصی', 'multiselect', false, [
+            $opt('ballet', 'باله'),
+            $opt('contemporary', 'معاصر/مدرن'),
+            $opt('folk', 'محلی و فولکلور'),
+            $opt('traditional_iranian', 'ایرانی/آیینی'),
+            $opt('hiphop', 'هیپ‌هاپ/استریت'),
+            $opt('latin', 'لاتین'),
+        ]);
+        $addField(23, 'years_experience_dance', 'سابقه (سال)', 'number');
+
         DB::table('specialty_attribute_definitions')->insert($rows);
     }
 }

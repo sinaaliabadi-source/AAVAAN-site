@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\ArtistProfile;
+use App\Models\SpecialtyCategory;
 use App\Mail\WelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return $this->redirectToDashboard();
         }
-        return view('auth.index');
+        return view('auth.index', ['fields' => SpecialtyCategory::fieldOptions()]);
     }
 
     public function login(Request $request)

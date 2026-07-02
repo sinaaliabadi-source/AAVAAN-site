@@ -251,7 +251,7 @@ window.__productionSearchSaved = @json((array) request('attr', []));
             </div>
             <div class="form-group" style="margin:0">
                 <label>کلیدواژه</label>
-                <input type="text" name="keyword" class="form-control" value="{{ request('keyword') }}" placeholder="نام، بیوگرافی ...">
+                <input type="text" name="keyword" class="form-control" value="{{ request('keyword') }}" placeholder="بیوگرافی، کلمات کلیدی ...">
             </div>
             <div style="display:flex;gap:.5rem;align-items:center">
                 <button type="submit" class="btn btn-primary btn-sm" style="flex:1">جستجو</button>
@@ -379,19 +379,24 @@ window.__productionSearchSaved = @json((array) request('attr', []));
 {{-- Artist cards --}}
 <div class="artists-grid">
     @forelse($artists as $artist)
-    @php $unlocked = in_array($artist->id, $unlockedIds); @endphp
+    @php
+        $unlocked = in_array($artist->id, $unlockedIds);
+        // کستینگ ناشناس: نام واقعی فقط پس از باز کردن پروفایل (unlock) نمایش داده می‌شود؛
+        // پیش از آن یک شناسهٔ مستعار پایدار جای نام و حرف اول قرار می‌گیرد (مخفی‌سازی سمت سرور).
+        $cardName = $unlocked ? $artist->user->name : 'هنرمند #' . $artist->id;
+    @endphp
 
     @if($hasPaidAccess)
         {{-- ── FULL CARD (user has paid) ── --}}
         <div class="artist-card" data-animate="artist-card">
             <span class="artist-card-overlay" data-card-overlay aria-hidden="true"></span>
             @if($artist->avatar)
-                <img src="{{ $artist->avatar_url }}" alt="{{ $artist->user->name }}" class="artist-card-img" data-card-img>
+                <img src="{{ $artist->avatar_url }}" alt="{{ $cardName }}" class="artist-card-img" data-card-img>
             @else
-                <div class="artist-card-img-placeholder">{{ mb_substr($artist->user->name, 0, 1) }}</div>
+                <div class="artist-card-img-placeholder">{{ mb_substr($cardName, 0, 1) }}</div>
             @endif
             <div class="artist-card-body">
-                <div class="artist-card-name">{{ $artist->user->name }}</div>
+                <div class="artist-card-name">{{ $cardName }}</div>
                 <span class="artist-card-field">{{ $artist->field }}</span>
                 <div class="artist-card-meta">
                     @if($artist->city)<span>📍 {{ $artist->city }}</span>@endif
@@ -423,10 +428,10 @@ window.__productionSearchSaved = @json((array) request('attr', []));
             @if($artist->avatar)
                 <img src="{{ $artist->avatar_url }}" alt="" class="artist-card-img" data-card-img>
             @else
-                <div class="artist-card-img-placeholder">{{ mb_substr($artist->user->name, 0, 1) }}</div>
+                <div class="artist-card-img-placeholder">{{ mb_substr($cardName, 0, 1) }}</div>
             @endif
             <div class="artist-card-body">
-                <div class="artist-card-name">{{ $artist->user->name }}</div>
+                <div class="artist-card-name">{{ $cardName }}</div>
                 <span class="artist-card-field">{{ $artist->field }}</span>
                 <div class="locked-bars">
                     <div class="locked-bar" style="width:75%"></div>

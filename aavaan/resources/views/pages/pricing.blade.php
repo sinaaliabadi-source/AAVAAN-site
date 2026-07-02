@@ -84,6 +84,13 @@
         max-width: 980px;
         margin: 0 auto;
     }
+    .pricing-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        max-width: 1180px;
+        margin: 0 auto;
+    }
 
     .pricing-card {
         background: #fff;
@@ -202,6 +209,9 @@
     }
 
     /* ─── Responsive ─── */
+    @media (max-width: 980px) {
+        .pricing-grid-4 { grid-template-columns: 1fr 1fr; max-width: 620px; }
+    }
     @media (max-width: 780px) {
         .pricing-grid-3 { grid-template-columns: 1fr; max-width: 420px; }
     }
@@ -209,6 +219,7 @@
         .pricing-hero h1 { font-size: 1.8rem; }
         .pricing-grid-2 { grid-template-columns: 1fr; max-width: 420px; }
         .pricing-grid-3 { grid-template-columns: 1fr; max-width: 420px; }
+        .pricing-grid-4 { grid-template-columns: 1fr; max-width: 420px; }
         .tab-btn { padding: .5rem 1.2rem; font-size: .88rem; }
     }
 </style>
@@ -287,7 +298,7 @@
             <p>به فهرست کامل هنرمندان فیلترشده دسترسی پیدا کنید</p>
         </div>
 
-        <div class="pricing-grid-3">
+        <div class="pricing-grid-4">
 
             {{-- دسترسی تکی --}}
             <div class="pricing-card">
@@ -321,6 +332,17 @@
                 </div>
                 <p class="card-desc" style="color:rgba(255,255,255,.8)">بهترین قیمت برای استودیوها. ده دسترسی کامل برای پروژه‌های مختلف.</p>
                 <a href="{{ route('auth') }}" class="btn btn-accent btn-block">انتخاب کنید</a>
+            </div>
+
+            {{-- سازمانی / پروژه بزرگ --}}
+            <div class="pricing-card">
+                <h3>سازمانی / پروژه بزرگ</h3>
+                <div class="price-block">
+                    <div class="price-amount" style="font-size:1.6rem">تماس بگیرید</div>
+                    <div class="price-period">قیمت‌گذاری اختصاصی</div>
+                </div>
+                <p class="card-desc">برای انتخاب بیش از ۱۰ هنرمند یا نیازهای سازمانی و پروژه‌های بزرگ. بستهٔ اختصاصی متناسب با حجم کار شما.</p>
+                <a href="{{ route('contact') }}" class="btn btn-outline btn-block">تماس بگیرید</a>
             </div>
 
         </div>

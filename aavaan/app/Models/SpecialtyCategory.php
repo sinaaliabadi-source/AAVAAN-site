@@ -59,6 +59,20 @@ class SpecialtyCategory extends Model
         return $this->attributeDefinitions()->orderBy('sort_order')->get();
     }
 
+    /**
+     * منبع واحد حوزه‌های فعالیت (رشته هنری) برای فرم‌های ثبت‌نام/ویرایش پروفایل و فیلتر جستجو.
+     * فهرست name_fa حوزه‌های اصلی (ریشه) فعال، مرتب بر اساس sort_order.
+     * جایگزین آرایهٔ منسوخ config('aavaan.artistic_fields') شده است.
+     */
+    public static function fieldOptions(): Collection
+    {
+        return static::query()
+            ->whereNull('parent_id')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->pluck('name_fa');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

@@ -212,6 +212,15 @@ class SpecialtyCategoriesSeeder extends Seeder
                 'icon' => 'language',
                 'is_active' => true,
             ],
+            [
+                'id' => 23,
+                'slug' => 'dance',
+                'name_fa' => 'رقص و کوریوگرافی',
+                'parent_id' => null,
+                'sort_order' => 23,
+                'icon' => 'person-walking',
+                'is_active' => true,
+            ],
         ];
 
         DB::table('specialty_categories')->insert($categories);

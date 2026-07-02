@@ -59,7 +59,7 @@
                 <label>رشته هنری <span class="req">*</span></label>
                 <select name="field" class="form-control" required>
                     <option value="">انتخاب کنید…</option>
-                    @foreach(config('aavaan.artistic_fields') as $f)
+                    @foreach($fields as $f)
                         <option value="{{ $f }}" {{ old('field', $profile?->field) === $f ? 'selected' : '' }}>{{ $f }}</option>
                     @endforeach
                 </select>

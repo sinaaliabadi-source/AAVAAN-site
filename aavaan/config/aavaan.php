@@ -2,8 +2,8 @@
 
 return [
     'artist_subscription' => [
-        'monthly_price' => (int) env('SUBSCRIPTION_MONTHLY_PRICE', 150000),
-        'yearly_price'  => (int) env('SUBSCRIPTION_YEARLY_PRICE', 1500000),
+        'monthly_price' => (int) env('SUBSCRIPTION_MONTHLY_PRICE', 200000),
+        'yearly_price'  => (int) env('SUBSCRIPTION_YEARLY_PRICE', 2000000),
     ],
     'production_access' => [
         'single_price'    => (int) env('ACCESS_SINGLE_PRICE', 200000),
@@ -17,10 +17,6 @@ return [
         'max_portfolio_items' => 10,
         'allowed_image_types' => ['jpg', 'jpeg', 'png', 'webp'],
     ],
-    'artistic_fields' => [
-        'بازیگری', 'کارگردانی', 'فیلمبرداری', 'تصویربرداری',
-        'موسیقی', 'طراحی صحنه', 'طراحی لباس', 'گریم',
-        'تدوین', 'صداگذاری', 'نویسندگی', 'تئاتر',
-        'رقص و کوریوگرافی', 'سایر',
-    ],
+    // فهرست حوزه‌های فعالیت (رشته هنری) از منبع واحد SpecialtyCategory خوانده می‌شود.
+    // به جای این آرایه از App\Models\SpecialtyCategory::fieldOptions() استفاده کنید.
 ];

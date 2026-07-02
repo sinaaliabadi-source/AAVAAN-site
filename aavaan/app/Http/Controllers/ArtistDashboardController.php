@@ -30,6 +30,41 @@ class ArtistDashboardController extends Controller
     }
 
 
+    /**
+     * قانون اعتبارسنجی بیوگرافی برای کستینگ ناشناس:
+     * از درج شماره تماس یا ایمیل داخل بیوگرافی جلوگیری می‌کند، چون بیوگرافی همیشه
+     * (حتی بدون خرید دسترسی) نمایش داده می‌شود و نباید اطلاعات تماس واقعی را لو بدهد.
+     * ارقام فارسی/عربی پیش از بررسی به ارقام لاتین نرمال می‌شوند. تشخیص شماره = ۸+ رقم پشت‌سرهم.
+     */
+    private function bioNoContactRule(): \Closure
+    {
+        return function (string $attribute, $value, \Closure $fail): void {
+            if (!is_string($value) || $value === '') {
+                return;
+            }
+
+            // نرمال‌سازی ارقام فارسی (۰-۹) و عربی (٠-٩) به لاتین
+            $normalized = strtr($value, [
+                '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4',
+                '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9',
+                '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+                '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+            ]);
+
+            // ایمیل
+            if (preg_match('/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/', $normalized)) {
+                $fail('لطفاً ایمیل را در بیوگرافی درج نکنید؛ برای این کار از فیلد «ایمیل تماس» استفاده کنید.');
+                return;
+            }
+
+            // شماره تماس: هر رشتهٔ ۸ رقمی یا بیشتر (با نادیده‌گرفتن فاصله، خط‌تیره و پرانتز)
+            $digitsOnly = preg_replace('/[\s\-()]+/', '', $normalized);
+            if (preg_match('/\d{8,}/', $digitsOnly)) {
+                $fail('لطفاً شماره تماس را در بیوگرافی درج نکنید؛ برای این کار از فیلد «شماره تماس» استفاده کنید.');
+            }
+        };
+    }
+
     public function index()
     {
         $user = auth()->user();
@@ -48,7 +83,7 @@ class ArtistDashboardController extends Controller
             ->with(['workHistories', 'portfolioImages', 'portfolioVideos'])
             ->first();
 
-        $fields = config('aavaan.artistic_fields');
+        $fields = SpecialtyCategory::fieldOptions();
 
         // Specialties with their category (own + parent attribute definitions) and media
         $specialties = $user->artistSpecialties()
@@ -122,7 +157,7 @@ class ArtistDashboardController extends Controller
             'city'             => 'nullable|string|max:100',
             'birth_year'       => 'nullable|integer|min:1300|max:1410',
             'years_experience' => 'nullable|integer|min:0|max:60',
-            'bio'              => 'nullable|string|max:1000',
+            'bio'              => ['nullable', 'string', 'max:1000', $this->bioNoContactRule()],
             'phone_contact'    => 'nullable|string|max:15',
             'email_contact'    => 'nullable|email|max:200',
             'avatar'           => 'nullable|image|mimes:jpg,jpeg,png|max:5120',

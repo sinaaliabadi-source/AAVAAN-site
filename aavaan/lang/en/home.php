@@ -61,7 +61,7 @@ return [
     'pricing_artist_badge'   => 'Artist',
     'pricing_artist_title'   => 'Artist subscription',
     'pricing_artist_desc'    => 'A complete profile, portfolio, showreel and presence in the casting directory of production teams nationwide.',
-    'pricing_artist_price'   => 'From 99,000 Toman',
+    'pricing_artist_price'   => 'From 200,000 Toman',
     'pricing_artist_period'  => '/ monthly',
     'pricing_production_badge' => 'Production team',
     'pricing_production_title' => 'Production access packages',

@@ -204,7 +204,7 @@
                                 <select name="field" id="reg-field"
                                         class="form-control @error('field') is-invalid @enderror">
                                     <option value="">— انتخاب کنید —</option>
-                                    @foreach(config('aavaan.artistic_fields') as $f)
+                                    @foreach($fields as $f)
                                         <option value="{{ $f }}" {{ old('field') === $f ? 'selected' : '' }}>{{ $f }}</option>
                                     @endforeach
                                 </select>

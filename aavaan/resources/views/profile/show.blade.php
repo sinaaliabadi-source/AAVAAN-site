@@ -3,7 +3,14 @@
                     ?? $profile->portfolioVideos->first();
     $images      = $profile->portfolioImages;
     $histories   = $profile->workHistories;
-    $artistName  = $profile->user->name;
+
+    // ── Blind casting (کستینگ ناشناس) ──
+    // نام واقعی هنرمند فقط زمانی نمایش داده می‌شود که بازدیدکننده خودِ هنرمند باشد
+    // یا کاربر تیم تولیدی که برای این پروفایل رکورد ProductionAccessLog دارد ($hasAccess).
+    // در غیر این‌صورت یک شناسهٔ مستعار پایدار نمایش داده می‌شود. این مخفی‌سازی سمت سرور است
+    // (اطلاعات واقعی اصلاً در HTML قرار نمی‌گیرد) نه صرفاً پنهان‌سازی بصری با CSS.
+    $showRealName = $isSelf || $hasAccess;
+    $artistName   = $showRealName ? $profile->user->name : 'هنرمند #' . $profile->id;
     $fieldLabel  = $profile->field ?? '';
     $cityLabel   = $profile->city  ?? '';
 

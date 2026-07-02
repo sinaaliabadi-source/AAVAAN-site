@@ -169,8 +169,15 @@
                 <span class="bundle-pill">دسترسی تکی</span>
                 <span class="bundle-pill">بسته ۵ دسترسی</span>
                 <span class="bundle-pill">بسته ۱۰ دسترسی — بهترین ارزش</span>
+                <span class="bundle-pill">سازمانی / پروژه بزرگ — تماس بگیرید</span>
             </div>
-            <a href="{{ route('pricing') }}" class="btn btn-accent">مشاهده تعرفه کامل</a>
+            <p class="payment-box-text" style="margin-bottom:1.5rem">
+                برای انتخاب بیش از ۱۰ هنرمند یا نیازهای سازمانی و پروژه‌های بزرگ، بستهٔ اختصاصی با قیمت‌گذاری ویژه در نظر گرفته می‌شود.
+            </p>
+            <div style="display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap;">
+                <a href="{{ route('pricing') }}" class="btn btn-accent">مشاهده تعرفه کامل</a>
+                <a href="{{ route('contact') }}" class="btn btn-outline" style="border-color:rgba(255,255,255,.6);color:#fff">تماس برای پلن سازمانی</a>
+            </div>
         </div>
     </div>
 </section>
