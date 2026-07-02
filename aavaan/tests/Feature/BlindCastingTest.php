@@ -127,6 +127,20 @@ class BlindCastingTest extends TestCase
         $this->assertStringContainsString('contact@example.com', $html);
     }
 
+    public function test_public_home_featured_section_does_not_leak_real_name(): void
+    {
+        $profile = $this->makeArtist();
+
+        // بازدیدکنندهٔ مهمان (بدون لاگین) صفحهٔ اصلی عمومی
+        $html = $this->get(route('home'))
+            ->assertOk()
+            ->getContent();
+
+        // در بخش «هنرمندان برگزیده» نباید نام واقعی هنرمند در HTML باشد
+        $this->assertStringNotContainsString(self::REAL_NAME, $html);
+        $this->assertStringContainsString('هنرمند #' . $profile->id, $html);
+    }
+
     public function test_artist_viewing_own_profile_sees_real_name(): void
     {
         $profile = $this->makeArtist();
