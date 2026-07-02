@@ -1,0 +1,48 @@
+-- admin-reports.sql
+-- Generated for the AAVAAN admin reports feature.
+--
+-- No new migrations were required for this feature.
+-- All report queries rely entirely on existing tables:
+--
+--   payments          (id, user_id, payable_type, payable_id, amount, status, paid_at, ...)
+--   subscriptions     (id, user_id, plan, status, starts_at, expires_at, ...)
+--   production_accesses (id, user_id, access_type, bundle_size, used_count, expires_at, ...)
+--   production_access_logs (id, production_access_id, production_user_id, artist_profile_id, accessed_at)
+--   discount_codes    (id, code, type, value, max_uses, used_count, valid_from, valid_until, is_active, ...)
+--   discount_code_uses (id, discount_code_id, user_id, subscription_id, used_at)
+--   users             (id, name, email, role, created_at, ...)
+--   artist_profiles   (id, user_id, ...)
+--
+-- If you need to run reporting queries directly against the database, here are
+-- the key queries used by the report controller:
+--
+-- 1. Total revenue by type in a date range:
+--    SELECT SUM(amount) FROM payments
+--      WHERE payable_type = 'App\\Models\\Subscription'
+--        AND status = 'paid'
+--        AND paid_at BETWEEN '2026-01-01' AND '2026-06-30';
+--
+-- 2. Monthly revenue breakdown (last 12 months):
+--    SELECT YEAR(paid_at) AS yr, MONTH(paid_at) AS mo,
+--           SUM(amount) AS total, COUNT(*) AS cnt
+--      FROM payments
+--      WHERE status = 'paid'
+--        AND paid_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+--      GROUP BY yr, mo
+--      ORDER BY yr, mo;
+--
+-- 3. Top 5 production teams by access count:
+--    SELECT user_id, COUNT(*) AS access_count
+--      FROM production_accesses pa
+--      JOIN payments p ON p.payable_type = 'App\\Models\\ProductionAccess'
+--           AND p.payable_id = pa.id AND p.status = 'paid'
+--      GROUP BY user_id
+--      ORDER BY access_count DESC
+--      LIMIT 5;
+--
+-- 4. Top 5 most-accessed artists:
+--    SELECT artist_profile_id, COUNT(*) AS access_count
+--      FROM production_access_logs
+--      GROUP BY artist_profile_id
+--      ORDER BY access_count DESC
+--      LIMIT 5;
