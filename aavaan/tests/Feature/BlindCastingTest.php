@@ -22,6 +22,13 @@ class BlindCastingTest extends TestCase
 
     private const REAL_NAME = 'علی رضایی واقعی';
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // دارایی‌های Vite در محیط تست بیلد نشده‌اند؛ دستورِ @vite را خنثی می‌کنیم.
+        $this->withoutVite();
+    }
+
     private function makeArtist(): ArtistProfile
     {
         $user = User::create([
