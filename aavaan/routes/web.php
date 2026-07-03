@@ -5,6 +5,7 @@ use App\Http\Controllers\TalentDensityController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArtistDashboardController;
 use App\Http\Controllers\ArtistSpecialtyController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\Admin\AdminPaymentController;
 use App\Http\Controllers\Admin\AdminDiscountController;
 use App\Http\Controllers\Admin\AdminSystemSettingController;
 use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
@@ -68,6 +70,13 @@ Route::post('/honarbaz/vote', [HonarbazController::class, 'vote'])
 Route::post('/honarbaz/vote/verify', [HonarbazController::class, 'verifyVote'])
     ->name('honarbaz.vote.verify')->middleware('throttle:honarbaz-vote');
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
+
+// امتیازدهی و نظرات هنرمند (فقط تیم تولید با دسترسی)
+Route::middleware('auth')->group(function () {
+    Route::post('/profile/{username}/review', [ReviewController::class, 'store'])->name('review.store');
+    Route::put('/profile/{username}/review', [ReviewController::class, 'update'])->name('review.update');
+    Route::delete('/review/{id}', [ReviewController::class, 'destroy'])->name('review.destroy');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/auth', [AuthController::class, 'index'])->name('auth');
@@ -163,6 +172,10 @@ Route::middleware(['auth', 'admin'])
         Route::get('/discount-codes/{id}/edit', [AdminDiscountController::class, 'edit'])->name('discounts.edit');
         Route::put('/discount-codes/{id}', [AdminDiscountController::class, 'update'])->name('discounts.update');
         Route::post('/discount-codes/{id}/toggle', [AdminDiscountController::class, 'toggle'])->name('discounts.toggle');
+
+        // Artist reviews moderation
+        Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::post('/reviews/{id}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
 
         // System Settings (pricing/limits)
         Route::get('/system-settings', [AdminSystemSettingController::class, 'index'])->name('system-settings.index');

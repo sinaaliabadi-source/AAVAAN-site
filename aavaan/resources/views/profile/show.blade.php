@@ -316,6 +316,58 @@
         border: none;
     }
 
+    /* ── Locked field (privacy) ── */
+    .locked-field {
+        background: #f0ece0;
+        border: 1px dashed #C9A24B;
+        border-radius: 6px;
+        padding: 4px 10px;
+        color: #888;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+
+    /* ── Rating / reviews ── */
+    .artist-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        font-size: .95rem;
+        margin-bottom: .75rem;
+    }
+    .artist-rating .star-filled { color: #f0b429; }
+    .artist-rating .star-empty  { color: #d8d2c6; }
+    .artist-rating .rating-num  { font-weight: 800; color: var(--color-primary); font-family: 'YekanBakh', sans-serif; margin-left: .2rem; }
+    .artist-rating .rating-count { font-size: .82rem; color: var(--color-muted); }
+
+    .review-form {
+        background: #faf7f2;
+        border: 1px solid #ede8dc;
+        border-radius: var(--radius);
+        padding: 1.1rem;
+        margin-bottom: 1.25rem;
+    }
+    .star-input { display: inline-flex; flex-direction: row-reverse; gap: .15rem; }
+    .star-input button {
+        background: none; border: none; cursor: pointer;
+        font-size: 1.6rem; line-height: 1; padding: 0 .05rem;
+        color: #d8d2c6; transition: color .12s;
+    }
+    .star-input button.on,
+    .star-input button.hover { color: #f0b429; }
+
+    .review-card {
+        border: 1px solid #f0ede8;
+        border-radius: 10px;
+        padding: .9rem 1.1rem;
+        margin-bottom: .75rem;
+        background: #fff;
+    }
+    .review-card .stars { color: #f0b429; font-size: .95rem; letter-spacing: 1px; }
+    .review-card .stars .star-empty { color: #d8d2c6; }
+    .review-card p { margin: .5rem 0 .35rem; line-height: 1.9; color: var(--color-text); }
+    .review-card .review-meta { font-size: .78rem; color: var(--color-muted); }
+
     /* ── Responsive ── */
     @media (max-width: 640px) {
         .profile-hero { flex-direction: column; align-items: center; text-align: center; }
@@ -360,6 +412,17 @@
                     <span class="profile-tag">🎬 {{ $histories->count() }} سابقه کاری</span>
                 @endif
             </div>
+
+            {{-- امتیاز کلی — همیشه نمایش داده می‌شود (بدون نیاز به پرداخت) --}}
+            @if($profile->rating_count > 0)
+            <div class="artist-rating" title="{{ $profile->rating_avg }} از ۵">
+                @for($i = 1; $i <= 5; $i++)
+                    <span class="{{ $i <= round($profile->rating_avg) ? 'star-filled' : 'star-empty' }}">★</span>
+                @endfor
+                <span class="rating-num">{{ $profile->rating_avg }}</span>
+                <span class="rating-count">({{ $profile->rating_count }} نظر)</span>
+            </div>
+            @endif
 
             @if($isSelf)
                 <a href="{{ route('artist.profile') }}" class="btn btn-outline btn-sm">✏️ ویرایش پروفایل</a>
@@ -614,6 +677,87 @@
         </div>
     </div>
     @endif
+
+    {{-- Reviews & rating --}}
+    <div class="section-card" id="reviews">
+        <div class="section-title">⭐ امتیاز و نظرات تیم‌های تولید</div>
+
+        @if(session('error'))
+            <div style="background:#fdecec;border:1px solid #f5c2c2;color:#a33;border-radius:8px;padding:.6rem .9rem;margin-bottom:1rem;font-size:.88rem">
+                {{ session('error') }}
+            </div>
+        @endif
+        @if(session('success'))
+            <div style="background:#ecf5ec;border:1px solid #c3dfc3;color:#2d5a2d;border-radius:8px;padding:.6rem .9rem;margin-bottom:1rem;font-size:.88rem">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        {{-- فرم ثبت/ویرایش نظر — فقط تیم تولید با دسترسیِ پرداخت‌شده --}}
+        @if($canReview)
+        <div class="review-form"
+             x-data="{ rating: {{ (int) ($myReview->rating ?? 0) }}, hover: 0 }">
+            <form method="POST" action="{{ $myReview ? route('review.update', $profile->username) : route('review.store', $profile->username) }}">
+                @csrf
+                @if($myReview) @method('PUT') @endif
+
+                <label style="display:block;font-size:.85rem;font-weight:600;color:var(--color-primary);margin-bottom:.4rem">
+                    {{ $myReview ? 'ویرایش نظر شما' : 'امتیاز شما به این هنرمند' }}
+                </label>
+
+                <div class="star-input">
+                    @for($i = 5; $i >= 1; $i--)
+                    <button type="button"
+                            @click="rating = {{ $i }}"
+                            @mouseenter="hover = {{ $i }}"
+                            @mouseleave="hover = 0"
+                            :class="{ 'on': rating >= {{ $i }} && hover === 0, 'hover': hover >= {{ $i }} }"
+                            aria-label="{{ $i }} ستاره">★</button>
+                    @endfor
+                </div>
+                <input type="hidden" name="rating" :value="rating">
+
+                <textarea name="comment" rows="3" maxlength="500"
+                          class="form-control" style="margin-top:.75rem"
+                          placeholder="نظر شما (اختیاری) — لطفاً نام هنرمند را ذکر نکنید.">{{ old('comment', $myReview->comment ?? '') }}</textarea>
+
+                <div style="display:flex;align-items:center;gap:.6rem;margin-top:.75rem">
+                    <button type="submit" class="btn btn-accent btn-sm" :disabled="rating < 1">
+                        {{ $myReview ? 'به‌روزرسانی نظر' : 'ثبت نظر' }}
+                    </button>
+                    @if($myReview)
+                    <span style="font-size:.78rem;color:var(--color-muted)">شما قبلاً به این هنرمند امتیاز داده‌اید.</span>
+                    @endif
+                </div>
+            </form>
+
+            @if($myReview)
+            <form method="POST" action="{{ route('review.destroy', $myReview->id) }}" style="margin-top:.5rem"
+                  onsubmit="return confirm('نظر شما حذف شود؟')">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-ghost btn-sm" style="color:#a33">حذف نظر من</button>
+            </form>
+            @endif
+        </div>
+        @endif
+
+        {{-- لیست نظرات — نام تیم تولید نمایش داده نمی‌شود --}}
+        @forelse($reviews as $review)
+        <div class="review-card">
+            <div class="stars">
+                @for($i = 1; $i <= 5; $i++)<span class="{{ $i <= $review->rating ? '' : 'star-empty' }}">★</span>@endfor
+            </div>
+            @if($review->comment)
+                <p>{{ $review->comment }}</p>
+            @endif
+            <span class="review-meta">تیم تولید — {{ $review->created_at->diffForHumans() }}</span>
+        </div>
+        @empty
+        <p style="color:var(--color-muted);font-size:.9rem;text-align:center;padding:1rem 0">
+            هنوز نظری برای این هنرمند ثبت نشده است.
+        </p>
+        @endforelse
+    </div>
 
     {{-- Contact section --}}
     @if($hasAccess)

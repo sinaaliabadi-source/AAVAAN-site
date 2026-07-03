@@ -509,6 +509,9 @@
             <a href="{{ route('admin.verifications.index') }}" class="{{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}">
                 <span class="nav-icon">✅</span> تأیید تخصص
             </a>
+            <a href="{{ route('admin.reviews.index') }}" class="{{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                <span class="nav-icon">⭐</span> نظرات هنرمندان
+            </a>
 
             <div class="sidebar-section-title">اشتراک و مالی</div>
             <a href="{{ route('admin.subscriptions.index') }}" class="{{ request()->routeIs('admin.subscriptions.*') ? 'active' : '' }}">
