@@ -513,6 +513,17 @@
                 <span class="nav-icon">⭐</span> نظرات هنرمندان
             </a>
 
+            <div class="sidebar-section-title">🎫 پشتیبانی</div>
+            <a href="{{ route('admin.support.index') }}" class="{{ request()->routeIs('admin.support.index') ? 'active' : '' }}">
+                <span class="nav-icon">📊</span> داشبورد پشتیبانی
+            </a>
+            <a href="{{ route('admin.support.tickets') }}" class="{{ request()->routeIs('admin.support.tickets') || request()->routeIs('admin.support.show') ? 'active' : '' }}">
+                <span class="nav-icon">🎫</span> همه تیکت‌ها
+            </a>
+            <a href="{{ route('admin.support.canned.index') }}" class="{{ request()->routeIs('admin.support.canned.*') ? 'active' : '' }}">
+                <span class="nav-icon">💬</span> پاسخ‌های آماده
+            </a>
+
             <div class="sidebar-section-title">اشتراک و مالی</div>
             <a href="{{ route('admin.subscriptions.index') }}" class="{{ request()->routeIs('admin.subscriptions.*') ? 'active' : '' }}">
                 <span class="nav-icon">⭐</span> اشتراک‌ها

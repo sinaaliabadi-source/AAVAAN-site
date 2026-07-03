@@ -6,6 +6,8 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SupportController;
+use App\Http\Controllers\Admin\SupportAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArtistDashboardController;
 use App\Http\Controllers\ArtistSpecialtyController;
@@ -76,6 +78,26 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/{username}/review', [ReviewController::class, 'store'])->name('review.store');
     Route::put('/profile/{username}/review', [ReviewController::class, 'update'])->name('review.update');
     Route::delete('/review/{id}', [ReviewController::class, 'destroy'])->name('review.destroy');
+});
+
+// ═══════════════════════════════════════════════════
+// پشتیبانی و تیکتینگ (عمومی)
+// ═══════════════════════════════════════════════════
+Route::prefix('support')->name('support.')->group(function () {
+    Route::get('/', [SupportController::class, 'index'])->name('index');
+
+    Route::get('/new', [SupportController::class, 'create'])->name('create');
+    Route::post('/new', [SupportController::class, 'store'])->name('store')->middleware('throttle:contact');
+
+    Route::get('/track', [SupportController::class, 'track'])->name('track');
+    Route::post('/track', [SupportController::class, 'trackResult'])->name('track.result');
+
+    Route::get('/tickets', [SupportController::class, 'myTickets'])->name('tickets')->middleware('auth');
+    Route::get('/tickets/{ticket}', [SupportController::class, 'show'])->name('show');
+    Route::post('/tickets/{ticket}/reply', [SupportController::class, 'reply'])->name('reply');
+    Route::post('/tickets/{ticket}/close', [SupportController::class, 'close'])->name('close');
+
+    Route::get('/attachments/{attachment}/download', [SupportController::class, 'downloadAttachment'])->name('attachment.download');
 });
 
 Route::middleware('guest')->group(function () {
@@ -176,6 +198,22 @@ Route::middleware(['auth', 'admin'])
         // Artist reviews moderation
         Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::post('/reviews/{id}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
+
+        // Support / ticketing
+        Route::prefix('support')->name('support.')->group(function () {
+            Route::get('/', [SupportAdminController::class, 'index'])->name('index');
+            Route::get('/tickets', [SupportAdminController::class, 'tickets'])->name('tickets');
+            Route::get('/tickets/{ticket}', [SupportAdminController::class, 'show'])->name('show');
+            Route::post('/tickets/{ticket}/reply', [SupportAdminController::class, 'reply'])->name('reply');
+            Route::post('/tickets/{ticket}/status', [SupportAdminController::class, 'updateStatus'])->name('status');
+            Route::post('/tickets/{ticket}/assign', [SupportAdminController::class, 'assign'])->name('assign');
+            Route::post('/tickets/{ticket}/priority', [SupportAdminController::class, 'updatePriority'])->name('priority');
+
+            Route::get('/canned', [SupportAdminController::class, 'cannedIndex'])->name('canned.index');
+            Route::post('/canned', [SupportAdminController::class, 'cannedStore'])->name('canned.store');
+            Route::put('/canned/{id}', [SupportAdminController::class, 'cannedUpdate'])->name('canned.update');
+            Route::delete('/canned/{id}', [SupportAdminController::class, 'cannedDestroy'])->name('canned.destroy');
+        });
 
         // System Settings (pricing/limits)
         Route::get('/system-settings', [AdminSystemSettingController::class, 'index'])->name('system-settings.index');
