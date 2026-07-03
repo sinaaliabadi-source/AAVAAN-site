@@ -4,7 +4,7 @@
 
 set -e
 
-DEPLOY_PATH="/var/www/aavaan"
+DEPLOY_PATH="/var/www/aavaan/aavaan"
 BACKUP_PATH="/var/www/aavaan-backups/$(date +%Y%m%d_%H%M%S)"
 PHP="php8.2"
 ARTISAN="$PHP $DEPLOY_PATH/artisan"
@@ -45,6 +45,21 @@ echo "⚡ بهینه‌سازی cache..."
 $ARTISAN config:cache
 $ARTISAN route:cache
 $ARTISAN view:cache
+
+# پاک‌سازی/تازه‌سازی OPcache
+# artisan config:cache فقط فایل جدید bootstrap/cache/config.php را می‌نویسد،
+# ولی اگر PHP-FPM با opcache.validate_timestamps=0 اجرا شود (رایج در production)
+# پردازه‌های در حال اجرا نسخه‌ی قدیمی همان فایل را در حافظه نگه می‌دارند تا
+# وقتی PHP-FPM ری‌لود شود. بدون این مرحله، مقادیر جدید config (مثل تعرفه‌های
+# جدید از .env) تا قبل از ری‌لود روی سایت زنده دیده نمی‌شوند.
+echo "♻️ تازه‌سازی OPcache (ری‌لود PHP-FPM)..."
+if systemctl reload "${PHP}-fpm" 2>/dev/null; then
+    echo "   PHP-FPM با موفقیت ری‌لود شد."
+elif service "${PHP}-fpm" reload 2>/dev/null; then
+    echo "   PHP-FPM با موفقیت ری‌لود شد."
+else
+    echo "   ⚠️ ری‌لود PHP-FPM ناموفق بود؛ لطفاً به‌صورت دستی ${PHP}-fpm را ری‌لود کنید تا config جدید اعمال شود."
+fi
 
 # storage symlink
 $ARTISAN storage:link --force 2>/dev/null || true
