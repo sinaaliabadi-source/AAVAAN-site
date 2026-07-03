@@ -24,6 +24,7 @@ yarn-error.log
 /public/uploads/avatars/*
 /public/uploads/portfolios/*
 /public/uploads/reels/*
+/public/uploads/cms/*
 !/public/uploads/avatars/.gitkeep
 !/public/uploads/portfolios/.gitkeep
 !/public/uploads/reels/.gitkeep

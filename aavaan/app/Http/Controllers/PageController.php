@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Faq;
+use App\Models\CmsFaq;
+use App\Models\CmsPage;
 use App\Models\ContactMessage;
 use App\Models\SpecialtyCategory;
 use Illuminate\Http\Request;
@@ -29,8 +30,24 @@ class PageController extends Controller
     }
 
     public function production() { return view('pages.production'); }
-    public function terms()    { return view('pages.terms'); }
-    public function privacy()  { return view('pages.privacy'); }
+
+    /**
+     * صفحات terms/privacy از CMS خوانده می‌شوند (قابل ویرایش توسط ادمین).
+     * در نبود رکورد منتشرشده، به قالب استاتیک قبلی برمی‌گردیم تا هیچ صفحه‌ای خالی نماند.
+     */
+    public function terms()   { return $this->renderCmsPage('terms', 'pages.terms'); }
+    public function privacy() { return $this->renderCmsPage('privacy', 'pages.privacy'); }
+
+    private function renderCmsPage(string $slug, string $fallbackView)
+    {
+        $page = CmsPage::where('slug', $slug)->where('is_published', true)->first();
+
+        if ($page && filled($page->content)) {
+            return view('pages.cms-page', compact('page'));
+        }
+
+        return view($fallbackView);
+    }
 
     public function pricing()
     {
@@ -47,7 +64,11 @@ class PageController extends Controller
 
     public function faq()
     {
-        $faqs = Faq::active()->get()->groupBy('category');
+        $faqs = CmsFaq::published()
+            ->orderBy('sort_order')
+            ->get()
+            ->groupBy('category');
+
         return view('pages.faq', compact('faqs'));
     }
 

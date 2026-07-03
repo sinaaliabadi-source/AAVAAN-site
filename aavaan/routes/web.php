@@ -32,6 +32,12 @@ use App\Http\Controllers\Admin\AdminDiscountController;
 use App\Http\Controllers\Admin\AdminSystemSettingController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\CmsPostController;
+use App\Http\Controllers\Admin\CmsCategoryController;
+use App\Http\Controllers\Admin\CmsTagController;
+use App\Http\Controllers\Admin\CmsPageController;
+use App\Http\Controllers\Admin\CmsFaqController;
+use App\Http\Controllers\Admin\CmsMediaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
@@ -57,6 +63,8 @@ Route::post('/contact', [PageController::class, 'sendContact'])->name('contact.s
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
+Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
+Route::get('/blog/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // ═══════════════════════════════════════════════════
@@ -213,6 +221,36 @@ Route::middleware(['auth', 'admin'])
             Route::post('/canned', [SupportAdminController::class, 'cannedStore'])->name('canned.store');
             Route::put('/canned/{id}', [SupportAdminController::class, 'cannedUpdate'])->name('canned.update');
             Route::delete('/canned/{id}', [SupportAdminController::class, 'cannedDestroy'])->name('canned.destroy');
+        });
+
+        // CMS — مدیریت محتوا
+        Route::prefix('cms')->name('cms.')->group(function () {
+            // بلاگ
+            Route::post('posts/{post}/publish', [CmsPostController::class, 'publish'])->name('posts.publish');
+            Route::post('posts/{post}/unpublish', [CmsPostController::class, 'unpublish'])->name('posts.unpublish');
+            Route::get('posts/{post}/preview', [CmsPostController::class, 'preview'])->name('posts.preview');
+            Route::resource('posts', CmsPostController::class)->except(['show']);
+
+            // دسته‌بندی‌ها
+            Route::resource('categories', CmsCategoryController::class)->except(['show']);
+
+            // برچسب‌ها
+            Route::resource('tags', CmsTagController::class)->only(['index', 'store', 'destroy']);
+
+            // صفحات استاتیک
+            Route::get('pages', [CmsPageController::class, 'index'])->name('pages.index');
+            Route::get('pages/{slug}/edit', [CmsPageController::class, 'edit'])->name('pages.edit');
+            Route::put('pages/{slug}', [CmsPageController::class, 'update'])->name('pages.update');
+
+            // FAQ
+            Route::post('faqs/reorder', [CmsFaqController::class, 'reorder'])->name('faqs.reorder');
+            Route::resource('faqs', CmsFaqController::class)->except(['show']);
+
+            // کتابخانه رسانه
+            Route::get('media', [CmsMediaController::class, 'index'])->name('media.index');
+            Route::post('media/upload', [CmsMediaController::class, 'upload'])->name('media.upload');
+            Route::delete('media/{id}', [CmsMediaController::class, 'destroy'])->name('media.destroy');
+            Route::get('media/{id}/url', [CmsMediaController::class, 'getUrl'])->name('media.url');
         });
 
         // System Settings (pricing/limits)
