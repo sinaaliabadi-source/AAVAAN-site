@@ -509,6 +509,40 @@
             <a href="{{ route('admin.verifications.index') }}" class="{{ request()->routeIs('admin.verifications.*') ? 'active' : '' }}">
                 <span class="nav-icon">✅</span> تأیید تخصص
             </a>
+            <a href="{{ route('admin.reviews.index') }}" class="{{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                <span class="nav-icon">⭐</span> نظرات هنرمندان
+            </a>
+
+            <div class="sidebar-section-title">🎫 پشتیبانی</div>
+            <a href="{{ route('admin.support.index') }}" class="{{ request()->routeIs('admin.support.index') ? 'active' : '' }}">
+                <span class="nav-icon">📊</span> داشبورد پشتیبانی
+            </a>
+            <a href="{{ route('admin.support.tickets') }}" class="{{ request()->routeIs('admin.support.tickets') || request()->routeIs('admin.support.show') ? 'active' : '' }}">
+                <span class="nav-icon">🎫</span> همه تیکت‌ها
+            </a>
+            <a href="{{ route('admin.support.canned.index') }}" class="{{ request()->routeIs('admin.support.canned.*') ? 'active' : '' }}">
+                <span class="nav-icon">💬</span> پاسخ‌های آماده
+            </a>
+
+            <div class="sidebar-section-title">📝 مدیریت محتوا</div>
+            <a href="{{ route('admin.cms.posts.index') }}" class="{{ request()->routeIs('admin.cms.posts.*') ? 'active' : '' }}">
+                <span class="nav-icon">📰</span> مقالات بلاگ
+            </a>
+            <a href="{{ route('admin.cms.categories.index') }}" class="{{ request()->routeIs('admin.cms.categories.*') ? 'active' : '' }}">
+                <span class="nav-icon">🗂</span> دسته‌بندی‌ها
+            </a>
+            <a href="{{ route('admin.cms.tags.index') }}" class="{{ request()->routeIs('admin.cms.tags.*') ? 'active' : '' }}">
+                <span class="nav-icon">🏷</span> برچسب‌ها
+            </a>
+            <a href="{{ route('admin.cms.pages.index') }}" class="{{ request()->routeIs('admin.cms.pages.*') ? 'active' : '' }}">
+                <span class="nav-icon">📄</span> صفحات سایت
+            </a>
+            <a href="{{ route('admin.cms.faqs.index') }}" class="{{ request()->routeIs('admin.cms.faqs.*') ? 'active' : '' }}">
+                <span class="nav-icon">❓</span> سوالات متداول
+            </a>
+            <a href="{{ route('admin.cms.media.index') }}" class="{{ request()->routeIs('admin.cms.media.*') ? 'active' : '' }}">
+                <span class="nav-icon">🖼</span> کتابخانه رسانه
+            </a>
 
             <div class="sidebar-section-title">اشتراک و مالی</div>
             <a href="{{ route('admin.subscriptions.index') }}" class="{{ request()->routeIs('admin.subscriptions.*') ? 'active' : '' }}">

@@ -5,6 +5,9 @@ use App\Http\Controllers\TalentDensityController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SupportController;
+use App\Http\Controllers\Admin\SupportAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArtistDashboardController;
 use App\Http\Controllers\ArtistSpecialtyController;
@@ -28,6 +31,13 @@ use App\Http\Controllers\Admin\AdminPaymentController;
 use App\Http\Controllers\Admin\AdminDiscountController;
 use App\Http\Controllers\Admin\AdminSystemSettingController;
 use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\CmsPostController;
+use App\Http\Controllers\Admin\CmsCategoryController;
+use App\Http\Controllers\Admin\CmsTagController;
+use App\Http\Controllers\Admin\CmsPageController;
+use App\Http\Controllers\Admin\CmsFaqController;
+use App\Http\Controllers\Admin\CmsMediaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
@@ -53,6 +63,8 @@ Route::post('/contact', [PageController::class, 'sendContact'])->name('contact.s
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
+Route::get('/blog/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
+Route::get('/blog/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // ═══════════════════════════════════════════════════
@@ -68,6 +80,33 @@ Route::post('/honarbaz/vote', [HonarbazController::class, 'vote'])
 Route::post('/honarbaz/vote/verify', [HonarbazController::class, 'verifyVote'])
     ->name('honarbaz.vote.verify')->middleware('throttle:honarbaz-vote');
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
+
+// امتیازدهی و نظرات هنرمند (فقط تیم تولید با دسترسی)
+Route::middleware('auth')->group(function () {
+    Route::post('/profile/{username}/review', [ReviewController::class, 'store'])->name('review.store');
+    Route::put('/profile/{username}/review', [ReviewController::class, 'update'])->name('review.update');
+    Route::delete('/review/{id}', [ReviewController::class, 'destroy'])->name('review.destroy');
+});
+
+// ═══════════════════════════════════════════════════
+// پشتیبانی و تیکتینگ (عمومی)
+// ═══════════════════════════════════════════════════
+Route::prefix('support')->name('support.')->group(function () {
+    Route::get('/', [SupportController::class, 'index'])->name('index');
+
+    Route::get('/new', [SupportController::class, 'create'])->name('create');
+    Route::post('/new', [SupportController::class, 'store'])->name('store')->middleware('throttle:contact');
+
+    Route::get('/track', [SupportController::class, 'track'])->name('track');
+    Route::post('/track', [SupportController::class, 'trackResult'])->name('track.result');
+
+    Route::get('/tickets', [SupportController::class, 'myTickets'])->name('tickets')->middleware('auth');
+    Route::get('/tickets/{ticket}', [SupportController::class, 'show'])->name('show');
+    Route::post('/tickets/{ticket}/reply', [SupportController::class, 'reply'])->name('reply');
+    Route::post('/tickets/{ticket}/close', [SupportController::class, 'close'])->name('close');
+
+    Route::get('/attachments/{attachment}/download', [SupportController::class, 'downloadAttachment'])->name('attachment.download');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/auth', [AuthController::class, 'index'])->name('auth');
@@ -163,6 +202,56 @@ Route::middleware(['auth', 'admin'])
         Route::get('/discount-codes/{id}/edit', [AdminDiscountController::class, 'edit'])->name('discounts.edit');
         Route::put('/discount-codes/{id}', [AdminDiscountController::class, 'update'])->name('discounts.update');
         Route::post('/discount-codes/{id}/toggle', [AdminDiscountController::class, 'toggle'])->name('discounts.toggle');
+
+        // Artist reviews moderation
+        Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::post('/reviews/{id}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
+
+        // Support / ticketing
+        Route::prefix('support')->name('support.')->group(function () {
+            Route::get('/', [SupportAdminController::class, 'index'])->name('index');
+            Route::get('/tickets', [SupportAdminController::class, 'tickets'])->name('tickets');
+            Route::get('/tickets/{ticket}', [SupportAdminController::class, 'show'])->name('show');
+            Route::post('/tickets/{ticket}/reply', [SupportAdminController::class, 'reply'])->name('reply');
+            Route::post('/tickets/{ticket}/status', [SupportAdminController::class, 'updateStatus'])->name('status');
+            Route::post('/tickets/{ticket}/assign', [SupportAdminController::class, 'assign'])->name('assign');
+            Route::post('/tickets/{ticket}/priority', [SupportAdminController::class, 'updatePriority'])->name('priority');
+
+            Route::get('/canned', [SupportAdminController::class, 'cannedIndex'])->name('canned.index');
+            Route::post('/canned', [SupportAdminController::class, 'cannedStore'])->name('canned.store');
+            Route::put('/canned/{id}', [SupportAdminController::class, 'cannedUpdate'])->name('canned.update');
+            Route::delete('/canned/{id}', [SupportAdminController::class, 'cannedDestroy'])->name('canned.destroy');
+        });
+
+        // CMS — مدیریت محتوا
+        Route::prefix('cms')->name('cms.')->group(function () {
+            // بلاگ
+            Route::post('posts/{post}/publish', [CmsPostController::class, 'publish'])->name('posts.publish');
+            Route::post('posts/{post}/unpublish', [CmsPostController::class, 'unpublish'])->name('posts.unpublish');
+            Route::get('posts/{post}/preview', [CmsPostController::class, 'preview'])->name('posts.preview');
+            Route::resource('posts', CmsPostController::class)->except(['show']);
+
+            // دسته‌بندی‌ها
+            Route::resource('categories', CmsCategoryController::class)->except(['show']);
+
+            // برچسب‌ها
+            Route::resource('tags', CmsTagController::class)->only(['index', 'store', 'destroy']);
+
+            // صفحات استاتیک
+            Route::get('pages', [CmsPageController::class, 'index'])->name('pages.index');
+            Route::get('pages/{slug}/edit', [CmsPageController::class, 'edit'])->name('pages.edit');
+            Route::put('pages/{slug}', [CmsPageController::class, 'update'])->name('pages.update');
+
+            // FAQ
+            Route::post('faqs/reorder', [CmsFaqController::class, 'reorder'])->name('faqs.reorder');
+            Route::resource('faqs', CmsFaqController::class)->except(['show']);
+
+            // کتابخانه رسانه
+            Route::get('media', [CmsMediaController::class, 'index'])->name('media.index');
+            Route::post('media/upload', [CmsMediaController::class, 'upload'])->name('media.upload');
+            Route::delete('media/{id}', [CmsMediaController::class, 'destroy'])->name('media.destroy');
+            Route::get('media/{id}/url', [CmsMediaController::class, 'getUrl'])->name('media.url');
+        });
 
         // System Settings (pricing/limits)
         Route::get('/system-settings', [AdminSystemSettingController::class, 'index'])->name('system-settings.index');

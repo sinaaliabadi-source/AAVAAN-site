@@ -1,2 +1,19 @@
 @import 'tailwindcss';
 @import './animations.css';
+
+/* ── Typography برای محتوای CMS (مقالات و صفحات) ── */
+.cms-content { line-height: 2; color: #333; }
+.cms-content h2 { font-size: 1.5rem; font-weight: 700; margin: 2rem 0 1rem; color: #1F2A44; }
+.cms-content h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: #1F2A44; }
+.cms-content h4 { font-size: 1.1rem; font-weight: 600; margin: 1.25rem 0 0.5rem; color: #1F2A44; }
+.cms-content p { line-height: 2; margin-bottom: 1.25rem; }
+.cms-content ul, .cms-content ol { padding-right: 1.5rem; margin-bottom: 1.25rem; }
+.cms-content li { line-height: 2; margin-bottom: 0.5rem; }
+.cms-content blockquote { border-right: 4px solid #C9A24B; padding-right: 1rem; color: #555; margin: 1.25rem 0; }
+.cms-content img { max-width: 100%; border-radius: 8px; margin: 1rem 0; }
+.cms-content a { color: #C9A24B; text-decoration: underline; }
+.cms-content code { background: #f0ece0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+.cms-content pre { background: #1F2A44; color: #f0ece0; padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin: 1.25rem 0; }
+.cms-content pre code { background: none; padding: 0; color: inherit; }
+.cms-content table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; }
+.cms-content th, .cms-content td { border: 1px solid #e8e2d6; padding: .5rem .75rem; text-align: right; }

@@ -10,6 +10,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * کنترلر هنرباز — برنامهٔ استعدادیابی.
+ *
+ * استثنای کستینگ ناشناس: قانونِ پنهان‌سازی اطلاعات هنرمند (App\Helpers\ArtistPrivacy)
+ * در هیچ‌کدام از مسیرهای هنرباز اعمال نمی‌شود. شرکت‌کنندگان هنرباز از مدل
+ * ProgramRegistration استفاده می‌کنند (نه ArtistProfile) و نام، عکس و همهٔ اطلاعات
+ * عمومیِ آن‌ها همیشه بدون نیاز به پرداخت نمایش داده می‌شود. بنابراین ArtistPrivacy
+ * عمداً در این کنترلر فراخوانی نمی‌شود.
+ */
 class HonarbazController extends Controller
 {
     /** برنامه فعال هنرباز را برمی‌گرداند (در صورت نبودن 404). */

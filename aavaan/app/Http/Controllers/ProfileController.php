@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ArtistPrivacy;
 use App\Models\ArtistProfile;
+use App\Models\ArtistReview;
 use App\Models\ProductionAccessLog;
 
 class ProfileController extends Controller
@@ -28,20 +30,31 @@ class ProfileController extends Controller
             $profile->increment('profile_views');
         }
 
-        $hasAccess = false;
+        // سطح دسترسی از طریق helper مرکزیِ کستینگ ناشناس تعیین می‌شود.
+        $hasAccess = ArtistPrivacy::hasAccess(auth()->user(), $profile->user_id);
         $canUnlock = false;
 
-        if ($isSelf) {
-            $hasAccess = true;
-        } elseif (auth()->check() && auth()->user()->isProduction()) {
-            $hasAccess = ProductionAccessLog::where('production_user_id', auth()->id())
+        if (!$hasAccess && !$isSelf && auth()->check() && auth()->user()->isProduction()) {
+            $canUnlock = auth()->user()->availableProductionAccess() !== null;
+        }
+
+        // نظرات قابل‌نمایش + نظر خودِ تیم تولید (برای فرم ویرایش)
+        $reviews = ArtistReview::where('artist_user_id', $profile->user_id)
+            ->where('is_visible', true)
+            ->latest()
+            ->get();
+
+        $myReview = auth()->check()
+            ? ArtistReview::where('artist_user_id', $profile->user_id)
+                ->where('reviewer_user_id', auth()->id())
+                ->first()
+            : null;
+
+        $canReview = auth()->check()
+            && auth()->user()->role === 'production'
+            && ProductionAccessLog::where('production_user_id', auth()->id())
                 ->where('artist_profile_id', $profile->id)
                 ->exists();
-
-            if (!$hasAccess) {
-                $canUnlock = auth()->user()->availableProductionAccess() !== null;
-            }
-        }
 
         $specialties = $profile->user->artistSpecialties()
             ->with([
@@ -53,6 +66,9 @@ class ProfileController extends Controller
             ->orderBy('id')
             ->get();
 
-        return view('profile.show', compact('profile', 'hasAccess', 'canUnlock', 'isSelf', 'specialties'));
+        return view('profile.show', compact(
+            'profile', 'hasAccess', 'canUnlock', 'isSelf', 'specialties',
+            'reviews', 'myReview', 'canReview'
+        ));
     }
 }

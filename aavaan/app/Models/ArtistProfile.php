@@ -11,6 +11,7 @@ class ArtistProfile extends Model
     protected $fillable = [
         'user_id', 'username', 'field', 'city', 'birth_year', 'years_experience',
         'bio', 'avatar', 'phone_contact', 'email_contact', 'is_active',
+        'rating_avg', 'rating_count',
     ];
 
     protected $casts = [
@@ -18,6 +19,8 @@ class ArtistProfile extends Model
         'birth_year' => 'integer',
         'years_experience' => 'integer',
         'profile_views' => 'integer',
+        'rating_avg' => 'float',
+        'rating_count' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -43,6 +46,11 @@ class ArtistProfile extends Model
     public function accessLogs(): HasMany
     {
         return $this->hasMany(ProductionAccessLog::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ArtistReview::class, 'artist_user_id', 'user_id');
     }
 
     public function getAvatarUrlAttribute(): string

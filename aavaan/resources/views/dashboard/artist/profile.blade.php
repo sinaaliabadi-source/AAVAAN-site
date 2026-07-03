@@ -57,12 +57,9 @@
         <div class="grid-2">
             <div class="form-group">
                 <label>رشته هنری <span class="req">*</span></label>
-                <select name="field" class="form-control" required>
-                    <option value="">انتخاب کنید…</option>
-                    @foreach($fields as $f)
-                        <option value="{{ $f }}" {{ old('field', $profile?->field) === $f ? 'selected' : '' }}>{{ $f }}</option>
-                    @endforeach
-                </select>
+                <x-art-fields-select name="field" required
+                    :selected="old('field', $profile?->field)"
+                    placeholder="انتخاب کنید…" />
                 @error('field')<span class="form-error">{{ $message }}</span>@enderror
             </div>
             <div class="form-group">

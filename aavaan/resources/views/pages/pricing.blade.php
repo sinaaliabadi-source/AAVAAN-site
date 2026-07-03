@@ -111,6 +111,13 @@
     .pricing-card.featured {
         border-color: var(--color-accent);
     }
+    /* سطح سازمانی — قاب لاجوردی */
+    .pricing-card.enterprise {
+        border-color: var(--color-primary);
+    }
+    .pricing-card.enterprise .price-amount {
+        color: var(--color-primary);
+    }
     .pricing-card.featured-primary {
         border-color: var(--color-primary);
         background: var(--color-primary);
@@ -335,14 +342,21 @@
             </div>
 
             {{-- سازمانی / پروژه بزرگ --}}
-            <div class="pricing-card">
-                <h3>سازمانی / پروژه بزرگ</h3>
+            <div class="pricing-card enterprise">
+                <h3>سازمانی</h3>
                 <div class="price-block">
                     <div class="price-amount" style="font-size:1.6rem">تماس بگیرید</div>
                     <div class="price-period">قیمت‌گذاری اختصاصی</div>
                 </div>
-                <p class="card-desc">برای انتخاب بیش از ۱۰ هنرمند یا نیازهای سازمانی و پروژه‌های بزرگ. بستهٔ اختصاصی متناسب با حجم کار شما.</p>
-                <a href="{{ route('contact') }}" class="btn btn-outline btn-block">تماس بگیرید</a>
+                <p class="card-desc">برای پروژه‌های بزرگ با بیش از ۱۰ نفر کست و نیازهای سازمانی.</p>
+                <ul class="feature-list">
+                    <li class="feature-item">انتخاب بیش از ۱۰ هنرمند</li>
+                    <li class="feature-item">پشتیبانی اختصاصی</li>
+                    <li class="feature-item">مشاوره کستینگ</li>
+                    <li class="feature-item">قرارداد سازمانی</li>
+                    <li class="feature-item">فاکتور رسمی</li>
+                </ul>
+                <a href="{{ route('contact') }}" class="btn btn-primary btn-block">مشاوره رایگان</a>
             </div>
 
         </div>
