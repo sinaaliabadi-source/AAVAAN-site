@@ -22,8 +22,10 @@ class PageController extends Controller
 
     public function artists()
     {
-        $categoryCount = SpecialtyCategory::where('is_active', true)->whereNull('parent_id')->count();
-        return view('pages.artists', compact('categoryCount'));
+        // منبع واحد حوزه‌های فعالیت: config/art_fields.php
+        $artFields     = config('art_fields');
+        $categoryCount = count($artFields);
+        return view('pages.artists', compact('categoryCount', 'artFields'));
     }
 
     public function production() { return view('pages.production'); }

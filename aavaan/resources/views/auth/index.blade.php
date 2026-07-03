@@ -201,13 +201,10 @@
                             </div>
                             <div class="form-group" id="field-group" style="{{ old('role') === 'production' ? 'display:none' : '' }}">
                                 <label for="reg-field">رشته هنری</label>
-                                <select name="field" id="reg-field"
-                                        class="form-control @error('field') is-invalid @enderror">
-                                    <option value="">— انتخاب کنید —</option>
-                                    @foreach($fields as $f)
-                                        <option value="{{ $f }}" {{ old('field') === $f ? 'selected' : '' }}>{{ $f }}</option>
-                                    @endforeach
-                                </select>
+                                <x-art-fields-select name="field" id="reg-field"
+                                        :selected="old('field')"
+                                        placeholder="— انتخاب کنید —"
+                                        class="@error('field') is-invalid @enderror" />
                                 @error('field')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
                             <div class="form-group">

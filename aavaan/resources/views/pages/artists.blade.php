@@ -252,6 +252,40 @@ details .faq-body {
     .steps-grid { grid-template-columns: 1fr; }
     .final-cta-artists { padding: 4rem 0; }
 }
+
+/* ===== Art fields showcase ===== */
+.fields-section { padding: 5rem 0; background: #fff; }
+.fields-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+}
+.field-cat-card {
+    background: var(--color-bg);
+    border: 1px solid #ece6da;
+    border-radius: var(--radius);
+    padding: 1.35rem 1.4rem;
+}
+.field-cat-card h3 {
+    font-size: 1.02rem;
+    color: var(--color-primary);
+    margin-bottom: .85rem;
+    padding-bottom: .6rem;
+    border-bottom: 2px solid var(--color-accent);
+}
+.field-sub-list { list-style: none; display: flex; flex-wrap: wrap; gap: .4rem; }
+.field-sub-list li {
+    font-size: .82rem;
+    color: var(--color-muted);
+    background: #fff;
+    border: 1px solid #e8e2d6;
+    border-radius: 999px;
+    padding: .2rem .7rem;
+}
+@media (max-width: 480px) {
+    .fields-grid { grid-template-columns: 1fr; }
+}
 </style>
 @endpush
 
@@ -288,6 +322,26 @@ details .faq-body {
                 <h3>دیده‌شدن در {{ $categoryCount }} رشته</h3>
                 <p>تیم‌های تولید فعال در سراسر کشور پروفایل تو را می‌بینند — در هر رشته‌ای که هستی</p>
             </div>
+        </div>
+    </div>
+</section>
+
+{{-- ===== حوزه‌های فعالیت (فهرست کامل) ===== --}}
+<section class="fields-section">
+    <div class="container">
+        <h2 class="section-title">{{ $categoryCount }} حوزه‌ی فعالیت، ده‌ها تخصص</h2>
+        <p class="section-sub">هر رشته‌ای که در آن فعالی، جای تو در آوان هست</p>
+        <div class="fields-grid">
+            @foreach($artFields as $category => $subFields)
+            <div class="field-cat-card">
+                <h3>{{ $category }}</h3>
+                <ul class="field-sub-list">
+                    @foreach($subFields as $sub)
+                        <li>{{ $sub }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endforeach
         </div>
     </div>
 </section>

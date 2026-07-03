@@ -210,12 +210,9 @@ window.__productionSearchSaved = @json((array) request('attr', []));
         <div class="filter-grid">
             <div class="form-group" style="margin:0">
                 <label>رشته هنری</label>
-                <select name="field" class="form-control">
-                    <option value="">همه رشته‌ها</option>
-                    @foreach($fields as $f)
-                        <option value="{{ $f }}" {{ request('field') === $f ? 'selected' : '' }}>{{ $f }}</option>
-                    @endforeach
-                </select>
+                <x-art-fields-select name="field"
+                    :selected="request('field')"
+                    placeholder="همه رشته‌ها" />
             </div>
             <div class="form-group" style="margin:0">
                 <label>دسته تخصصی</label>
