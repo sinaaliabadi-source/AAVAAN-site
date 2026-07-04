@@ -16,28 +16,35 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
         $rows = [];
         $sortOrder = 0;
 
+        // انواعی که منطقاً قابل فیلتر در جستجوی تیم تولید هستند.
+        $filterableTypes = ['select', 'multiselect', 'number', 'boolean'];
+
         $addField = function (
-            int    $categoryId,
-            string $key,
-            string $labelFa,
-            string $fieldType,
-            bool   $isRequired = false,
-            ?array $options = null,
-            bool   $isPreium = false,
-            string $visibility = 'public',
-        ) use (&$rows, &$sortOrder): void {
+            int     $categoryId,
+            string  $key,
+            string  $labelFa,
+            string  $fieldType,
+            bool    $isRequired = false,
+            ?array  $options = null,
+            bool    $isPreium = false,
+            string  $visibility = 'public',
+            ?string $unit = null,
+        ) use (&$rows, &$sortOrder, $filterableTypes): void {
             $rows[] = [
-                'category_id' => $categoryId,
-                'key'         => $key,
-                'label_fa'    => $labelFa,
-                'field_type'  => $fieldType,
-                'options'     => $options !== null ? json_encode($options) : null,
-                'is_required' => $isRequired ? 1 : 0,
-                'is_premium'  => $isPreium ? 1 : 0,
-                'visibility'  => $visibility,
-                'sort_order'  => ++$sortOrder,
-                'created_at'  => now(),
-                'updated_at'  => now(),
+                'category_id'   => $categoryId,
+                'key'           => $key,
+                'label_fa'      => $labelFa,
+                'field_type'    => $fieldType,
+                'unit'          => $unit,
+                'options'       => $options !== null ? json_encode($options) : null,
+                'is_required'   => $isRequired ? 1 : 0,
+                'is_premium'    => $isPreium ? 1 : 0,
+                'visibility'    => $visibility,
+                // فیلدهای انتخابی/عددی/بولی فیلترپذیرند؛ متن آزاد و پیوند فایل نه.
+                'is_filterable' => in_array($fieldType, $filterableTypes, true) ? 1 : 0,
+                'sort_order'    => ++$sortOrder,
+                'created_at'    => now(),
+                'updated_at'    => now(),
             ];
         };
 
@@ -45,6 +52,40 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
         $opt = fn(string $value, string $label = '') => [
             'value' => $value,
             'label' => $label ?: $value,
+        ];
+
+        // ── فهرست‌های مشترک برای دسته‌های جلوی دوربین (بازیگری، کاسکادوری، رقص) ──
+
+        // رنگ پوست
+        $skinColors = [
+            $opt('very_fair', 'بسیار روشن'), $opt('fair', 'روشن'),
+            $opt('medium', 'متوسط'), $opt('olive', 'گندمی'),
+            $opt('brown', 'سبزه'), $opt('dark', 'تیره'),
+        ];
+
+        // مهارت‌های ویژهٔ قابل فیلتر (اسب‌سواری، شنا، آواز، ساز، رانندگی حرفه‌ای، رزمی و ...)
+        $specialSkillOptions = [
+            $opt('horse_riding', 'اسب‌سواری'), $opt('swimming', 'شنا'),
+            $opt('singing', 'آواز'), $opt('instrument', 'نوازندگی ساز'),
+            $opt('pro_driving', 'رانندگی حرفه‌ای'), $opt('martial_arts', 'هنرهای رزمی'),
+            $opt('dancing', 'رقص'), $opt('acrobatics', 'آکروبات'),
+            $opt('fencing', 'شمشیربازی'), $opt('archery', 'تیراندازی با کمان'),
+            $opt('skating', 'اسکیت'), $opt('cycling', 'دوچرخه‌سواری حرفه‌ای'),
+        ];
+
+        // سایز لباس
+        $dressSizes = [
+            $opt('xs', 'XS'), $opt('s', 'S'), $opt('m', 'M'),
+            $opt('l', 'L'), $opt('xl', 'XL'), $opt('xxl', 'XXL'),
+            $opt('xxxl', 'XXXL'),
+        ];
+
+        // سابقهٔ نوع پروژه (مشترک میان دسته‌های عوامل و پشت‌صحنه)
+        $projectExperience = [
+            $opt('feature', 'فیلم سینمایی بلند'), $opt('short', 'فیلم کوتاه'),
+            $opt('tv_series', 'سریال تلویزیونی'), $opt('web_series', 'سریال نمایش خانگی'),
+            $opt('documentary', 'مستند'), $opt('commercial', 'تبلیغاتی'),
+            $opt('music_video', 'موزیک ویدیو'), $opt('theater', 'تئاتر'),
         ];
 
         // ─── 1. بازیگری و اجرا ────────────────────────────────────────────
@@ -56,8 +97,8 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('voice_dubbing', 'گوینده/دوبلور'),
             $opt('host', 'مجری'),
         ]);
-        $addField(1, 'height_cm', 'قد (سانتی‌متر)', 'number');
-        $addField(1, 'weight_kg', 'وزن (کیلوگرم)', 'number');
+        $addField(1, 'height_cm', 'قد', 'number', unit: 'سانتی‌متر');
+        $addField(1, 'weight_kg', 'وزن', 'number', unit: 'کیلوگرم');
         $addField(1, 'hair_color', 'رنگ مو', 'select', false, [
             $opt('black', 'مشکی'), $opt('dark_brown', 'قهوه‌ای تیره'),
             $opt('brown', 'قهوه‌ای'), $opt('light_brown', 'قهوه‌ای روشن'),
@@ -76,7 +117,12 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('kurdish', 'کردی'), $opt('gilaki', 'گیلکی'),
             $opt('english', 'انگلیسی'), $opt('arabic', 'عربی'),
         ]);
-        $addField(1, 'special_skills', 'مهارت‌های ویژه', 'textarea', false);
+        $addField(1, 'skin_color', 'رنگ پوست', 'select', false, $skinColors);
+        $addField(1, 'playable_age_min', 'حداقل سن قابل ایفا', 'number', unit: 'سال');
+        $addField(1, 'playable_age_max', 'حداکثر سن قابل ایفا', 'number', unit: 'سال');
+        $addField(1, 'dress_size', 'سایز لباس', 'select', false, $dressSizes);
+        $addField(1, 'special_skills_list', 'مهارت‌های ویژه', 'multiselect', false, $specialSkillOptions);
+        $addField(1, 'special_skills', 'توضیحات مهارت‌های ویژه', 'textarea', false);
         $addField(1, 'acting_method', 'متد بازیگری', 'multiselect', false, [
             $opt('stanislavski', 'استانیسلاوسکی'),
             $opt('method_acting', 'متد اکتینگ'),
@@ -98,13 +144,24 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('explosions', 'انفجار'),
         ]);
         $addField(2, 'certifications', 'گواهینامه‌ها و تأییدیه‌ها', 'textarea');
-        $addField(2, 'height_cm', 'قد (سانتی‌متر)', 'number');
-        $addField(2, 'weight_kg', 'وزن (کیلوگرم)', 'number');
+        $addField(2, 'height_cm', 'قد', 'number', unit: 'سانتی‌متر');
+        $addField(2, 'weight_kg', 'وزن', 'number', unit: 'کیلوگرم');
         $addField(2, 'hair_color', 'رنگ مو', 'select', false, [
             $opt('black', 'مشکی'), $opt('dark_brown', 'قهوه‌ای تیره'),
             $opt('brown', 'قهوه‌ای'), $opt('blonde', 'بلوند'),
             $opt('white', 'سفید'), $opt('gray', 'خاکستری'),
         ]);
+        $addField(2, 'eye_color', 'رنگ چشم', 'select', false, [
+            $opt('black', 'مشکی'), $opt('dark_brown', 'قهوه‌ای تیره'),
+            $opt('brown', 'قهوه‌ای'), $opt('green', 'سبز'),
+            $opt('blue', 'آبی'), $opt('hazel', 'فندقی'),
+            $opt('gray', 'خاکستری'),
+        ]);
+        $addField(2, 'skin_color', 'رنگ پوست', 'select', false, $skinColors);
+        $addField(2, 'playable_age_min', 'حداقل سن قابل ایفا', 'number', unit: 'سال');
+        $addField(2, 'playable_age_max', 'حداکثر سن قابل ایفا', 'number', unit: 'سال');
+        $addField(2, 'dress_size', 'سایز لباس', 'select', false, $dressSizes);
+        $addField(2, 'special_skills_list', 'مهارت‌های ویژه', 'multiselect', false, $specialSkillOptions);
 
         // ─── 3. کارگردانی و دستیاری صحنه ────────────────────────────────
         $addField(3, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -127,6 +184,7 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('arc_studio', 'Arc Studio'),
             $opt('celtx', 'Celtx'),
         ]);
+        $addField(3, 'project_experience', 'سابقهٔ نوع پروژه', 'multiselect', false, $projectExperience);
 
         // ─── 4. نویسندگی ─────────────────────────────────────────────────
         $addField(4, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -150,6 +208,8 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('arc_studio', 'Arc Studio'), $opt('fade_in', 'Fade In'),
             $opt('word', 'Microsoft Word'),
         ]);
+        $addField(4, 'project_experience', 'سابقهٔ نوع پروژه', 'multiselect', false, $projectExperience);
+        $addField(4, 'remote_work', 'امکان همکاری دورکاری', 'boolean');
 
         // ─── 5. تصویربرداری ──────────────────────────────────────────────
         $addField(5, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -170,6 +230,13 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('aerial', 'هوایی'), $opt('underwater', 'زیر آب'),
         ]);
         $addField(5, 'owns_equipment', 'صاحب تجهیزات است', 'boolean', false);
+        $addField(5, 'rig_experience', 'تجربهٔ ریگ و حرکت دوربین', 'multiselect', false, [
+            $opt('gimbal', 'گیمبال'), $opt('steadicam', 'استدی‌کم'),
+            $opt('aerial', 'هوایی/پهپاد'), $opt('underwater', 'زیر آب'),
+            $opt('dolly', 'دالی'), $opt('crane', 'کرین/جیب‌آرم'),
+            $opt('handheld', 'روی‌دست'),
+        ]);
+        $addField(5, 'color_grading', 'توانایی تصحیح و درجه‌بندی رنگ', 'boolean', false);
 
         // ─── 6. نورپردازی ────────────────────────────────────────────────
         $addField(6, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -186,6 +253,11 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('natural', 'طبیعی'), $opt('studio', 'استودیویی'),
             $opt('chiaroscuro', 'کیاروسکورو'), $opt('high_key', 'High Key'),
             $opt('low_key', 'Low Key'),
+        ]);
+        $addField(6, 'owns_equipment', 'صاحب تجهیزات است', 'boolean', false);
+        $addField(6, 'work_environment', 'تجربهٔ محیط کار', 'multiselect', false, [
+            $opt('studio', 'استودیو'), $opt('location', 'لوکیشن'),
+            $opt('outdoor', 'فضای باز'), $opt('night', 'شب‌کاری'),
         ]);
 
         // ─── 7. صدا ──────────────────────────────────────────────────────
@@ -204,6 +276,12 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
         $addField(7, 'microphones', 'تجهیزات میکروفون', 'multiselect', false, [
             $opt('sennheiser', 'Sennheiser'), $opt('lectrosonics', 'Lectrosonics'),
             $opt('sound_devices', 'Sound Devices'), $opt('zaxcom', 'Zaxcom'),
+        ]);
+        $addField(7, 'owns_equipment', 'صاحب تجهیزات شخصی است', 'boolean', false);
+        $addField(7, 'equipment_details', 'توضیح تجهیزات شخصی', 'textarea', false);
+        $addField(7, 'work_environment', 'تجربهٔ لوکیشن/استودیو', 'multiselect', false, [
+            $opt('studio', 'استودیو'), $opt('location', 'سرصحنه/لوکیشن'),
+            $opt('post_production', 'پساتولید'), $opt('live', 'اجرای زنده'),
         ]);
 
         // ─── 8. موسیقی ────────────────────────────────────────────────────
@@ -236,6 +314,12 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('pro_tools', 'Pro Tools'), $opt('cubase', 'Cubase'),
             $opt('fl_studio', 'FL Studio'), $opt('sibelius', 'Sibelius'),
         ]);
+        $addField(8, 'live_performance', 'توان اجرای زنده', 'boolean', false);
+        $addField(8, 'composition_arrangement', 'آهنگسازی و تنظیم', 'multiselect', false, [
+            $opt('composing', 'آهنگسازی'), $opt('arranging', 'تنظیم'),
+            $opt('orchestration', 'ارکستراسیون'), $opt('songwriting', 'ترانه‌سرایی/ملودی'),
+            $opt('mixing', 'میکس'), $opt('mastering', 'مسترینگ'),
+        ]);
 
         // ─── 9. تدوین و پساتولید ─────────────────────────────────────────
         $addField(9, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -254,6 +338,7 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('documentary', 'مستند'), $opt('commercial', 'تبلیغاتی'),
             $opt('music_video', 'موزیک ویدیو'),
         ]);
+        $addField(9, 'remote_work', 'امکان دورکاری', 'boolean', false);
 
         // ─── 10. جلوه‌های ویژه و CGI ─────────────────────────────────────
         $addField(10, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -273,6 +358,12 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('matte_painting', 'Matte Painting'), $opt('rigging', 'Rigging'),
             $opt('lighting_rendering', 'Lighting & Rendering'),
         ]);
+        $addField(10, 'genres', 'ژانرهای تخصصی', 'multiselect', false, [
+            $opt('cinema', 'سینمایی'), $opt('tv_series', 'سریال تلویزیونی'),
+            $opt('commercial', 'تبلیغاتی'), $opt('music_video', 'موزیک ویدیو'),
+            $opt('game_cinematic', 'سینماتیک بازی'),
+        ]);
+        $addField(10, 'remote_work', 'امکان دورکاری', 'boolean', false);
 
         // ─── 11. طراحی صحنه ──────────────────────────────────────────────
         $addField(11, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -290,6 +381,7 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('vectorworks', 'Vectorworks'), $opt('archicad', 'ArchiCAD'),
             $opt('photoshop', 'Photoshop'),
         ]);
+        $addField(11, 'team_leadership', 'توان تیم‌داری و سرپرستی گروه', 'boolean', false);
 
         // ─── 12. طراحی لباس ──────────────────────────────────────────────
         $addField(12, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -307,6 +399,7 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('machine_sewing', 'دوخت ماشین'), $opt('embroidery', 'گلدوزی'),
             $opt('aging', 'فرسوده‌سازی لباس'),
         ]);
+        $addField(12, 'team_leadership', 'توان تیم‌داری کارگاه لباس', 'boolean', false);
 
         // ─── 13. گریم ────────────────────────────────────────────────────
         $addField(13, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -324,6 +417,7 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('wounds', 'زخم و جراحت'), $opt('aging', 'پیرسازی'),
             $opt('creature', 'موجودات'), $opt('dental', 'دندان مصنوعی'),
         ]);
+        $addField(13, 'team_leadership', 'توان تیم‌داری گروه گریم', 'boolean', false);
 
         // ─── 14. عکاسی ───────────────────────────────────────────────────
         $addField(14, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -378,6 +472,7 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('casting_networks', 'Casting Networks'),
             $opt('spotlight', 'Spotlight'),
         ]);
+        $addField(16, 'project_experience', 'سابقهٔ نوع پروژه', 'multiselect', false, $projectExperience);
 
         // ─── 17. روابط عمومی و بازاریابی ─────────────────────────────────
         $addField(17, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -396,6 +491,8 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('google_ads', 'Google Ads'),
             $opt('mailchimp', 'Mailchimp'),
         ]);
+        $addField(17, 'project_experience', 'سابقهٔ نوع پروژه', 'multiselect', false, $projectExperience);
+        $addField(17, 'remote_work', 'امکان دورکاری', 'boolean', false);
 
         // ─── 18. انیمیشن ─────────────────────────────────────────────────
         $addField(18, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -416,6 +513,8 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('3d_cgi', '3D CGI'), $opt('stop_motion', 'Stop Motion'),
             $opt('motion_graphics', 'موشن گرافیک'),
         ]);
+        $addField(18, 'project_experience', 'سابقهٔ نوع پروژه', 'multiselect', false, $projectExperience);
+        $addField(18, 'remote_work', 'امکان دورکاری', 'boolean', false);
 
         // ─── 19. بازی‌های ویدیویی ─────────────────────────────────────────
         $addField(19, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -435,6 +534,13 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('substance', 'Substance Painter'),
             $opt('zbrush', 'ZBrush'), $opt('photoshop', 'Photoshop'),
         ]);
+        $addField(19, 'game_genres', 'ژانرهای بازی', 'multiselect', false, [
+            $opt('action', 'اکشن'), $opt('adventure', 'ماجراجویی'),
+            $opt('rpg', 'نقش‌آفرینی (RPG)'), $opt('puzzle', 'پازل'),
+            $opt('strategy', 'استراتژی'), $opt('simulation', 'شبیه‌سازی'),
+            $opt('mobile', 'موبایل'),
+        ]);
+        $addField(19, 'remote_work', 'امکان دورکاری', 'boolean', false);
 
         // ─── 20. عوامل صحنه و پشت‌صحنه ──────────────────────────────────
         $addField(20, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -455,6 +561,7 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('generator', 'ژنراتور'), $opt('crane', 'جرثقیل/جیب آرم'),
             $opt('dolly', 'دالی'), $opt('technocrane', 'تکنوکرین'),
         ]);
+        $addField(20, 'project_experience', 'سابقهٔ نوع پروژه', 'multiselect', false, $projectExperience);
 
         // ─── 21. آموزش و مربیگری ─────────────────────────────────────────
         $addField(21, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -471,6 +578,7 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('children', 'کودک (۶-۱۲)'), $opt('teen', 'نوجوان (۱۲-۱۸)'),
             $opt('adult', 'بزرگسال'), $opt('all', 'همه سنین'),
         ]);
+        $addField(21, 'remote_work', 'امکان آموزش آنلاین/دورکاری', 'boolean', false);
 
         // ─── 22. ترجمه و زیرنویس ─────────────────────────────────────────
         $addField(22, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -492,6 +600,8 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('fab_subtitler', 'FAB Subtitler'),
             $opt('eztitles', 'EZTitles'),
         ]);
+        $addField(22, 'project_experience', 'سابقهٔ نوع پروژه', 'multiselect', false, $projectExperience);
+        $addField(22, 'remote_work', 'امکان دورکاری', 'boolean', false);
 
         // ─── 23. رقص و کوریوگرافی ──────────────────────────────────────────
         $addField(23, 'sub_specialty', 'زیرتخصص', 'select', true, [
@@ -510,8 +620,46 @@ class SpecialtyAttributeDefinitionsSeeder extends Seeder
             $opt('hiphop', 'هیپ‌هاپ/استریت'),
             $opt('latin', 'لاتین'),
         ]);
-        $addField(23, 'years_experience_dance', 'سابقه (سال)', 'number');
+        $addField(23, 'height_cm', 'قد', 'number', unit: 'سانتی‌متر');
+        $addField(23, 'weight_kg', 'وزن', 'number', unit: 'کیلوگرم');
+        $addField(23, 'hair_color', 'رنگ مو', 'select', false, [
+            $opt('black', 'مشکی'), $opt('dark_brown', 'قهوه‌ای تیره'),
+            $opt('brown', 'قهوه‌ای'), $opt('light_brown', 'قهوه‌ای روشن'),
+            $opt('blonde', 'بلوند'), $opt('red', 'قرمز'),
+            $opt('white', 'سفید'), $opt('gray', 'خاکستری'),
+        ]);
+        $addField(23, 'eye_color', 'رنگ چشم', 'select', false, [
+            $opt('black', 'مشکی'), $opt('dark_brown', 'قهوه‌ای تیره'),
+            $opt('brown', 'قهوه‌ای'), $opt('green', 'سبز'),
+            $opt('blue', 'آبی'), $opt('hazel', 'فندقی'),
+            $opt('gray', 'خاکستری'),
+        ]);
+        $addField(23, 'skin_color', 'رنگ پوست', 'select', false, $skinColors);
+        $addField(23, 'playable_age_min', 'حداقل سن قابل ایفا', 'number', unit: 'سال');
+        $addField(23, 'playable_age_max', 'حداکثر سن قابل ایفا', 'number', unit: 'سال');
+        $addField(23, 'dress_size', 'سایز لباس', 'select', false, $dressSizes);
+        $addField(23, 'special_skills_list', 'مهارت‌های ویژه', 'multiselect', false, $specialSkillOptions);
+        $addField(23, 'years_experience_dance', 'سابقه رقص', 'number', unit: 'سال');
 
         DB::table('specialty_attribute_definitions')->insert($rows);
+
+        // نکتهٔ سازگاری با re-seed روی محیط تولید:
+        // زیرتخصص‌ها (کلید sub_specialty) پس از اجرای SpecialtySubcategoriesSeeder
+        // به‌صورت دستهٔ فرزند کدگذاری و از تعریف‌ها حذف می‌شوند. چون این Seeder جدول را
+        // truncate و بازسازی می‌کند، در اجرای مجدد ممکن است sub_specialty دوباره ساخته شود.
+        // بنابراین برای هر دستهٔ والدی که «از قبل» زیرشاخه دارد، تعریف sub_specialty را پاک می‌کنیم
+        // تا فیلد تکراری «زیرتخصص» روی فرم برنگردد. در نصب تازه (بدون زیرشاخه) دست‌نخورده می‌ماند
+        // و SpecialtySubcategoriesSeeder بعداً آن را مصرف و حذف می‌کند.
+        $parentsWithChildren = DB::table('specialty_categories')
+            ->whereNotNull('parent_id')
+            ->distinct()
+            ->pluck('parent_id');
+
+        if ($parentsWithChildren->isNotEmpty()) {
+            DB::table('specialty_attribute_definitions')
+                ->whereIn('category_id', $parentsWithChildren)
+                ->where('key', 'sub_specialty')
+                ->delete();
+        }
     }
 }

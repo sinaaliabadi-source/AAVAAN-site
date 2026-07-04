@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ArtistProfile extends Model
 {
     protected $fillable = [
-        'user_id', 'username', 'field', 'city', 'birth_year', 'years_experience',
+        'user_id', 'username', 'field', 'city', 'birth_year', 'gender', 'years_experience',
         'bio', 'avatar', 'phone_contact', 'email_contact', 'is_active',
         'rating_avg', 'rating_count',
     ];

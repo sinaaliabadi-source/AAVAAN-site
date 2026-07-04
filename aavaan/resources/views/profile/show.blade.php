@@ -274,6 +274,22 @@
     .spec-attr-row { font-size: .88rem; }
     .spec-attr-key { color: var(--color-muted); font-size: .8rem; margin-bottom: .1rem; }
     .spec-attr-val { color: var(--color-primary); font-weight: 600; }
+    .spec-attr-val .unit { color: var(--color-muted); font-weight: 400; font-size: .78rem; margin-right: .2rem; }
+    /* چیپ‌های گرد برای ویژگی‌های چندانتخابی */
+    .spec-chips { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .15rem; }
+    .spec-chip {
+        display: inline-flex; align-items: center;
+        font-size: .78rem; font-weight: 500;
+        background: #faf6ec; color: #7a5c00;
+        border: 1px solid #ecdfbf;
+        padding: .12rem .6rem; border-radius: 999px;
+    }
+    /* جدول کوچک مقادیر عددی */
+    .spec-num-table { border-collapse: collapse; margin: .2rem 0 1.1rem; font-size: .84rem; }
+    .spec-num-table td { padding: .3rem .8rem; border-bottom: 1px solid #f0ede6; }
+    .spec-num-table td:first-child { color: var(--color-muted); }
+    .spec-num-table td:last-child { color: var(--color-primary); font-weight: 600; text-align: left; direction: ltr; }
+    .spec-num-table td .unit { color: var(--color-muted); font-weight: 400; font-size: .76rem; margin-right: .2rem; }
     .prod-only-badge {
         font-size: .72rem;
         background: #fef3cd;
@@ -408,6 +424,9 @@
                 @if($profile->birth_year)
                     <span class="profile-tag">🗓 متولد {{ $profile->birth_year }}</span>
                 @endif
+                @if($profile->gender)
+                    <span class="profile-tag">{{ $profile->gender === 'male' ? '👨 آقا' : '👩 خانم' }}</span>
+                @endif
                 @if($histories->count())
                     <span class="profile-tag">🎬 {{ $histories->count() }} سابقه کاری</span>
                 @endif
@@ -533,44 +552,53 @@
             @php
             $defs    = $spec->category->effectiveAttributeDefinitions();
             $attrs   = $spec->attributes ?? [];
-            $hasVals = false;
-            @endphp
-            @if($defs->count())
-            <div class="spec-attr-grid">
-                @foreach($defs as $def)
-                @php
-                $isProdOnly = $def->visibility === 'production_team_only';
-                $val        = $attrs[$def->key] ?? null;
-                $displayed  = $displayVal($val, $def);
-                @endphp
 
-                @if($isProdOnly && !($hasAccess || $isSelf))
-                    {{-- Only show lock placeholder if field was explicitly set --}}
-                    @if($val !== null && $val !== '' && $val !== [])
-                    <div class="spec-attr-row">
-                        <div class="spec-attr-key">{{ $def->label_fa }}</div>
-                        <span class="prod-only-badge">🔒 فقط تیم تولید با دسترسی</span>
-                    </div>
-                    @php $hasVals = true; @endphp
+            // ویژگی‌هایی با visibility=production_team_only فقط برای مالک یا تیم تولید دارای دسترسی نمایش داده می‌شوند.
+            $canSee = fn($def) => $def->visibility !== 'production_team_only' || $hasAccess || $isSelf;
+            $isSet  = fn($val) => $val !== null && $val !== '' && $val !== [];
+
+            // فیلدهای عددی → جدول کوچک؛ بقیه (به‌جز file_link که پایین‌تر به‌صورت امبد می‌آید) → گرید/چیپ.
+            $numberDefs = $defs->where('field_type', 'number')->filter(fn($d) => $isSet($attrs[$d->key] ?? null));
+            $otherDefs  = $defs->whereNotIn('field_type', ['number', 'file_link'])
+                               ->filter(fn($d) => $isSet($attrs[$d->key] ?? null));
+            @endphp
+
+            {{-- جدول کوچک مقادیر عددی --}}
+            @if($numberDefs->count())
+            <table class="spec-num-table">
+                @foreach($numberDefs as $def)
+                <tr>
+                    <td>{{ $def->label_fa }}</td>
+                    @if($canSee($def))
+                    <td>{{ $attrs[$def->key] }}@if($def->unit)<span class="unit">{{ $def->unit }}</span>@endif</td>
+                    @else
+                    <td><span class="prod-only-badge">🔒 فقط تیم تولید با دسترسی</span></td>
                     @endif
-                @elseif($displayed !== null && $displayed !== '')
-                    <div class="spec-attr-row">
-                        <div class="spec-attr-key">{{ $def->label_fa }}</div>
-                        @if($def->field_type === 'file_link')
-                            @php $embedUrl = $aparatEmbed((string)$val); @endphp
-                            @if($embedUrl)
-                                <div class="spec-attr-val" style="margin-top:.3rem">
-                                    <a href="{{ $val }}" target="_blank" rel="noopener" style="color:var(--color-accent);font-size:.82rem">مشاهده در آپارات ↗</a>
-                                </div>
-                            @else
-                                <div class="spec-attr-val">{{ $displayed }}</div>
-                            @endif
-                        @else
-                            <div class="spec-attr-val">{{ $displayed }}</div>
-                        @endif
-                    </div>
-                    @php $hasVals = true; @endphp
-                @endif
+                </tr>
+                @endforeach
+            </table>
+            @endif
+
+            {{-- سایر ویژگی‌ها: چیپ برای چندانتخابی، متن ساده برای بقیه --}}
+            @if($otherDefs->count())
+            <div class="spec-attr-grid">
+                @foreach($otherDefs as $def)
+                @php $val = $attrs[$def->key] ?? null; @endphp
+                <div class="spec-attr-row">
+                    <div class="spec-attr-key">{{ $def->label_fa }}</div>
+                    @if(!$canSee($def))
+                        <span class="prod-only-badge">🔒 فقط تیم تولید با دسترسی</span>
+                    @elseif($def->field_type === 'multiselect')
+                        <div class="spec-chips">
+                            @foreach((array) $val as $item)
+                                @php $o = collect($def->options ?? [])->firstWhere('value', $item); @endphp
+                                <span class="spec-chip">{{ $o['label'] ?? $item }}</span>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="spec-attr-val">{{ $displayVal($val, $def) }}</div>
+                    @endif
+                </div>
                 @endforeach
             </div>
             @endif

@@ -56,3 +56,24 @@
 - `CACHE_STORE=file`
 - `QUEUE_CONNECTION=sync` (حتماً)
 - `FILESYSTEM_DISK=uploads`
+
+## دیپلوی ویژگی‌های تخصص (Artist Specialty Attributes)
+
+> روی سرور همهٔ دستورات artisan با `php8.5` اجرا می‌شوند.
+
+پس از آپلود این نسخه، این دستورات را به‌ترتیب اجرا کنید:
+
+```bash
+php8.5 artisan migrate --force
+php8.5 artisan db:seed --class=SpecialtyAttributeDefinitionsSeeder --force
+php8.5 artisan specialties:reindex
+php8.5 artisan config:cache && php8.5 artisan route:cache && php8.5 artisan view:clear
+```
+
+توضیح:
+- `migrate` ستون `gender` را به `artist_profiles`، ستون‌های `unit` و `is_filterable` را به
+  `specialty_attribute_definitions` اضافه و جدول `artist_specialty_attribute_values` را می‌سازد.
+- Seeder جدول تعریف‌ها را truncate و بازسازی می‌کند؛ **مقادیر کاربران دست‌نخورده می‌ماند**
+  (منبع حقیقت ستون JSON `attributes` است). زیرشاخه‌ها هم حفظ می‌شوند و فیلد تکراری «زیرتخصص» برنمی‌گردد.
+- `specialties:reindex` جدول ایندکس فیلترپذیر را برای همهٔ تخصص‌های موجود از روی JSON بازسازی می‌کند
+  (تطبیق مقادیر با «کلید» تعریف انجام می‌شود، پس تغییر idها پس از seed مشکلی ایجاد نمی‌کند).

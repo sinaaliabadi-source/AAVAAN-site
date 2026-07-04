@@ -6,6 +6,7 @@ use App\Http\Requests\UpsertArtistSpecialtyRequest;
 use App\Models\ArtistSpecialty;
 use App\Models\ArtistSpecialtyMedia;
 use App\Services\ImageResizer;
+use App\Services\SpecialtyAttributeIndexer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -46,7 +47,10 @@ class ArtistSpecialtyController extends Controller
             $data['is_primary'] = true;
         }
 
-        ArtistSpecialty::create($data);
+        $specialty = ArtistSpecialty::create($data);
+
+        // بازسازی ایندکس فیلترپذیر از روی JSON.
+        app(SpecialtyAttributeIndexer::class)->sync($specialty);
 
         return back()->with('success', 'تخصص با موفقیت اضافه شد.');
     }
@@ -65,6 +69,9 @@ class ArtistSpecialtyController extends Controller
         }
 
         $specialty->update($data);
+
+        // بازسازی ایندکس فیلترپذیر پس از ذخیره.
+        app(SpecialtyAttributeIndexer::class)->sync($specialty->fresh());
 
         return back()->with('success', 'تخصص با موفقیت به‌روزرسانی شد.');
     }

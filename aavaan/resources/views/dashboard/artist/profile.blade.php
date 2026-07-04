@@ -74,6 +74,24 @@
                        min="1300" max="1410" placeholder="مثلاً: 1370" dir="ltr">
             </div>
             <div class="form-group">
+                {{-- جنسیت: ویژگی سراسری کستینگ در پروفایل پایه --}}
+                <label>جنسیت</label>
+                @php $genderVal = old('gender', $profile?->gender); @endphp
+                <div style="display:flex;gap:.6rem">
+                    <label class="gender-pill" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem;border:1px solid #ddd8ce;border-radius:8px;cursor:pointer;font-weight:400;margin:0;{{ $genderVal === 'male' ? 'border-color:#C9A24B;background:#faf6ec;color:var(--color-primary);font-weight:600' : '' }}">
+                        <input type="radio" name="gender" value="male" {{ $genderVal === 'male' ? 'checked' : '' }}
+                               style="accent-color:#C9A24B">
+                        <span>آقا</span>
+                    </label>
+                    <label class="gender-pill" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem;border:1px solid #ddd8ce;border-radius:8px;cursor:pointer;font-weight:400;margin:0;{{ $genderVal === 'female' ? 'border-color:#C9A24B;background:#faf6ec;color:var(--color-primary);font-weight:600' : '' }}">
+                        <input type="radio" name="gender" value="female" {{ $genderVal === 'female' ? 'checked' : '' }}
+                               style="accent-color:#C9A24B">
+                        <span>خانم</span>
+                    </label>
+                </div>
+                @error('gender')<span class="form-error">{{ $message }}</span>@enderror
+            </div>
+            <div class="form-group">
                 <label>سال‌های تجربه</label>
                 <input type="number" name="years_experience" class="form-control"
                        value="{{ old('years_experience', $profile?->years_experience) }}"

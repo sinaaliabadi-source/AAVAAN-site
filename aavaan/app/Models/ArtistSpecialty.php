@@ -32,6 +32,15 @@ class ArtistSpecialty extends Model
         return $this->hasMany(ArtistSpecialtyMedia::class)->orderBy('sort_order');
     }
 
+    /**
+     * ردیف‌های نرمال‌شدهٔ مقادیر ویژگی‌ها (ایندکس جستجو).
+     * با حذف تخصص، این ردیف‌ها به‌صورت cascade در سطح دیتابیس پاک می‌شوند.
+     */
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(ArtistSpecialtyAttributeValue::class);
+    }
+
     public function photos(): HasMany
     {
         return $this->hasMany(ArtistSpecialtyMedia::class)->where('type', 'photo')->orderBy('sort_order');

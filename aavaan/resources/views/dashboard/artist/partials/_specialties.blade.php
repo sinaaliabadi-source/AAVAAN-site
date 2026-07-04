@@ -28,17 +28,18 @@
         $attrs        = $specialty->attributes ?? [];
     @endphp
 
+    {{-- کارت تخصص؛ برای هنر اصلی، حاشیهٔ طلایی دودی #C9A24B --}}
     <div x-data="{ open: false }"
-         style="border:1px solid #ede8dc;border-radius:8px;margin-bottom:1rem;overflow:hidden">
+         style="border:1px solid {{ $specialty->is_primary ? '#C9A24B' : '#ede8dc' }};border-radius:8px;margin-bottom:1rem;overflow:hidden{{ $specialty->is_primary ? ';box-shadow:0 0 0 1px #C9A24B33' : '' }}">
 
         {{-- Header --}}
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;background:#faf7f2;flex-wrap:wrap;gap:.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;background:{{ $specialty->is_primary ? '#faf6ec' : '#faf7f2' }};flex-wrap:wrap;gap:.5rem">
             <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
                 <strong style="font-family:'YekanBakh',sans-serif;color:var(--color-primary)">
                     {{ $specialty->category->name_fa }}
                 </strong>
                 @if($specialty->is_primary)
-                    <span class="badge badge-warning">⭐ اصلی</span>
+                    <span class="badge" style="background:#C9A24B;color:#fff">⭐ اصلی</span>
                 @endif
                 @if($specialty->years_experience)
                     <span class="text-sm text-muted">{{ $specialty->years_experience }} سال تجربه</span>
@@ -121,8 +122,14 @@
                                   rows="3" {{ $def->is_required ? 'required' : '' }}>{{ $val }}</textarea>
 
                     @elseif($def->field_type === 'number')
-                        <input type="number" name="attributes[{{ $def->key }}]" class="form-control"
-                               value="{{ $val }}" {{ $def->is_required ? 'required' : '' }} dir="ltr">
+                        <div style="display:flex;align-items:center;gap:.5rem">
+                            <input type="number" name="attributes[{{ $def->key }}]" class="form-control"
+                                   value="{{ $val }}" {{ $def->is_required ? 'required' : '' }} dir="ltr"
+                                   style="flex:1">
+                            @if($def->unit)
+                                <span class="text-sm text-muted" style="white-space:nowrap">{{ $def->unit }}</span>
+                            @endif
+                        </div>
 
                     @elseif($def->field_type === 'url')
                         <input type="text" name="attributes[{{ $def->key }}]" class="form-control"
@@ -398,14 +405,20 @@
                                        x-model="attributes[def.key]">
                             </template>
 
-                            {{-- number --}}
+                            {{-- number (با واحد اختیاری کنار فیلد) --}}
                             <template x-if="def.field_type === 'number'">
-                                <input type="number"
-                                       :name="'attributes[' + def.key + ']'"
-                                       class="form-control"
-                                       :required="def.is_required"
-                                       x-model="attributes[def.key]"
-                                       dir="ltr">
+                                <div style="display:flex;align-items:center;gap:.5rem">
+                                    <input type="number"
+                                           :name="'attributes[' + def.key + ']'"
+                                           class="form-control"
+                                           :required="def.is_required"
+                                           x-model="attributes[def.key]"
+                                           dir="ltr"
+                                           style="flex:1">
+                                    <template x-if="def.unit">
+                                        <span class="text-sm text-muted" style="white-space:nowrap" x-text="def.unit"></span>
+                                    </template>
+                                </div>
                             </template>
 
                             {{-- textarea --}}
