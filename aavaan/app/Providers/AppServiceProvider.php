@@ -22,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
                 . " : '<span class=\"locked-field\">🔒 بعد از پرداخت نمایش داده می‌شود</span>'; ?>";
         });
 
+        // @faNum(...) — فارسی‌سازی ارقام لاتین برای نمایش در رابط کاربری (پروژه helper اختصاصی نداشت).
+        Blade::directive('faNum', function ($expression) {
+            return "<?php echo strtr((string) ($expression), "
+                . "['0'=>'۰','1'=>'۱','2'=>'۲','3'=>'۳','4'=>'۴','5'=>'۵','6'=>'۶','7'=>'۷','8'=>'۸','9'=>'۹']); ?>";
+        });
+
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by($request->input('email') . '|' . $request->ip());
         });

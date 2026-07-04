@@ -313,6 +313,8 @@ Route::middleware(['auth', 'role:production'])
     ->group(function () {
         Route::get('/', [ProductionDashboardController::class, 'index'])->name('dashboard');
         Route::get('/search', [ProductionDashboardController::class, 'search'])->name('search');
+        // تصویر ناشناس هنرمند برای کارت‌های قفلِ کست‌یاب (بدون افشای مسیر واقعی فایل)
+        Route::get('/anon-avatar/{code}', [ProductionDashboardController::class, 'anonAvatar'])->name('anon-avatar');
         Route::get('/saved', [ProductionDashboardController::class, 'saved'])->name('saved');
         Route::get('/access', [ProductionAccessController::class, 'index'])->name('access');
         Route::post('/access/buy', [ProductionAccessController::class, 'buy'])->name('access.buy');

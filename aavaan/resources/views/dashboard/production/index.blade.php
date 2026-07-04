@@ -8,6 +8,25 @@
 
 @section('content')
 
+{{-- کارت میان‌بر برجستهٔ کست‌یاب --}}
+<a href="{{ route('production.search') }}"
+   style="display:flex;align-items:center;gap:1.1rem;background:linear-gradient(120deg,var(--color-primary) 0%,#33456b 100%);color:#fff;border-radius:var(--radius);padding:1.4rem 1.6rem;margin-bottom:1.5rem;text-decoration:none;box-shadow:0 4px 18px rgba(31,42,68,.18);transition:transform .18s,box-shadow .18s"
+   onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 26px rgba(31,42,68,.26)'"
+   onmouseout="this.style.transform='';this.style.boxShadow='0 4px 18px rgba(31,42,68,.18)'">
+    <div style="flex-shrink:0;width:56px;height:56px;border-radius:14px;background:rgba(201,162,75,.18);display:flex;align-items:center;justify-content:center;font-size:1.8rem">🎯</div>
+    <div style="flex:1">
+        <div style="font-family:'YekanBakh',sans-serif;font-weight:800;font-size:1.15rem;margin-bottom:.25rem">
+            کست‌یاب — یافتن هنرمند بر اساس ویژگی‌ها
+        </div>
+        <div style="font-size:.87rem;color:#c8d0e0;line-height:1.7">
+            بدون دیدن هویت، با فیلتر جنسیت، سن، قد، وزن، لهجه و هر ویژگی تخصصی، کست موردنظرتان را پیدا کنید.
+        </div>
+    </div>
+    <span style="flex-shrink:0;background:var(--color-accent);color:var(--color-primary);font-weight:700;font-family:'YekanBakh',sans-serif;padding:.55rem 1.1rem;border-radius:8px;font-size:.9rem">
+        شروع جستجو ←
+    </span>
+</a>
+
 {{-- Onboarding banner — only when no paid access yet --}}
 @if(!$hasPaidAccess)
 <div style="background:linear-gradient(135deg,var(--color-primary) 0%,#2d3e60 100%);color:#fff;border-radius:var(--radius);padding:1.5rem 2rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">

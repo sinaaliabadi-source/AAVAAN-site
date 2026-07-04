@@ -77,3 +77,26 @@ php8.5 artisan config:cache && php8.5 artisan route:cache && php8.5 artisan view
   (منبع حقیقت ستون JSON `attributes` است). زیرشاخه‌ها هم حفظ می‌شوند و فیلد تکراری «زیرتخصص» برنمی‌گردد.
 - `specialties:reindex` جدول ایندکس فیلترپذیر را برای همهٔ تخصص‌های موجود از روی JSON بازسازی می‌کند
   (تطبیق مقادیر با «کلید» تعریف انجام می‌شود، پس تغییر idها پس از seed مشکلی ایجاد نمی‌کند).
+
+## دیپلوی «کست‌یاب» (Cast Finder)
+
+این نسخه صفحهٔ `/dashboard/production/search` را به «کست‌یاب» با فیلتر کاملاً SQL ارتقا می‌دهد.
+فقط یک migration سبک (ایندکس ترکیبی) دارد و نیازی به seed مجدد نیست:
+
+```bash
+cd /var/www/aavaan-dev
+git fetch origin
+git checkout claude/artist-specialties-schema-9gpn9m   # یا: git pull اگر روی همین برنچ هستید
+cd aavaan
+npm install && npm run build
+php8.5 artisan migrate --force
+php8.5 artisan config:cache && php8.5 artisan route:cache && php8.5 artisan view:clear
+chown -R www-data:www-data /var/www/aavaan-dev
+```
+
+توضیح:
+- `migrate` ایندکس ترکیبی `asav_sp_def_number_idx (artist_specialty_id, definition_id, value_number)`
+  را برای بهینه‌کردن فیلتر بازهٔ عددیِ همبسته اضافه می‌کند.
+- دستور `db:seed` و `specialties:reindex` **فقط** بعد از پرامپت قبلی لازم بودند؛ برای این نسخه لازم نیستند
+  (مگر داده‌های موجود هنوز reindex نشده باشند).
+- ممیزی مستقل SQL: `docs/schema-cast-finder.sql` (DDL ایندکس + ۵ نمونه‌کوئری فیلتر ترکیبی برای MariaDB).
