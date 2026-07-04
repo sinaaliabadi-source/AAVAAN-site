@@ -2,13 +2,67 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreUserRequest;
+use App\Mail\AccountCreatedByAdminMail;
+use App\Models\ArtistProfile;
 use App\Models\User;
 use App\Traits\LogsAdminActivity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 
 class AdminUserController extends Controller {
     use LogsAdminActivity;
+
+    // نمایش فرم افزودن کاربر. دسترسی ادمین از middleware گروه route تضمین می‌شود.
+    public function create() {
+        return view('admin.users.create');
+    }
+
+    // ساخت کاربر توسط ادمین (هنرمند/تیم تولید/ادمین).
+    public function store(StoreUserRequest $request) {
+        $data = $request->validated();
+
+        $user = User::create([
+            'name'            => $data['name'],
+            'email'           => $data['email'],
+            'phone'           => $data['phone'] ?? null,
+            'password'        => $data['password'], // cast: hashed
+            'role'            => $data['role'],
+            // تیم تولیدی که ادمین می‌سازد مستقیم تأییدشده است؛ سایر نقش‌ها هم approved (پیش‌فرض ستون).
+            'approval_status' => 'approved',
+            'approved_at'     => $data['role'] === 'production' ? now() : null,
+            'approved_by'     => $data['role'] === 'production' ? auth()->id() : null,
+        ]);
+
+        // برای هنرمند، رکورد پروفایل با username یکتای تولیدشده از نام ساخته می‌شود.
+        if ($user->isArtist()) {
+            ArtistProfile::create([
+                'user_id'  => $user->id,
+                'field'    => $data['field'],
+                'city'     => $data['city'] ?? null,
+                'username' => ArtistProfile::generateUniqueUsername($data['name']),
+            ]);
+        }
+
+        // ارسال ایمیل خوش‌آمد حاوی رمز — داخل try/catch تا خطای SMTP اقدام ادمین را fail نکند.
+        if ($request->boolean('send_welcome') && $user->email) {
+            try {
+                Mail::to($user->email)->send(new AccountCreatedByAdminMail($user, $data['password']));
+            } catch (\Throwable) {
+                // خطای ارسال ایمیل نباید ساخت کاربر را متوقف کند.
+            }
+        }
+
+        $this->logAdminActivity(
+            'user_created',
+            "کاربر «{$user->name}» با نقش {$user->role} توسط ادمین ساخته شد.",
+            'user',
+            $user->id
+        );
+
+        return redirect()->route('admin.users.index')->with('success', 'کاربر جدید با موفقیت ساخته شد.');
+    }
 
     public function index(Request $request) {
         abort_unless(auth()->user()->role === 'admin', 403);

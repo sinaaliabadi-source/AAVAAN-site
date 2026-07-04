@@ -2,6 +2,9 @@
 @section('title', 'اشتراک‌ها')
 @section('page-title', 'مدیریت اشتراک‌ها')
 @section('content')
+<div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+    <a href="{{ route('admin.subscriptions.create') }}" class="btn btn-primary">➕ اشتراک دستی</a>
+</div>
 <div class="card">
     <form method="GET" style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;margin-bottom:1.2rem;">
         <div class="form-group" style="margin:0;flex:1;min-width:180px;">
@@ -46,7 +49,12 @@
             <tr>
                 <td>{{ $sub->id }}</td>
                 <td>{{ $sub->user?->name }}</td>
-                <td>{{ $sub->plan === 'monthly' ? 'ماهانه' : 'سالانه' }}</td>
+                <td>
+                    {{ $sub->plan === 'monthly' ? 'ماهانه' : 'سالانه' }}
+                    @if($sub->payment?->isManual())
+                        <span class="badge" style="background:#e7e2f5;color:#5b4a8a;">دستی</span>
+                    @endif
+                </td>
                 <td>{{ $sub->starts_at?->format('Y/m/d') ?: '—' }}</td>
                 <td>{{ $sub->expires_at?->format('Y/m/d') ?: '—' }}</td>
                 <td>

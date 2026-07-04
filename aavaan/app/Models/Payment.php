@@ -10,13 +10,19 @@ class Payment extends Model
 {
     protected $fillable = [
         'user_id', 'payable_type', 'payable_id',
-        'amount', 'gateway', 'authority', 'ref_id', 'status', 'paid_at',
+        'amount', 'gateway', 'payment_source', 'authority', 'ref_id', 'status', 'paid_at',
     ];
 
     protected $casts = [
         'amount' => 'integer',
         'paid_at' => 'datetime',
     ];
+
+    // آیا این پرداخت به‌صورت دستی توسط ادمین ثبت شده است؟
+    public function isManual(): bool
+    {
+        return $this->payment_source === 'manual';
+    }
 
     public function user(): BelongsTo
     {

@@ -5,9 +5,33 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class ArtistProfile extends Model
 {
+    /**
+     * تولید username یکتای URL-امن از روی نام هنرمند.
+     * منبع واحد این منطق؛ هم فرم افزودن کاربر ادمین و هم هر جای دیگر باید همین را reuse کند
+     * (کپی نشود). نام‌های فارسی با Str::slug به رشتهٔ خالی می‌رسند؛ در آن حالت پیشوند «honarmand»
+     * با پسوند تصادفی کوتاه استفاده می‌شود.
+     */
+    public static function generateUniqueUsername(string $name): string
+    {
+        $base = Str::slug($name, '-');
+        if ($base === '') {
+            $base = 'honarmand-' . Str::lower(Str::random(5));
+        }
+
+        $username = $base;
+        $suffix   = 1;
+        while (static::where('username', $username)->exists()) {
+            $username = $base . '-' . $suffix;
+            $suffix++;
+        }
+
+        return $username;
+    }
+
     protected $fillable = [
         'user_id', 'username', 'field', 'city', 'birth_year', 'gender', 'years_experience',
         'bio', 'avatar', 'phone_contact', 'email_contact', 'is_active',

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Subscription extends Model
 {
-    protected $fillable = ['user_id', 'plan', 'status', 'starts_at', 'expires_at'];
+    protected $fillable = ['user_id', 'plan', 'status', 'starts_at', 'expires_at', 'admin_note'];
 
     protected $casts = [
         'starts_at' => 'datetime',

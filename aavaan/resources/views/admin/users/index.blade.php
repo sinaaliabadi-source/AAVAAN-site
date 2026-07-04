@@ -2,6 +2,9 @@
 @section('title', 'مدیریت کاربران')
 @section('page-title', 'مدیریت کاربران')
 @section('content')
+<div style="display:flex;justify-content:flex-end;margin-bottom:1rem;">
+    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">➕ افزودن کاربر</a>
+</div>
 <div class="card">
     <form method="GET" style="display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end;margin-bottom:1.2rem;">
         <div class="form-group" style="margin:0;flex:1;min-width:180px;">

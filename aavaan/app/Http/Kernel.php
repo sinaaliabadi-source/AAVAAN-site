@@ -46,5 +46,6 @@ class Kernel extends HttpKernel
         'role'             => \App\Http\Middleware\CheckRole::class,
         'admin'            => \App\Http\Middleware\EnsureUserIsAdmin::class,
         'admin.permission' => \App\Http\Middleware\CheckAdminPermission::class,
+        'production.approved' => \App\Http\Middleware\EnsureProductionApproved::class,
     ];
 }

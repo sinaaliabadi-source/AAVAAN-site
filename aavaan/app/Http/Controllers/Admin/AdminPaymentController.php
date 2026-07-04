@@ -33,10 +33,11 @@ class AdminPaymentController extends Controller {
         $callback = function() use ($payments) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM for Excel
-            fputcsv($file, ['شناسه','کاربر','ایمیل','مبلغ','وضعیت','نوع','تاریخ']);
+            fputcsv($file, ['شناسه','کاربر','ایمیل','مبلغ','وضعیت','نوع','روش','تاریخ']);
             foreach ($payments as $p) {
-                $type = str_contains($p->payable_type, 'Subscription') ? 'اشتراک' : 'دسترسی تولید';
-                fputcsv($file, [$p->id, $p->user?->name, $p->user?->email, $p->amount, $p->status, $type, $p->created_at?->format('Y-m-d H:i')]);
+                $type   = str_contains($p->payable_type, 'Subscription') ? 'اشتراک' : 'دسترسی تولید';
+                $source = $p->payment_source === 'manual' ? 'دستی' : 'درگاه';
+                fputcsv($file, [$p->id, $p->user?->name, $p->user?->email, $p->amount, $p->status, $type, $source, $p->created_at?->format('Y-m-d H:i')]);
             }
             fclose($file);
         };

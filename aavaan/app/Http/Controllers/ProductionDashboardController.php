@@ -199,6 +199,20 @@ class ProductionDashboardController extends Controller
         ]);
     }
 
+    /**
+     * صفحهٔ وضعیت انتظار/رد تأیید برای تیم‌های تولید تأییدنشده.
+     * اگر کاربر approved باشد به داشبورد هدایت می‌شود.
+     */
+    public function pendingApproval()
+    {
+        $user = auth()->user();
+        if ($user->approval_status === 'approved') {
+            return redirect()->route('production.dashboard');
+        }
+
+        return view('dashboard.production.pending-approval', compact('user'));
+    }
+
     public function saved()
     {
         $user         = auth()->user();

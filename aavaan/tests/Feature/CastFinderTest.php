@@ -74,6 +74,8 @@ class CastFinderTest extends TestCase
             'email'    => "prod{$m}@example.com",
             'password' => 'password',
             'role'     => 'production',
+            // تیم تولید تأییدشده تا از middleware تأیید عبور کند.
+            'approval_status' => 'approved',
         ]);
 
         if ($withCredits) {

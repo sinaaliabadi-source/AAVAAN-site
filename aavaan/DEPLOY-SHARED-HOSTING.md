@@ -100,3 +100,22 @@ chown -R www-data:www-data /var/www/aavaan-dev
 - دستور `db:seed` و `specialties:reindex` **فقط** بعد از پرامپت قبلی لازم بودند؛ برای این نسخه لازم نیستند
   (مگر داده‌های موجود هنوز reindex نشده باشند).
 - ممیزی مستقل SQL: `docs/schema-cast-finder.sql` (DDL ایندکس + ۵ نمونه‌کوئری فیلتر ترکیبی برای MariaDB).
+
+## دیپلوی فاز ادمین (افزودن کاربر، تأیید تیم تولید، اشتراک/اعتبار دستی)
+
+فقط چند migration دارد و نیازی به seed ندارد:
+
+```bash
+php8.5 artisan migrate --force
+php8.5 artisan config:cache && php8.5 artisan route:cache && php8.5 artisan view:clear
+```
+
+توضیح:
+- `migrate` این ستون‌ها را می‌افزاید: روی `users` گردش‌کار تأیید
+  (`approval_status` با پیش‌فرض **approved** برای سازگاری با کاربران فعلی، `approved_at`،
+  `approved_by`، `rejection_reason` + ایندکس `role,approval_status`)؛ روی `payments` ستون
+  `payment_source`؛ روی `subscriptions` و `production_accesses` ستون `admin_note`؛ و
+  آزادسازی `access_type` از enum برای مقدار `manual`.
+- هیچ کاربر فعلی قفل نمی‌شود؛ فقط ثبت‌نام **جدید** تیم تولید در وضعیت `pending` قرار می‌گیرد
+  و تا تأیید ادمین به داشبورد/کست‌یاب دسترسی ندارد.
+- ممیزی مستقل SQL: `docs/schema-admin-phase.sql`.

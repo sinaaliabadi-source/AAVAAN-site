@@ -8,16 +8,21 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable {
     use HasFactory, Notifiable, SoftDeletes;
 
-    protected $fillable = ['name', 'email', 'phone', 'password', 'role', 'admin_role', 'is_banned', 'admin_notes'];
+    protected $fillable = [
+        'name', 'email', 'phone', 'password', 'role', 'admin_role', 'is_banned', 'admin_notes',
+        'approval_status', 'approved_at', 'approved_by', 'rejection_reason',
+    ];
     protected $hidden = ['password', 'remember_token'];
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password'          => 'hashed',
         'is_banned'         => 'boolean',
+        'approved_at'       => 'datetime',
     ];
 
     public function artistProfile(): HasOne { return $this->hasOne(ArtistProfile::class); }
@@ -33,6 +38,15 @@ class User extends Authenticatable {
     public function isArtist(): bool { return $this->role === 'artist'; }
     public function isProduction(): bool { return $this->role === 'production'; }
     public function isAdmin(): bool { return $this->role === 'admin'; }
+
+    // تیم تولیدی که ادمین حسابش را ساخته یا تأیید کرده (approver).
+    public function approvedBy(): BelongsTo { return $this->belongsTo(User::class, 'approved_by'); }
+
+    // آیا این کاربر production تأییدشده است؟ (هنرمندان همیشه approved هستند و تأیید برایشان معنا ندارد.)
+    public function isApprovedProduction(): bool
+    {
+        return $this->role === 'production' && $this->approval_status === 'approved';
+    }
 
     public function activeSubscription(): ?Subscription {
         return $this->subscriptions()

@@ -39,7 +39,7 @@
     <div style="overflow-x:auto;">
         <table class="table">
             <thead><tr>
-                <th>#</th><th>کاربر</th><th>مبلغ (تومان)</th><th>نوع</th><th>وضعیت</th><th>کد مرجع</th><th>تاریخ</th>
+                <th>#</th><th>کاربر</th><th>مبلغ (تومان)</th><th>نوع</th><th>روش</th><th>وضعیت</th><th>کد مرجع</th><th>تاریخ</th>
             </tr></thead>
             <tbody>
             @forelse($payments as $p)
@@ -52,6 +52,13 @@
                 <td>{{ number_format($p->amount) }}</td>
                 <td>{{ str_contains($p->payable_type ?? '', 'Subscription') ? 'اشتراک' : 'دسترسی تولید' }}</td>
                 <td>
+                    @if($p->isManual())
+                        <span class="badge" style="background:#e7e2f5;color:#5b4a8a;">دستی</span>
+                    @else
+                        <span class="text-sm text-muted">{{ $p->gateway }}</span>
+                    @endif
+                </td>
+                <td>
                     @if($p->status==='paid') <span class="badge badge-success">پرداخت‌شده</span>
                     @elseif($p->status==='pending') <span class="badge badge-warning">در انتظار</span>
                     @elseif($p->status==='refunded') <span class="badge badge-info">بازگشت‌داده‌شده</span>
@@ -62,7 +69,7 @@
                 <td>{{ $p->created_at->format('Y/m/d') }}</td>
             </tr>
             @empty
-            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--color-muted);">پرداختی یافت نشد.</td></tr>
+            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--color-muted);">پرداختی یافت نشد.</td></tr>
             @endforelse
             </tbody>
         </table>

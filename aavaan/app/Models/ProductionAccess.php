@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class ProductionAccess extends Model
 {
-    protected $fillable = ['user_id', 'access_type', 'bundle_size', 'used_count', 'expires_at'];
+    protected $fillable = ['user_id', 'access_type', 'bundle_size', 'used_count', 'expires_at', 'admin_note'];
 
     protected $casts = [
         'expires_at' => 'datetime',

@@ -79,6 +79,9 @@ class AuthController extends Controller
             'phone'    => $validated['phone'] ?? null,
             'password' => $validated['password'],
             'role'     => $validated['role'],
+            // تیم‌های تولید تا تأیید ادمین در وضعیت pending می‌مانند؛ هنرمندان همیشه approved
+            // (پیش‌فرض ستون). این تمایز، دسترسی تیم تولید تأییدنشده را مسدود می‌کند.
+            'approval_status' => $validated['role'] === 'production' ? 'pending' : 'approved',
         ]);
 
         if ($user->isArtist()) {
@@ -100,11 +103,14 @@ class AuthController extends Controller
             }
         }
 
-        return $user->isArtist()
-            ? redirect()->route('artist.profile')
-                ->with('success', 'خوش آمدید! پروفایل خود را تکمیل کنید تا در نتایج جستجو ظاهر شوید.')
-            : redirect()->route('production.dashboard')
-                ->with('success', 'خوش آمدید به آوان!');
+        if ($user->isArtist()) {
+            return redirect()->route('artist.profile')
+                ->with('success', 'خوش آمدید! پروفایل خود را تکمیل کنید تا در نتایج جستجو ظاهر شوید.');
+        }
+
+        // تیم تولید پس از ثبت‌نام به صفحهٔ انتظار تأیید می‌رود، نه داشبورد.
+        return redirect()->route('production.pending-approval')
+            ->with('success', 'ثبت‌نام شما انجام شد و در انتظار تأیید تیم آوان است.');
     }
 
     public function logout(Request $request)

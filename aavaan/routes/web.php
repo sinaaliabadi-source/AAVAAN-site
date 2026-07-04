@@ -164,6 +164,10 @@ Route::middleware(['auth', 'admin'])
 
         // Users
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        // جستجوی هنرمند برای autocomplete اشتراک دستی (JSON)
+        Route::get('/api/artist-search', [AdminSubscriptionController::class, 'artistSearch'])->name('api.artist-search');
         Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
         Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
         Route::post('/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
@@ -183,9 +187,15 @@ Route::middleware(['auth', 'admin'])
         // Production teams
         Route::get('/production-teams', [AdminProductionController::class, 'index'])->name('production.index');
         Route::get('/production-teams/{id}', [AdminProductionController::class, 'show'])->name('production.show');
+        Route::post('/production-teams/{id}/approve', [AdminProductionController::class, 'approve'])->name('production.approve');
+        Route::post('/production-teams/{id}/reject', [AdminProductionController::class, 'reject'])->name('production.reject');
+        Route::post('/production-teams/{id}/add-credit', [AdminProductionController::class, 'addCredit'])->name('production.add-credit');
 
         // Subscriptions
         Route::get('/subscriptions', [AdminSubscriptionController::class, 'index'])->name('subscriptions.index');
+        // create پیش از {id} تعریف می‌شود تا با route نمایش تداخل نکند.
+        Route::get('/subscriptions/create', [AdminSubscriptionController::class, 'create'])->name('subscriptions.create');
+        Route::post('/subscriptions', [AdminSubscriptionController::class, 'store'])->name('subscriptions.store');
         Route::get('/subscriptions/{id}', [AdminSubscriptionController::class, 'show'])->name('subscriptions.show');
         Route::post('/subscriptions/{id}/cancel', [AdminSubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
         Route::post('/subscriptions/{id}/extend', [AdminSubscriptionController::class, 'extend'])->name('subscriptions.extend');
@@ -307,10 +317,14 @@ Route::middleware(['auth', 'admin'])
 // ═══════════════════════════════════════════════════
 // Production Dashboard
 // ═══════════════════════════════════════════════════
-Route::middleware(['auth', 'role:production'])
+Route::middleware(['auth', 'role:production', 'production.approved'])
     ->prefix('dashboard/production')
     ->name('production.')
     ->group(function () {
+        // صفحهٔ وضعیت انتظار تأیید — خودِ این route نباید پشت middleware تأیید باشد (جلوگیری از حلقهٔ redirect).
+        Route::get('/pending-approval', [ProductionDashboardController::class, 'pendingApproval'])
+            ->name('pending-approval')
+            ->withoutMiddleware(\App\Http\Middleware\EnsureProductionApproved::class);
         Route::get('/', [ProductionDashboardController::class, 'index'])->name('dashboard');
         Route::get('/search', [ProductionDashboardController::class, 'search'])->name('search');
         // تصویر ناشناس هنرمند برای کارت‌های قفلِ کست‌یاب (بدون افشای مسیر واقعی فایل)
