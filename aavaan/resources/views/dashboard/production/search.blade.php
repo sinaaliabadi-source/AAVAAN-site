@@ -130,6 +130,7 @@
         background: #eef1f6; color: var(--color-primary);
         border-radius: 999px; padding: .12rem .55rem;
     }
+    .cf-verified { color: #C9A24B; margin-inline-start: .15rem; }
     .cf-card-meta { font-size: .8rem; color: var(--color-muted); margin-bottom: .55rem; }
     .cf-card-meta span + span::before { content: ' · '; }
 
@@ -300,6 +301,10 @@
                         </select>
                         <span class="form-hint">با انتخاب دسته، فیلترهای تخصصی نمایش داده می‌شوند.</span>
                     </div>
+                    <label style="display:flex;align-items:center;gap:.5rem;margin:.8rem 0 0;cursor:pointer;font-weight:500;font-size:.85rem;">
+                        <input type="checkbox" name="verified_only" value="1" {{ request()->boolean('verified_only') ? 'checked' : '' }}>
+                        <span>فقط تخصص‌های تأییدشده <span style="color:#C9A24B;">✔</span></span>
+                    </label>
                 </div>
 
                 {{-- کارت ویژگی‌های تخصصی (پویا) --}}
@@ -427,11 +432,14 @@
                             <div class="cf-card-code">{{ $pseudo }}</div>
                         @endif
 
-                        {{-- چیپ تخصص‌ها --}}
+                        {{-- چیپ تخصص‌ها + نشان تأیید (بدون افشای هویت) --}}
                         @if(!empty($card['specialty_chips']))
                         <div class="cf-chips">
                             @foreach($card['specialty_chips'] as $chip)
-                                <span class="cf-chip">{{ $chip }}</span>
+                                <span class="cf-chip">
+                                    {{ $chip['name'] }}
+                                    @if($chip['verified'])<span class="cf-verified" title="تخصص تأییدشده">✔</span>@endif
+                                </span>
                             @endforeach
                         </div>
                         @endif

@@ -16,6 +16,7 @@
             <label>نوع</label>
             <select name="type" class="form-control">
                 <option value="">همه</option>
+                <option value="specialty" {{ request('type')=='specialty'?'selected':'' }}>تخصص</option>
                 <option value="phone" {{ request('type')=='phone'?'selected':'' }}>تلفن</option>
                 <option value="resume" {{ request('type')=='resume'?'selected':'' }}>رزومه</option>
                 <option value="professional" {{ request('type')=='professional'?'selected':'' }}>حرفه‌ای</option>
@@ -26,7 +27,7 @@
     <div style="overflow-x:auto;">
         <table class="table">
             <thead><tr>
-                <th>#</th><th>هنرمند</th><th>نوع</th><th>وضعیت</th><th>یادداشت</th><th>تاریخ درخواست</th><th>عملیات</th>
+                <th>#</th><th>هنرمند</th><th>نوع</th><th>تخصص</th><th>وضعیت</th><th>یادداشت</th><th>تاریخ درخواست</th><th>عملیات</th>
             </tr></thead>
             <tbody>
             @forelse($verifications as $v)
@@ -34,9 +35,10 @@
                 <td>{{ $v->id }}</td>
                 <td>{{ $v->user?->name }}</td>
                 <td>
-                    @php $types=['phone'=>'تلفن','resume'=>'رزومه','professional'=>'حرفه‌ای']; @endphp
+                    @php $types=['phone'=>'تلفن','resume'=>'رزومه','professional'=>'حرفه‌ای','specialty'=>'تخصص']; @endphp
                     {{ $types[$v->type] ?? $v->type }}
                 </td>
+                <td>{{ $v->artistSpecialty?->category?->name_fa ?? '—' }}</td>
                 <td>
                     @if($v->status==='approved') <span class="badge badge-success">تأییدشده</span>
                     @elseif($v->status==='rejected') <span class="badge badge-danger">ردشده</span>
@@ -46,24 +48,20 @@
                 <td>{{ $v->notes ? \Str::limit($v->notes, 50) : '—' }}</td>
                 <td>{{ $v->created_at->format('Y/m/d') }}</td>
                 <td>
-                    @if($v->status === 'pending')
-                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-                        <form method="POST" action="{{ route('admin.verifications.approve', $v->id) }}" style="display:flex;gap:.3rem;align-items:center;">@csrf
-                            <input type="text" name="notes" class="form-control" style="padding:.3rem .5rem;font-size:.8rem;width:130px;" placeholder="یادداشت (اختیاری)">
-                            <button class="btn btn-outline btn-sm" style="color:var(--color-success);border-color:var(--color-success);">تأیید</button>
+                    <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
+                        <a href="{{ route('admin.verifications.show', $v->id) }}" class="btn btn-primary btn-sm">بررسی</a>
+                        @if($v->status === 'pending')
+                        <form method="POST" action="{{ route('admin.verifications.approve', $v->id) }}" style="display:inline;">@csrf
+                            <button class="btn btn-outline btn-sm" style="color:var(--color-success);border-color:var(--color-success);">تأیید سریع</button>
                         </form>
-                        <form method="POST" action="{{ route('admin.verifications.reject', $v->id) }}" style="display:flex;gap:.3rem;align-items:center;">@csrf
-                            <input type="text" name="notes" class="form-control" style="padding:.3rem .5rem;font-size:.8rem;width:130px;" placeholder="دلیل رد">
-                            <button class="btn btn-danger btn-sm">رد</button>
-                        </form>
+                        @else
+                        <span class="text-muted text-sm">{{ $v->reviewed_at?->format('Y/m/d') }}</span>
+                        @endif
                     </div>
-                    @else
-                    <span class="text-muted text-sm">{{ $v->reviewed_at?->format('Y/m/d') }}</span>
-                    @endif
                 </td>
             </tr>
             @empty
-            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--color-muted);">موردی یافت نشد.</td></tr>
+            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--color-muted);">موردی یافت نشد.</td></tr>
             @endforelse
             </tbody>
         </table>

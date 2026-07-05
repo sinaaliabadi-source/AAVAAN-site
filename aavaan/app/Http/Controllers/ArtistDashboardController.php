@@ -91,6 +91,7 @@ class ArtistDashboardController extends Controller
                 'category.attributeDefinitions'            => fn($q) => $q->orderBy('sort_order'),
                 'category.parent.attributeDefinitions'     => fn($q) => $q->orderBy('sort_order'),
                 'media'                                     => fn($q) => $q->orderBy('sort_order'),
+                'latestVerification',
             ])
             ->get();
 

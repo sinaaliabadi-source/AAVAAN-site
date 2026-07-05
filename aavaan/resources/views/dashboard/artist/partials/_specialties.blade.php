@@ -26,10 +26,12 @@
         $spVideos     = $specialty->media->where('type', 'video_link');
         $attrDefs     = $specialty->category->effectiveAttributeDefinitions();
         $attrs        = $specialty->attributes ?? [];
+        $ver          = $specialty->latestVerification; // eager-loaded
+        $verStatus    = $ver?->status; // null | pending | approved | rejected
     @endphp
 
     {{-- کارت تخصص؛ برای هنر اصلی، حاشیهٔ طلایی دودی #C9A24B --}}
-    <div x-data="{ open: false }"
+    <div x-data="{ open: false, verify: false }"
          style="border:1px solid {{ $specialty->is_primary ? '#C9A24B' : '#ede8dc' }};border-radius:8px;margin-bottom:1rem;overflow:hidden{{ $specialty->is_primary ? ';box-shadow:0 0 0 1px #C9A24B33' : '' }}">
 
         {{-- Header --}}
@@ -50,6 +52,15 @@
                 @if($spVideos->count())
                     <span class="badge badge-info">{{ $spVideos->count() }} ویدیو</span>
                 @endif
+
+                {{-- نشان وضعیت تأیید تخصص --}}
+                @if($verStatus === 'approved')
+                    <span class="badge" style="background:#C9A24B;color:#fff" title="تخصص تأییدشده">✔ تأییدشده</span>
+                @elseif($verStatus === 'pending')
+                    <span class="badge badge-warning" title="در انتظار بررسی ادمین">⏳ در انتظار بررسی</span>
+                @elseif($verStatus === 'rejected')
+                    <span class="badge badge-danger" title="درخواست رد شد">✕ رد شده</span>
+                @endif
             </div>
 
             <div style="display:flex;gap:.4rem;flex-wrap:wrap">
@@ -62,6 +73,12 @@
                     </button>
                 </form>
                 @endif
+                {{-- دکمهٔ درخواست/ارسال مجدد تأیید (فقط وقتی تأییدشده یا در انتظار نیست) --}}
+                @if($verStatus !== 'approved' && $verStatus !== 'pending')
+                <button @click="verify = !verify" type="button" class="btn btn-accent btn-sm">
+                    <span x-text="verify ? '✕ بستن' : '{{ $verStatus === 'rejected' ? '↻ ارسال مجدد تأیید' : '✔ درخواست تأیید تخصص' }}'">{{ $verStatus === 'rejected' ? '↻ ارسال مجدد تأیید' : '✔ درخواست تأیید تخصص' }}</span>
+                </button>
+                @endif
                 <button @click="open = !open" class="btn btn-outline btn-sm">
                     <span x-text="open ? '✕ بستن' : '✎ ویرایش'">✎ ویرایش</span>
                 </button>
@@ -73,6 +90,38 @@
                 </form>
             </div>
         </div>
+
+        {{-- ─── بخش تأیید تخصص ─── --}}
+        @if($verStatus === 'rejected' && $ver?->notes)
+        <div style="padding:.7rem 1rem;background:#fdecea;border-top:1px solid #f5c6cb;color:#a03027;font-size:.85rem">
+            <strong>دلیل رد بررسی:</strong> {{ $ver->notes }}
+        </div>
+        @endif
+
+        @if($verStatus !== 'approved' && $verStatus !== 'pending')
+        <div x-show="verify" x-cloak style="padding:1rem 1.25rem;background:#faf6ec;border-top:1px solid #ecdfbf">
+            <div style="font-size:.85rem;color:#8a6d1f;margin-bottom:.6rem">
+                برای تأیید این تخصص، توضیح کوتاهی بنویسید و در صورت تمایل تا ۳ لینک مدرک بگذارید.
+                رسانه‌های همین تخصص به‌صورت خودکار به بررسی ادمین پیوست می‌شوند.
+            </div>
+            <form action="{{ route('artist.specialties.verify', $specialty->id) }}" method="POST">
+                @csrf
+                <div class="form-group">
+                    <label>توضیح شما <span class="req">*</span></label>
+                    <textarea name="artist_note" class="form-control" rows="2" required
+                              placeholder="مثلاً: ۱۰ سال سابقهٔ حرفه‌ای در این تخصص با نمونه‌کارهای زیر…">{{ old('artist_note') }}</textarea>
+                </div>
+                <div class="form-group" style="margin-bottom:.5rem">
+                    <label>لینک مدارک (اختیاری — حداکثر ۳)</label>
+                    @for($i = 0; $i < 3; $i++)
+                        <input type="url" name="evidence_links[]" class="form-control" dir="ltr"
+                               placeholder="https://…" style="margin-bottom:.4rem">
+                    @endfor
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">ارسال درخواست تأیید</button>
+            </form>
+        </div>
+        @endif
 
         {{-- Collapsible edit form (server-side rendered, static fields) --}}
         <div x-show="open" x-cloak style="padding:1.25rem;border-top:1px solid #ede8dc">

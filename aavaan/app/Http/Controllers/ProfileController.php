@@ -61,6 +61,7 @@ class ProfileController extends Controller
                 'category.attributeDefinitions'        => fn($q) => $q->orderBy('sort_order'),
                 'category.parent.attributeDefinitions' => fn($q) => $q->orderBy('sort_order'),
                 'media'                                 => fn($q) => $q->orderBy('sort_order'),
+                'latestVerification',
             ])
             ->orderByDesc('is_primary')
             ->orderBy('id')

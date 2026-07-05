@@ -44,5 +44,37 @@
     </div>
     @endif
 </div>
+
+{{-- تخصص‌ها و وضعیت تأیید (فقط‌خواندنی) --}}
+<div class="card">
+    <div class="card-title">🎯 تخصص‌ها و وضعیت تأیید</div>
+    @php
+        $verMeta = [
+            'pending'  => ['label' => 'در انتظار بررسی', 'class' => 'badge-warning'],
+            'approved' => ['label' => 'تأییدشده',        'class' => 'badge-success'],
+            'rejected' => ['label' => 'ردشده',           'class' => 'badge-danger'],
+        ];
+    @endphp
+    @forelse($specialties as $sp)
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.55rem 0;border-bottom:1px solid #f0ede8;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+            <strong style="font-size:.9rem;">{{ $sp->category?->name_fa ?? '—' }}</strong>
+            @if($sp->is_primary)<span class="badge" style="background:#C9A24B;color:#fff;">اصلی</span>@endif
+            @php $v = $sp->latestVerification; @endphp
+            @if($v)
+                @php $m = $verMeta[$v->status] ?? $verMeta['pending']; @endphp
+                <span class="badge {{ $m['class'] }}">{{ $m['label'] }}</span>
+            @else
+                <span class="text-muted text-sm">بدون درخواست تأیید</span>
+            @endif
+        </div>
+        @if($sp->latestVerification)
+        <a href="{{ route('admin.verifications.show', $sp->latestVerification->id) }}" class="btn btn-ghost btn-sm">بررسی</a>
+        @endif
+    </div>
+    @empty
+    <p class="text-muted text-sm">این هنرمند تخصصی ثبت نکرده است.</p>
+    @endforelse
+</div>
 </div>
 @endsection

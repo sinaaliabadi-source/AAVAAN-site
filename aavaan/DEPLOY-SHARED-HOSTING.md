@@ -119,3 +119,23 @@ php8.5 artisan config:cache && php8.5 artisan route:cache && php8.5 artisan view
 - هیچ کاربر فعلی قفل نمی‌شود؛ فقط ثبت‌نام **جدید** تیم تولید در وضعیت `pending` قرار می‌گیرد
   و تا تأیید ادمین به داشبورد/کست‌یاب دسترسی ندارد.
 - ممیزی مستقل SQL: `docs/schema-admin-phase.sql`.
+
+## دیپلوی فاز تأیید تخصص + داشبورد ادمین
+
+فقط یک migration دارد و نیازی به seed ندارد:
+
+```bash
+php8.5 artisan migrate --force
+php8.5 artisan config:cache && php8.5 artisan route:cache && php8.5 artisan view:clear
+```
+
+توضیح:
+- `migrate` به جدول `verifications` ستون‌های `artist_specialty_id` (FK با حذف آبشاری)، `artist_note`
+  و `evidence_links` (JSON) را می‌افزاید و ایندکس `status,created_at` می‌سازد.
+- جریان تأیید تخصص از سمت هنرمند (روی هر کارت تخصص) فعال می‌شود؛ نشان «تخصص تأییدشده» در پروفایل
+  عمومی و کست‌یاب ظاهر می‌شود و فیلتر «فقط تأییدشده‌ها» به کست‌یاب اضافه می‌گردد.
+- داشبورد ادمین: آمار کامل (در انتظار اقدام، مالی، اشتراک، محتوا)، «صف اقدامات» و دو نمودار ۳۰ روزه
+  (Chart.js از endpoint `admin/reports/chart-data`). محاسبات سنگین با کش ۵ دقیقه‌ای؛ در صورت نیاز به
+  به‌روزرسانی فوری، `php8.5 artisan cache:clear`.
+- سه route منسوخ (`moderation`، `content`، `reports/violations`) حذف شدند؛ در sidebar لینکی به آن‌ها نبود.
+- ممیزی مستقل SQL: `docs/schema-verification-dashboard.sql`.

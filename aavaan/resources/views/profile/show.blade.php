@@ -523,6 +523,9 @@
                 {{ $catIconMap[$spec->category->slug] ?? '🎯' }}
                 {{ $spec->category->name_fa }}
                 @if($spec->is_primary)<span class="primary-dot" title="تخصص اصلی"></span>@endif
+                @if($spec->latestVerification?->status === 'approved')
+                    <span title="تخصص تأییدشده" style="color:#C9A24B;font-size:.85rem;">✔</span>
+                @endif
             </button>
             @endforeach
         </div>
@@ -538,6 +541,9 @@
                 <strong style="font-size:1rem;color:var(--color-primary)">{{ $spec->category->name_fa }}</strong>
                 @if($spec->is_primary)
                     <span style="font-size:.75rem;background:var(--color-accent);color:#fff;padding:.15rem .6rem;border-radius:999px">تخصص اصلی</span>
+                @endif
+                @if($spec->latestVerification?->status === 'approved')
+                    <span style="font-size:.72rem;background:#faf6ec;color:#8a6d1f;border:1px solid #ecdfbf;padding:.12rem .6rem;border-radius:999px;">✔ تخصص تأییدشده</span>
                 @endif
             </div>
             @endif

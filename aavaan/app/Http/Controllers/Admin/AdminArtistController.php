@@ -28,7 +28,14 @@ class AdminArtistController extends Controller {
     public function edit(int $id) {
         abort_unless(auth()->user()->role === 'admin', 403);
         $artist = ArtistProfile::with('user')->findOrFail($id);
-        return view('admin.artists.edit', compact('artist'));
+
+        // تخصص‌ها و وضعیت تأیید (فقط‌خواندنی) برای نمایش در صفحهٔ ادمین.
+        $specialties = \App\Models\ArtistSpecialty::where('user_id', $artist->user_id)
+            ->with(['category:id,name_fa', 'latestVerification'])
+            ->orderByDesc('is_primary')
+            ->get();
+
+        return view('admin.artists.edit', compact('artist', 'specialties'));
     }
 
     public function update(Request $request, int $id) {

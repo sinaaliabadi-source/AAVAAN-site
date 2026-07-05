@@ -147,6 +147,23 @@ class ProductionDashboardController extends Controller
             });
         }
 
+        // ── فیلتر «فقط تأییدشده‌ها» ─────────────────────────────────────
+        // تخصص تأییدشده = وجود verification با type=specialty و status=approved روی تخصص کاربر
+        // (در صورت انتخاب دسته، محدود به همان دسته‌ها). سازگار با whereExists جستجوی SQL فعلی.
+        if ($request->boolean('verified_only')) {
+            $query->whereExists(function ($q) use ($categoryIds) {
+                $q->select(DB::raw(1))
+                  ->from('verifications as vr')
+                  ->join('artist_specialties as vsp', 'vsp.id', '=', 'vr.artist_specialty_id')
+                  ->whereColumn('vsp.user_id', 'artist_profiles.user_id')
+                  ->where('vr.type', 'specialty')
+                  ->where('vr.status', 'approved');
+                if (!empty($categoryIds)) {
+                    $q->whereIn('vsp.category_id', $categoryIds);
+                }
+            });
+        }
+
         $artists = $query->with('user')
             ->orderByDesc('id')
             ->paginate(20)
@@ -161,7 +178,9 @@ class ProductionDashboardController extends Controller
 
         // شمارندهٔ فیلترهای فعال (برای سایدبار و نسخهٔ موبایل)
         $activeFilterCount = collect(['city', 'gender', 'age_min', 'age_max', 'experience_min', 'keyword', 'category_id'])
-            ->filter(fn($k) => $request->filled($k))->count() + count($attrFilters);
+            ->filter(fn($k) => $request->filled($k))->count()
+            + count($attrFilters)
+            + ($request->boolean('verified_only') ? 1 : 0);
 
         return view('dashboard.production.search', compact(
             'artists', 'unlockedIds', 'access', 'hasPaidAccess',
@@ -322,6 +341,7 @@ class ProductionDashboardController extends Controller
                 'category:id,name_fa,slug,parent_id',
                 'category.attributeDefinitions' => fn($q) => $q->orderBy('sort_order'),
                 'category.parent.attributeDefinitions' => fn($q) => $q->orderBy('sort_order'),
+                'latestVerification',
             ])
             ->orderByDesc('is_primary')
             ->get()
@@ -331,8 +351,11 @@ class ProductionDashboardController extends Controller
         foreach ($profiles as $profile) {
             $specs = $specialtiesByUser->get($profile->user_id, collect());
 
-            // چیپ همهٔ تخصص‌ها
-            $chips = $specs->map(fn($s) => $s->category?->name_fa)->filter()->unique()->values()->all();
+            // چیپ همهٔ تخصص‌ها به‌همراه وضعیت تأیید (برای نشان «تخصص تأییدشده»).
+            $chips = $specs->map(fn($s) => [
+                'name'     => $s->category?->name_fa,
+                'verified' => $s->latestVerification?->status === 'approved',
+            ])->filter(fn($c) => $c['name'])->unique('name')->values()->all();
 
             // تخصص match شده: در صورت فیلتر دسته، اولین تخصصِ درون دسته‌های انتخابی؛ وگرنه تخصص اصلی/اول.
             $matched = !empty($categoryIds)

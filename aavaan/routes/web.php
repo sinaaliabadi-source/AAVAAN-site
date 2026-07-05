@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\SupportAdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ArtistDashboardController;
 use App\Http\Controllers\ArtistSpecialtyController;
+use App\Http\Controllers\ArtistVerificationController;
 use App\Http\Controllers\ArtistProfilePremiumController;
 use App\Http\Controllers\ArtistSubscriptionController;
 use App\Http\Controllers\ProductionDashboardController;
@@ -141,6 +142,8 @@ Route::middleware(['auth', 'role:artist'])
         Route::delete('/specialties/{specialty}', [ArtistSpecialtyController::class, 'destroy'])->name('specialties.destroy');
         Route::post('/specialties/{specialty}/primary', [ArtistSpecialtyController::class, 'setPrimary'])->name('specialties.primary');
         Route::post('/specialties/{specialty}/media', [ArtistSpecialtyController::class, 'uploadMedia'])->name('specialties.media.upload');
+        // درخواست تأیید تخصص
+        Route::post('/specialties/{specialty}/verify', [ArtistVerificationController::class, 'store'])->name('specialties.verify');
 
         // Premium profile
         Route::post('/profile-premium', [ArtistProfilePremiumController::class, 'upsert'])->name('profile-premium.update');
@@ -181,6 +184,7 @@ Route::middleware(['auth', 'admin'])
 
         // Verifications
         Route::get('/verifications', [AdminVerificationController::class, 'index'])->name('verifications.index');
+        Route::get('/verifications/{id}', [AdminVerificationController::class, 'show'])->name('verifications.show');
         Route::post('/verifications/{id}/approve', [AdminVerificationController::class, 'approve'])->name('verifications.approve');
         Route::post('/verifications/{id}/reject', [AdminVerificationController::class, 'reject'])->name('verifications.reject');
 
@@ -304,11 +308,6 @@ Route::middleware(['auth', 'admin'])
         Route::get('/reports/users',                                  [AdminReportController::class, 'users'])->name('reports.users');
         Route::get('/reports/export',                                 [AdminReportController::class, 'exportPage'])->name('reports.export');
         Route::get('/reports/export/download',                        [AdminReportController::class, 'exportDownload'])->name('reports.export.download');
-
-        // Legacy stubs kept for future phases
-        Route::get('/moderation', fn() => view('admin.placeholder'))->name('moderation.index');
-        Route::get('/reports/violations', fn() => view('admin.placeholder'))->name('reports.violations');
-        Route::get('/content', fn() => view('admin.placeholder'))->name('content.index');
         Route::get('/tickets', fn() => view('admin.placeholder'))->name('tickets.index');
         Route::get('/notifications', fn() => view('admin.placeholder'))->name('notifications.index');
         Route::get('/backup', fn() => view('admin.placeholder'))->name('backup.index');
