@@ -89,9 +89,8 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'field'   => $validated['field'],
             ]);
-
-            // جشنوارهٔ افتتاح: اشتراک رایگان خودکار برای هنرمند تازه‌ثبت‌نام‌کرده.
-            \App\Support\Festival::grantSubscription($user);
+            // توجه: اشتراک جشنواره فقط پس از «تأیید ایمیل» ساخته می‌شود (در EmailVerificationController)،
+            // نه هنگام ثبت‌نام؛ تا حساب تأییدنشده در نتایج ظاهر نشود.
         }
 
         Auth::login($user);
@@ -106,9 +105,22 @@ class AuthController extends Controller
             }
         }
 
+        // هنرمند: ارسال ایمیل فعال‌سازی (داخل الگوی امن) و هدایت به صفحهٔ بررسی ایمیل.
+        // شکست SMTP نباید ثبت‌نام را rollback کند؛ کاربر می‌تواند از «ارسال مجدد» استفاده کند.
         if ($user->isArtist()) {
-            return redirect()->route('artist.profile')
-                ->with('success', 'خوش آمدید! پروفایل خود را تکمیل کنید تا در نتایج جستجو ظاهر شوید.');
+            $mailFailed = false;
+            try {
+                $user->sendEmailVerificationNotification();
+            } catch (\Throwable) {
+                $mailFailed = true;
+            }
+
+            return redirect()->route('verification.notice')->with(
+                $mailFailed ? 'error' : 'success',
+                $mailFailed
+                    ? 'حساب شما ساخته شد اما ایمیل فعال‌سازی ارسال نشد؛ از دکمهٔ «ارسال مجدد» استفاده کنید.'
+                    : 'حساب شما ساخته شد. برای فعال‌سازی، ایمیل خود را بررسی کنید.'
+            );
         }
 
         // تیم تولید پس از ثبت‌نام به صفحهٔ انتظار تأیید می‌رود، نه داشبورد.

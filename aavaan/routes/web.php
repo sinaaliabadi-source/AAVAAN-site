@@ -9,6 +9,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\Admin\SupportAdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ArtistDashboardController;
 use App\Http\Controllers\ArtistSpecialtyController;
 use App\Http\Controllers\ArtistVerificationController;
@@ -121,7 +122,16 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('auth');
 
-Route::middleware(['auth', 'role:artist'])
+// ── تأیید ایمیل (فعال‌سازی حساب هنرمند) — مکانیزم استاندارد Laravel ──
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'send'])
+        ->middleware('throttle:6,1')->name('verification.send');
+});
+
+Route::middleware(['auth', 'role:artist', 'verified'])
     ->prefix('dashboard/artist')
     ->name('artist.')
     ->group(function () {
@@ -149,6 +159,7 @@ Route::middleware(['auth', 'role:artist'])
         Route::post('/profile-premium', [ArtistProfilePremiumController::class, 'upsert'])->name('profile-premium.update');
 
         Route::get('/subscription', [ArtistSubscriptionController::class, 'index'])->name('subscription');
+        Route::post('/subscription/discount', [ArtistSubscriptionController::class, 'validateDiscount'])->name('subscription.discount');
         Route::post('/subscription/pay', [ArtistSubscriptionController::class, 'pay'])->name('subscription.pay');
         Route::get('/subscription/callback', [ArtistSubscriptionController::class, 'callback'])->name('subscription.callback');
     });

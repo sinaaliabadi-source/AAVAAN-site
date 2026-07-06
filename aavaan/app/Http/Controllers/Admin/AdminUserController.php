@@ -33,6 +33,8 @@ class AdminUserController extends Controller {
             'approval_status' => 'approved',
             'approved_at'     => $data['role'] === 'production' ? now() : null,
             'approved_by'     => $data['role'] === 'production' ? auth()->id() : null,
+            // کاربرِ ساخته‌شده توسط ادمین قابل‌اعتماد است و نیازی به تأیید ایمیل ندارد.
+            'email_verified_at' => now(),
         ]);
 
         // برای هنرمند، رکورد پروفایل با username یکتای تولیدشده از نام ساخته می‌شود.

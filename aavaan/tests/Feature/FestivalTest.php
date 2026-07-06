@@ -36,10 +36,11 @@ class FestivalTest extends TestCase
         static $n = 0;
         $n++;
         $user = User::create([
-            'name'     => $name ?? "هنرمند {$n}",
-            'email'    => "fartist{$n}@example.com",
-            'password' => 'password',
-            'role'     => 'artist',
+            'name'              => $name ?? "هنرمند {$n}",
+            'email'             => "fartist{$n}@example.com",
+            'password'          => 'password',
+            'role'              => 'artist',
+            'email_verified_at' => now(), // هنرمند تأییدشده
         ]);
 
         return ArtistProfile::create([
@@ -66,8 +67,11 @@ class FestivalTest extends TestCase
         ]);
     }
 
-    /** ثبت‌نام هنرمند در جشنواره → اشتراک festival خودکار ساخته می‌شود. */
-    public function test_artist_registration_in_festival_creates_festival_subscription(): void
+    /**
+     * ثبت‌نام هنرمند در جشنواره → هنوز اشتراکی ساخته نمی‌شود (تا تأیید ایمیل)؛
+     * پس از کلیک لینک تأیید → حساب فعال + اشتراک festival خودکار ساخته می‌شود.
+     */
+    public function test_festival_subscription_created_after_email_verification(): void
     {
         $this->post(route('auth.register'), [
             'name'                  => 'هنرمند تازه',
@@ -76,13 +80,27 @@ class FestivalTest extends TestCase
             'password_confirmation' => 'password123',
             'role'                  => 'artist',
             'field'                 => 'بازیگری و اجرا',
-        ]);
+        ])->assertRedirect(route('verification.notice'));
 
         $user = User::where('email', 'newartist@example.com')->first();
         $this->assertNotNull($user);
+        $this->assertFalse($user->hasVerifiedEmail(), 'هنرمند باید تأییدنشده باشد.');
+
+        // پیش از تأیید هیچ اشتراکی ساخته نشده است.
+        $this->assertSame(0, Subscription::where('user_id', $user->id)->count());
+
+        // شبیه‌سازی کلیک لینک تأیید (URL امضاشدهٔ استاندارد Laravel).
+        $verifyUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        );
+        $this->actingAs($user)->get($verifyUrl)->assertRedirect(route('artist.dashboard'));
+
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
 
         $sub = Subscription::where('user_id', $user->id)->first();
-        $this->assertNotNull($sub, 'اشتراک جشنواره باید ساخته می‌شد.');
+        $this->assertNotNull($sub, 'اشتراک جشنواره باید پس از تأیید ساخته می‌شد.');
         $this->assertSame('festival', $sub->plan);
         $this->assertSame('active', $sub->status);
         $this->assertTrue($sub->isActive());

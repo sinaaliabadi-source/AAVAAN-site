@@ -40,6 +40,7 @@ class SpecialtyVerificationTest extends TestCase
         $user = User::create([
             'name' => "هنرمند {$n}", 'email' => "art{$n}@x.com",
             'password' => 'password', 'role' => 'artist',
+            'email_verified_at' => now(), // هنرمند تأییدشده (عبور از middleware فعال‌سازی ایمیل)
         ]);
         ArtistProfile::create(['user_id' => $user->id, 'field' => 'بازیگری', 'is_active' => true, 'username' => "art-{$n}"]);
         $spec = ArtistSpecialty::create([

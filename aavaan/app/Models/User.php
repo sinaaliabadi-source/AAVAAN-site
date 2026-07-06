@@ -2,6 +2,8 @@
 namespace App\Models;
 
 use App\Notifications\ResetPasswordNotification;
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,12 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class User extends Authenticatable {
+class User extends Authenticatable implements MustVerifyEmail {
     use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name', 'email', 'phone', 'password', 'role', 'admin_role', 'is_banned', 'admin_notes',
-        'approval_status', 'approved_at', 'approved_by', 'rejection_reason',
+        'approval_status', 'approved_at', 'approved_by', 'rejection_reason', 'email_verified_at',
     ];
     protected $hidden = ['password', 'remember_token'];
     protected $casts = [
@@ -71,5 +73,10 @@ class User extends Authenticatable {
 
     public function sendPasswordResetNotification($token): void {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    // ایمیل تأیید حساب با قالب فارسی و برندِ آوان (به‌جای قالب پیش‌فرض Laravel).
+    public function sendEmailVerificationNotification(): void {
+        $this->notify(new VerifyEmailNotification());
     }
 }
