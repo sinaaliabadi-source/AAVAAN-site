@@ -126,6 +126,9 @@ class AdminDashboardController extends Controller
                 'at'    => $v->created_at,
             ]);
 
-        return $teams->merge($vers)->sortByDesc('at')->take(8)->values()->all();
+        // وقتی کوئری تیم‌های pending خالی برمی‌گردد، map روی Eloquent Collection خالی همچنان
+        // Eloquent Collection می‌ماند و merge آن با آرایه‌ها باعث خطای getKey() on array می‌شود؛
+        // با toBase() هر دو را به Collection پایه تبدیل می‌کنیم تا merge روی آرایه‌ها امن باشد.
+        return $teams->toBase()->merge($vers->toBase())->sortByDesc('at')->take(8)->values()->all();
     }
 }
