@@ -24,13 +24,19 @@ class HomeController extends Controller
         }
         app()->setLocale($locale);
 
-        // هنرمندان برگزیده: فعال‌ترین/پربازدیدترین پروفایل‌ها (اولویت نمایش واقعی)
-        $featuredArtists = ArtistProfile::with('user')
+        // هنرمندان برگزیده: فقط دارندگان «تیک آبی آوان» (نشان برگزیدگیِ ادمین) و پروفایل فعال.
+        // هویت این هنرمندان عمومی است، پس نام واقعی و لینک پروفایل نمایش داده می‌شود.
+        // اگر هیچ هنرمند تیک‌آبی‌داری نباشد، بخش برگزیدگان اصلاً رندر نمی‌شود.
+        $featuredArtists = ArtistProfile::with(['user.primarySpecialty.category'])
             ->where('is_active', true)
+            ->where('has_blue_tick', true)
+            ->orderByDesc('blue_tick_granted_at')
             ->orderByDesc('profile_views')
-            ->orderByDesc('created_at')
-            ->limit(6)
+            ->limit(8)
             ->get();
+
+        $festivalActive = \App\Support\Festival::active();
+        $festivalEndsFa = \App\Support\Festival::endsAtJalali();
 
         $allCategories = SpecialtyCategory::where('is_active', true)
             ->whereNull('parent_id')
@@ -42,6 +48,9 @@ class HomeController extends Controller
             return $group;
         });
 
-        return view('home.index', compact('featuredArtists', 'categoryGroups', 'allCategories', 'locale'));
+        return view('home.index', compact(
+            'featuredArtists', 'categoryGroups', 'allCategories', 'locale',
+            'festivalActive', 'festivalEndsFa'
+        ));
     }
 }

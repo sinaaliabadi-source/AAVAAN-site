@@ -16,6 +16,7 @@
                 <li><a href="{{ route('about') }}" style="color: #aaa;">درباره ما</a></li>
                 <li><a href="{{ route('how-it-works') }}" style="color: #aaa;">نحوه کار</a></li>
                 <li><a href="{{ route('faq') }}" style="color: #aaa;">سوالات متداول</a></li>
+                <li><a href="{{ route('support.index') }}" style="color: #aaa;">پشتیبانی</a></li>
             </ul>
         </div>
         <div>

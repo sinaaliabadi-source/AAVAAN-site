@@ -17,6 +17,14 @@
             </select>
         </div>
         <div class="form-group" style="margin:0;">
+            <label>تیک آبی</label>
+            <select name="blue_tick" class="form-control">
+                <option value="">همه</option>
+                <option value="yes" {{ request('blue_tick')=='yes'?'selected':'' }}>دارای تیک آبی</option>
+                <option value="no" {{ request('blue_tick')=='no'?'selected':'' }}>بدون تیک آبی</option>
+            </select>
+        </div>
+        <div class="form-group" style="margin:0;">
             <label>شهر</label>
             <select name="city" class="form-control">
                 <option value="">همه شهرها</option>
@@ -31,7 +39,7 @@
     <div style="overflow-x:auto;">
         <table class="table">
             <thead><tr>
-                <th>#</th><th>نام هنری</th><th>نام کاربر</th><th>شهر</th><th>وضعیت</th><th>بازدید</th><th>تاریخ</th><th>عملیات</th>
+                <th>#</th><th>نام هنری</th><th>نام کاربر</th><th>شهر</th><th>وضعیت</th><th>تیک آبی</th><th>بازدید</th><th>تاریخ</th><th>عملیات</th>
             </tr></thead>
             <tbody>
             @forelse($artists as $artist)
@@ -45,6 +53,13 @@
                     @else <span class="badge badge-muted">غیرفعال</span>
                     @endif
                 </td>
+                <td>
+                    @if($artist->has_blue_tick)
+                        <span title="دارای تیک آبی آوان"><x-blue-tick :size="18" /></span>
+                    @else
+                        <span class="text-muted">—</span>
+                    @endif
+                </td>
                 <td>{{ number_format($artist->profile_views) }}</td>
                 <td>{{ $artist->created_at->format('Y/m/d') }}</td>
                 <td style="white-space:nowrap;">
@@ -55,7 +70,7 @@
                 </td>
             </tr>
             @empty
-            <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--color-muted);">هنرمندی یافت نشد.</td></tr>
+            <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--color-muted);">هنرمندی یافت نشد.</td></tr>
             @endforelse
             </tbody>
         </table>

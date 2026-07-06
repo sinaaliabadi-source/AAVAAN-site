@@ -15,6 +15,8 @@ class AdminArtistController extends Controller {
         $query = ArtistProfile::with(['user']);
         if ($request->status === 'active') $query->where('is_active', true);
         elseif ($request->status === 'inactive') $query->where('is_active', false);
+        if ($request->blue_tick === 'yes') $query->where('has_blue_tick', true);
+        elseif ($request->blue_tick === 'no') $query->where('has_blue_tick', false);
         if ($request->city) $query->where('city', $request->city);
         if ($request->search) {
             $s = '%' . $request->search . '%';
@@ -42,11 +44,28 @@ class AdminArtistController extends Controller {
         abort_unless(auth()->user()->role === 'admin', 403);
         $artist = ArtistProfile::findOrFail($id);
         $validated = $request->validate([
-            'is_active'    => 'boolean',
-            'admin_notes'  => 'nullable|string|max:2000',
+            'is_active'     => 'boolean',
+            'has_blue_tick' => 'boolean',
+            'admin_notes'   => 'nullable|string|max:2000',
         ]);
         $isActive = $request->boolean('is_active');
         $artist->update(['is_active' => $isActive]);
+
+        // «تیک آبی آوان» — نشان برگزیدگیِ کلِ پروفایل (جدا از تأیید تخصص).
+        $wantsBlueTick = $request->boolean('has_blue_tick');
+        if ($wantsBlueTick !== (bool) $artist->has_blue_tick) {
+            $artist->update([
+                'has_blue_tick'        => $wantsBlueTick,
+                'blue_tick_granted_at' => $wantsBlueTick ? now() : null,
+            ]);
+            $this->logAdminActivity(
+                $wantsBlueTick ? 'artist_blue_tick_granted' : 'artist_blue_tick_revoked',
+                ($wantsBlueTick ? 'تیک آبی آوان به هنرمند ' : 'تیک آبی آوان از هنرمند ') . "{$artist->username} " . ($wantsBlueTick ? 'اعطا شد.' : 'برداشته شد.'),
+                'artist_profile',
+                $artist->id
+            );
+        }
+
         if ($artist->user) $artist->user->update(['admin_notes' => $request->admin_notes]);
         $this->logAdminActivity('artist_updated', "پروفایل هنرمند {$artist->username} ویرایش شد.", 'artist_profile', $artist->id);
         return back()->with('success', 'پروفایل هنرمند به‌روزرسانی شد.');

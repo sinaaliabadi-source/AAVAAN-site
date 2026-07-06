@@ -18,8 +18,12 @@ class ArtistSubscriptionController extends Controller
         $subscription = $user->activeSubscription();
         $history      = $user->subscriptions()->with('payment')->latest()->limit(10)->get();
         $prices       = config('aavaan.artist_subscription');
+        $festivalActive = \App\Support\Festival::active();
+        $festivalEndsFa = \App\Support\Festival::endsAtJalali();
 
-        return view('dashboard.artist.subscription', compact('subscription', 'history', 'prices'));
+        return view('dashboard.artist.subscription', compact(
+            'subscription', 'history', 'prices', 'festivalActive', 'festivalEndsFa'
+        ));
     }
 
     public function pay(Request $request)

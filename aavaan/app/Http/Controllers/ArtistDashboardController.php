@@ -195,6 +195,9 @@ class ArtistDashboardController extends Controller
             ArtistProfile::create($data);
         }
 
+        // جشنوارهٔ افتتاح: اگر هنرمند اشتراک فعال ندارد، هنگام تکمیل پروفایل رایگان بگیرد.
+        \App\Support\Festival::grantSubscription($user->fresh());
+
         return back()->with('success', 'پروفایل با موفقیت ذخیره شد.');
     }
 

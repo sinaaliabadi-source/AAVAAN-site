@@ -9,8 +9,22 @@
 @section('content')
 <h1 style="margin-bottom:1.5rem">خرید دسترسی</h1>
 
+@if($festivalActive)
+<div style="margin-bottom:1.5rem">
+    <x-festival-banner
+        title="جشنوارهٔ آغاز — دسترسی رایگان"
+        message="به مناسبت آغاز به کار آوان، تا پایان تابستان باز کردن پروفایل هنرمندان برای تیم‌های تولید تأییدشده رایگان است. تعرفه‌ها را می‌توانید ببینید؛ پس از جشنواره اعمال می‌شوند." />
+</div>
+@endif
+
 <div class="card">
     <p style="color:var(--color-muted);margin-bottom:1.5rem;font-size:.9rem">با خرید دسترسی، می‌توانید اطلاعات کامل هنرمندان انتخابی را مشاهده کنید.</p>
+    @if($festivalActive)
+    <p style="margin-bottom:1.25rem;font-size:.86rem;color:#6a5a2e;background:#faf6ec;border:1px solid #ecdfbf;border-radius:8px;padding:.6rem .8rem">
+        <span class="festival-badge">جشنواره</span>
+        در حال حاضر نیازی به خرید نیست — باز کردن پروفایل‌ها رایگان است. تعرفه‌های زیر پس از پایان جشنواره فعال می‌شوند.
+    </p>
+    @endif
     <form action="{{ route('production.access.buy') }}" method="POST">
         @csrf
         <div class="grid-3" style="margin-bottom:1.5rem">

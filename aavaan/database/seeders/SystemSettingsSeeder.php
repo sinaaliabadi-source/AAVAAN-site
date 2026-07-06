@@ -16,6 +16,8 @@ class SystemSettingsSeeder extends Seeder {
             ['key' => 'production_access_price',    'value' => '200000', 'label_fa' => 'قیمت دسترسی تیم تولید',      'group' => 'pricing'],
             ['key' => 'max_photos_per_artist',      'value' => '30',     'label_fa' => 'حداکثر عکس هر هنرمند',       'group' => 'limits'],
             ['key' => 'site_maintenance_mode',      'value' => '0',      'label_fa' => 'حالت تعمیر و نگهداری',       'group' => 'general'],
+            ['key' => 'festival_active',            'value' => '1',      'label_fa' => 'جشنوارهٔ افتتاح فعال باشد (رایگان تا پایان تابستان)', 'group' => 'general'],
+            ['key' => 'festival_ends_at',           'value' => '2026-09-22', 'label_fa' => 'تاریخ پایان جشنواره (میلادی، مثل 2026-09-22)',      'group' => 'general'],
         ];
 
         DB::table('system_settings')->insert($settings);

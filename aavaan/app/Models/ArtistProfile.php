@@ -35,11 +35,14 @@ class ArtistProfile extends Model
     protected $fillable = [
         'user_id', 'username', 'field', 'city', 'birth_year', 'gender', 'years_experience',
         'bio', 'avatar', 'phone_contact', 'email_contact', 'is_active',
+        'has_blue_tick', 'blue_tick_granted_at',
         'rating_avg', 'rating_count',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'has_blue_tick' => 'boolean',
+        'blue_tick_granted_at' => 'datetime',
         'birth_year' => 'integer',
         'years_experience' => 'integer',
         'profile_views' => 'integer',

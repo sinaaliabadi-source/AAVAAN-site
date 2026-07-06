@@ -57,8 +57,12 @@ class PageController extends Controller
         $bundle5Price = config('aavaan.production_access.bundle_5_price');
         $bundle10Price = config('aavaan.production_access.bundle_10_price');
 
+        $festivalActive = \App\Support\Festival::active();
+        $festivalEndsFa = \App\Support\Festival::endsAtJalali();
+
         return view('pages.pricing', compact(
-            'monthlyPrice', 'yearlyPrice', 'singlePrice', 'bundle5Price', 'bundle10Price'
+            'monthlyPrice', 'yearlyPrice', 'singlePrice', 'bundle5Price', 'bundle10Price',
+            'festivalActive', 'festivalEndsFa'
         ));
     }
 

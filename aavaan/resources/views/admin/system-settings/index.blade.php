@@ -13,8 +13,23 @@ $groupLabels = ['pricing' => '💰 قیمت‌گذاری', 'limits' => '🔒 م�
         @foreach($items as $setting)
         <div class="form-group">
             <label>{{ $setting->label_fa }}</label>
-            <input type="text" name="{{ $setting->key }}" value="{{ old($setting->key, $setting->value) }}"
-                class="form-control" style="max-width:400px;">
+
+            @if($setting->key === 'festival_active')
+                {{-- بولی: چک‌باکس با مقدار پیش‌فرض 0 (چک‌باکس خاموش چیزی نمی‌فرستد) --}}
+                <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                    <input type="hidden" name="{{ $setting->key }}" value="0">
+                    <input type="checkbox" name="{{ $setting->key }}" value="1"
+                           {{ in_array((string) old($setting->key, $setting->value), ['1','true','on'], true) ? 'checked' : '' }}>
+                    جشنواره فعال باشد (عضویت و دسترسی رایگان تا پایان تابستان)
+                </label>
+            @elseif($setting->key === 'festival_ends_at')
+                <input type="date" name="{{ $setting->key }}" value="{{ old($setting->key, $setting->value) }}"
+                    class="form-control" style="max-width:400px;" dir="ltr">
+            @else
+                <input type="text" name="{{ $setting->key }}" value="{{ old($setting->key, $setting->value) }}"
+                    class="form-control" style="max-width:400px;">
+            @endif
+
             <span class="form-hint" style="direction:ltr;display:inline-block;">{{ $setting->key }}</span>
         </div>
         @endforeach

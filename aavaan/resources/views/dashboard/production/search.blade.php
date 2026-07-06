@@ -385,12 +385,15 @@
                 </div>
 
                 <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
-                    @if($access && $access->remainingCredits() > 0)
+                    @if($festivalActive)
+                        <span class="cf-credits"><span class="festival-badge">جشنواره</span> مشاهدهٔ پروفایل‌ها رایگان است 🎉</span>
+                    @elseif($access && $access->remainingCredits() > 0)
                         <span class="cf-credits">💳 <strong>@faNum($access->remainingCredits())</strong> اعتبار باقی‌مانده</span>
+                        <a href="{{ route('production.access') }}" class="btn btn-primary btn-sm">خرید اعتبار</a>
                     @else
                         <span class="cf-credits is-empty">⚠️ بدون اعتبار</span>
+                        <a href="{{ route('production.access') }}" class="btn btn-primary btn-sm">خرید اعتبار</a>
                     @endif
-                    <a href="{{ route('production.access') }}" class="btn btn-primary btn-sm">خرید اعتبار</a>
                 </div>
             </div>
 
@@ -398,6 +401,9 @@
                 @forelse($artists as $artist)
                 @php
                     $unlocked = in_array($artist->id, $unlockedIds);
+                    $isBlue   = (bool) $artist->has_blue_tick;
+                    // هنرمند تیک‌آبی هویت عمومی دارد: نام واقعی و لینک پروفایل حتی پیش از unlock مجاز است.
+                    $showReal = $unlocked || $isBlue;
                     $card     = $cardData[$artist->id] ?? ['specialty_chips' => [], 'public_attrs' => []];
                     $pseudo   = \App\Helpers\ArtistPseudonym::code($artist->id);
                     $age      = $artist->birth_year ? ($currentJalaliYear - (int) $artist->birth_year) : null;
@@ -409,8 +415,8 @@
                         <span class="cf-card-badge-unlocked">✓ باز شده</span>
                     @endif
 
-                    {{-- تصویر: کارت قفل از route ناشناس می‌آید (بدون افشای مسیر واقعی) --}}
-                    @if($unlocked)
+                    {{-- تصویر: کارت قفلِ ناشناس از route مستعار می‌آید؛ تیک‌آبی/باز‌شده تصویر واقعی --}}
+                    @if($showReal)
                         @if($artist->avatar)
                             <img src="{{ $artist->avatar_url }}" alt="{{ $artist->user->name }}" class="cf-card-img" loading="lazy">
                         @else
@@ -426,8 +432,11 @@
                     @endif
 
                     <div class="cf-card-body">
-                        @if($unlocked)
-                            <div class="cf-card-code">{{ $artist->user->name }}</div>
+                        @if($showReal)
+                            <div class="cf-card-code" style="display:flex;align-items:center;gap:.3rem">
+                                {{ $artist->user->name }}
+                                @if($isBlue)<x-blue-tick :size="16" />@endif
+                            </div>
                         @else
                             <div class="cf-card-code">{{ $pseudo }}</div>
                         @endif
@@ -464,19 +473,35 @@
                         @endif
 
                         {{-- اکشن --}}
-                        <div class="cf-card-actions">
+                        <div class="cf-card-actions" style="display:flex;flex-direction:column;gap:.4rem">
                             @if($unlocked)
                                 <a href="{{ route('profile.show', $artist->username) }}" class="btn btn-primary btn-sm btn-block">
                                     مشاهده پروفایل کامل
                                 </a>
-                            @elseif($access && $access->remainingCredits() > 0)
-                                <form action="{{ route('production.access.unlock') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="artist_profile_id" value="{{ $artist->id }}">
-                                    <button type="submit" class="btn btn-accent btn-sm btn-block">🔓 باز کردن با ۱ اعتبار</button>
-                                </form>
                             @else
-                                <a href="{{ route('production.access') }}" class="btn btn-outline btn-sm btn-block">خرید اعتبار</a>
+                                {{-- تیک‌آبی: لینک پروفیل عمومی مجاز است (هویت عمومی)، اطلاعات تماس همچنان نیازمند unlock --}}
+                                @if($isBlue)
+                                    <a href="{{ route('profile.show', $artist->username) }}" class="btn btn-outline btn-sm btn-block">
+                                        مشاهده پروفایل
+                                    </a>
+                                @endif
+
+                                @if($festivalActive)
+                                    {{-- جشنواره: باز کردن رایگان برای تیم تأییدشده --}}
+                                    <form action="{{ route('production.access.unlock') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="artist_profile_id" value="{{ $artist->id }}">
+                                        <button type="submit" class="btn btn-accent btn-sm btn-block">مشاهده رایگان (جشنواره) 🔓</button>
+                                    </form>
+                                @elseif($access && $access->remainingCredits() > 0)
+                                    <form action="{{ route('production.access.unlock') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="artist_profile_id" value="{{ $artist->id }}">
+                                        <button type="submit" class="btn btn-accent btn-sm btn-block">🔓 باز کردن با ۱ اعتبار</button>
+                                    </form>
+                                @else
+                                    <a href="{{ route('production.access') }}" class="btn btn-outline btn-sm btn-block">خرید اعتبار</a>
+                                @endif
                             @endif
                         </div>
                     </div>

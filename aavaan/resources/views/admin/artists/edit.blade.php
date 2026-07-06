@@ -19,6 +19,19 @@
             <span class="form-hint">غیرفعال‌سازی باعث پنهان‌شدن پروفایل از جستجوی عمومی می‌شود.</span>
         </div>
         <div class="form-group">
+            <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+                <input type="hidden" name="has_blue_tick" value="0">
+                <input type="checkbox" name="has_blue_tick" value="1" {{ $artist->has_blue_tick?'checked':'' }}>
+                <span style="display:inline-flex;align-items:center;gap:.35rem;">
+                    <x-blue-tick :size="18" /> تیک آبی آوان (پروفیل برگزیده)
+                </span>
+            </label>
+            <span class="form-hint">نشان برگزیدگی و اعتماد کلِ پروفایل — جدا از «تأیید تخصص». هنرمند دارای تیک آبی در کست‌یاب با نام واقعی نمایش داده می‌شود و در بخش برگزیدگان صفحهٔ اصلی می‌آید.</span>
+            @if($artist->has_blue_tick && $artist->blue_tick_granted_at)
+            <span class="form-hint">تاریخ اعطا: {{ $artist->blue_tick_granted_at->format('Y/m/d') }}</span>
+            @endif
+        </div>
+        <div class="form-group">
             <label>یادداشت داخلی ادمین</label>
             <textarea name="admin_notes" class="form-control" rows="4" placeholder="این یادداشت فقط برای ادمین‌ها قابل مشاهده است">{{ old('admin_notes', $artist->user?->admin_notes) }}</textarea>
         </div>

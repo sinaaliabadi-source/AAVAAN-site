@@ -217,6 +217,10 @@ class AdminPhaseTest extends TestCase
 
     public function test_manual_credit_added_and_usable(): void
     {
+        // این تست مسیرِ مصرفِ اعتبار (رفتار پس از جشنواره) را می‌سنجد؛ جشنواره خاموش می‌شود.
+        \App\Models\SystemSetting::set('festival_active', '0');
+        \App\Support\Festival::forgetCache();
+
         $admin = $this->admin();
         $team  = User::create([
             'name' => 'تیم', 'email' => 'pcred@x.com', 'password' => 'password',

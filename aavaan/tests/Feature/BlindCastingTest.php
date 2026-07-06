@@ -129,16 +129,30 @@ class BlindCastingTest extends TestCase
 
     public function test_public_home_featured_section_does_not_leak_real_name(): void
     {
-        $profile = $this->makeArtist();
+        // هنرمند عادی (بدون تیک آبی) نباید در بخش «هنرمندان برگزیده» بیاید و نامش لو برود.
+        // بخش برگزیدگان فقط دارندگان تیک آبی (هویت عمومی) را نشان می‌دهد.
+        $this->makeArtist();
 
         // بازدیدکنندهٔ مهمان (بدون لاگین) صفحهٔ اصلی عمومی
         $html = $this->get(route('home'))
             ->assertOk()
             ->getContent();
 
-        // در بخش «هنرمندان برگزیده» نباید نام واقعی هنرمند در HTML باشد
+        // نام واقعی هنرمندِ بدون تیک آبی نباید در HTML صفحهٔ اصلی باشد
         $this->assertStringNotContainsString(self::REAL_NAME, $html);
-        $this->assertStringContainsString('هنرمند #' . $profile->id, $html);
+    }
+
+    public function test_blue_tick_artist_is_shown_by_real_name_in_featured(): void
+    {
+        // هنرمند دارای تیک آبی → هویت عمومی → نام واقعی در بخش برگزیدگان نمایش داده می‌شود.
+        $profile = $this->makeArtist();
+        $profile->update(['has_blue_tick' => true, 'blue_tick_granted_at' => now()]);
+
+        $html = $this->get(route('home'))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString(self::REAL_NAME, $html);
     }
 
     public function test_artist_viewing_own_profile_sees_real_name(): void

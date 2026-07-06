@@ -89,6 +89,9 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'field'   => $validated['field'],
             ]);
+
+            // جشنوارهٔ افتتاح: اشتراک رایگان خودکار برای هنرمند تازه‌ثبت‌نام‌کرده.
+            \App\Support\Festival::grantSubscription($user);
         }
 
         Auth::login($user);

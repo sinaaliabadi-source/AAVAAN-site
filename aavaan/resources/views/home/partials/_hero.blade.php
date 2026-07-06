@@ -3,6 +3,21 @@
     <div class="swiper hero-swiper">
         <div class="swiper-wrapper">
 
+            @if(!empty($festivalActive))
+            {{-- اسلاید جشنوارهٔ افتتاح — فقط در دورهٔ جشنواره رندر می‌شود --}}
+            <div class="swiper-slide hero-slide hero-slide--festival">
+                <div class="container hero-slide-inner">
+                    <div class="hero-festival-badge" aria-hidden="true">🎉 جشنوارهٔ آغاز</div>
+                    <h1>جشنوارهٔ آغاز — آوانِ رایگانِ شما</h1>
+                    <p>به مناسبت شروع به کار آوان، تا پایان تابستان عضویت هنرمندان و دسترسی تیم‌های تولید رایگان است.</p>
+                    <div class="hero-btns">
+                        <a href="{{ route('auth') }}?role=artist" class="btn btn-accent btn-lg" data-magnetic>ثبت‌نام رایگان هنرمند</a>
+                        <a href="{{ route('pricing') }}" class="btn btn-outline-white btn-lg" data-magnetic>جزئیات جشنواره</a>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             {{-- اسلاید ۱ — معرفی آوان --}}
             <div class="swiper-slide hero-slide hero-slide--intro">
                 <div class="container hero-slide-inner">
@@ -78,6 +93,20 @@
     .hero-slide--intro    { background: linear-gradient(135deg, #1F2A44 0%, #0d1a2e 100%); }
     .hero-slide--artists  { background: linear-gradient(135deg, #1a1a2e 0%, #1F2A44 100%); }
     .hero-slide--honarbaz { background: linear-gradient(135deg, #7a5a1a 0%, #1F2A44 100%); }
+    .hero-slide--festival { background: linear-gradient(135deg, #23304f 0%, #1F2A44 55%, #3a2f14 100%); }
+
+    .hero-festival-badge {
+        display: inline-block;
+        background: #C9A24B;
+        color: #1F2A44;
+        font-family: 'YekanBakh', Tahoma, sans-serif;
+        font-weight: 800;
+        font-size: .95rem;
+        padding: .35rem 1.1rem;
+        border-radius: 999px;
+        margin-bottom: 1.4rem;
+        box-shadow: 0 4px 16px rgba(201,162,75,.35);
+    }
 
     .hero-slide-inner { position: relative; z-index: 1; }
 

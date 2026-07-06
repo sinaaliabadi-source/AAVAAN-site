@@ -9,7 +9,8 @@
     // یا کاربر تیم تولیدی که برای این پروفایل رکورد ProductionAccessLog دارد ($hasAccess).
     // در غیر این‌صورت یک شناسهٔ مستعار پایدار نمایش داده می‌شود. این مخفی‌سازی سمت سرور است
     // (اطلاعات واقعی اصلاً در HTML قرار نمی‌گیرد) نه صرفاً پنهان‌سازی بصری با CSS.
-    $showRealName = $isSelf || $hasAccess;
+    // هنرمند دارای «تیک آبی آوان» هویت عمومی دارد؛ نام واقعی‌اش همیشه نمایش داده می‌شود.
+    $showRealName = $isSelf || $hasAccess || $profile->has_blue_tick;
     $artistName   = $showRealName ? $profile->user->name : 'هنرمند #' . $profile->id;
     $fieldLabel  = $profile->field ?? '';
     $cityLabel   = $profile->city  ?? '';
@@ -408,7 +409,10 @@
         @endif
 
         <div class="profile-meta" data-aos="fade-right" data-aos-duration="600">
-            <h1 class="profile-name">{{ $artistName }}</h1>
+            <h1 class="profile-name" style="display:inline-flex;align-items:center;gap:.4rem;">
+                {{ $artistName }}
+                @if($profile->has_blue_tick)<x-blue-tick :size="22" />@endif
+            </h1>
 
             @if($fieldLabel)
                 <span class="profile-field">{{ $fieldLabel }}</span>

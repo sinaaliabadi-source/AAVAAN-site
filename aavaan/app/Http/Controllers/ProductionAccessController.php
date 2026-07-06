@@ -8,6 +8,7 @@ use App\Models\ArtistProfile;
 use App\Models\Payment;
 use App\Models\ProductionAccess;
 use App\Models\ProductionAccessLog;
+use App\Support\Festival;
 use Illuminate\Http\Request;
 
 class ProductionAccessController extends Controller
@@ -22,9 +23,11 @@ class ProductionAccessController extends Controller
             ->with('payment')
             ->latest()
             ->get();
-        $prices = config('aavaan.production_access');
+        $prices          = config('aavaan.production_access');
+        $festivalActive  = Festival::active();
+        $festivalEndsFa  = Festival::endsAtJalali();
 
-        return view('dashboard.production.access', compact('accesses', 'prices'));
+        return view('dashboard.production.access', compact('accesses', 'prices', 'festivalActive', 'festivalEndsFa'));
     }
 
     public function buy(Request $request)
@@ -98,6 +101,27 @@ class ProductionAccessController extends Controller
 
         if (ProductionAccessLog::where('production_user_id', $user->id)->where('artist_profile_id', $profileId)->exists()) {
             return redirect()->route('profile.show', $profile->username)->with('info', 'این هنرمند قبلاً باز شده است.');
+        }
+
+        // ── جشنوارهٔ افتتاح ──
+        // تیم تولید تأییدشده در دورهٔ جشنواره بدون مصرف اعتبار و بدون نیاز به بستهٔ اعتبار
+        // پروفایل را باز می‌کند. دسترسی همچنان در لاگ ثبت می‌شود (برای آمار)، ولی از هیچ
+        // used_count/اعتباری کم نمی‌شود. تأیید ادمین شرط لازم است (رایگان بودن ربطی به تأیید ندارد).
+        if (Festival::active()) {
+            if (! $user->isApprovedProduction()) {
+                return redirect()->route('production.pending-approval')
+                    ->with('error', 'دسترسی شما هنوز توسط تیم آوان تأیید نشده است.');
+            }
+
+            ProductionAccessLog::create([
+                'production_access_id' => null, // در جشنواره به بستهٔ اعتبار وصل نیست.
+                'production_user_id'   => $user->id,
+                'artist_profile_id'    => $profileId,
+                'accessed_at'          => now(),
+            ]);
+
+            return redirect()->route('profile.show', $profile->username)
+                ->with('success', 'پروفایل این هنرمند به‌صورت رایگان (جشنواره) باز شد.');
         }
 
         $access = $user->availableProductionAccess();

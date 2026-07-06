@@ -240,6 +240,14 @@
         <h1>تعرفه‌ها</h1>
         <p>پلانی انتخاب کنید که با مسیر هنری یا نیاز تولیدی شما هم‌خوانی دارد</p>
 
+        @if($festivalActive)
+        <div style="max-width:680px;margin:1.75rem auto 0">
+            <x-festival-banner
+                title="جشنوارهٔ آغاز — تا پایان تابستان رایگان"
+                message="به مناسبت شروع به کار آوان، عضویت هنرمندان و دسترسی تیم‌های تولید تا پایان تابستان رایگان است. قیمت‌های زیر پس از پایان جشنواره اعمال می‌شوند." />
+        </div>
+        @endif
+
         <div class="tab-switcher" id="tabSwitcher">
             <button class="tab-btn active" data-target="artists" onclick="switchTab('artists')">
                 هنرمندان
@@ -265,7 +273,8 @@
             <div class="pricing-card">
                 <h3>اشتراک ماهانه</h3>
                 <div class="price-block">
-                    <div class="price-amount">{{ number_format($monthlyPrice) }}</div>
+                    @if($festivalActive)<span class="festival-badge" style="margin-bottom:.5rem;display:inline-block">رایگان در جشنواره</span>@endif
+                    <div class="price-amount {{ $festivalActive ? 'festival-price-old' : '' }}">{{ number_format($monthlyPrice) }}</div>
                     <div class="price-period">تومان / ماه</div>
                 </div>
                 <ul class="feature-list">
@@ -281,7 +290,8 @@
                 <span class="pricing-badge">صرفه‌جویی بیشتر</span>
                 <h3>اشتراک سالانه</h3>
                 <div class="price-block">
-                    <div class="price-amount">{{ number_format($yearlyPrice) }}</div>
+                    @if($festivalActive)<span class="festival-badge" style="margin-bottom:.5rem;display:inline-block">رایگان در جشنواره</span>@endif
+                    <div class="price-amount {{ $festivalActive ? 'festival-price-old' : '' }}">{{ number_format($yearlyPrice) }}</div>
                     <div class="price-period">تومان / سال</div>
                 </div>
                 <ul class="feature-list">
@@ -311,7 +321,8 @@
             <div class="pricing-card">
                 <h3>دسترسی تکی</h3>
                 <div class="price-block">
-                    <div class="price-amount">{{ number_format($singlePrice) }}</div>
+                    @if($festivalActive)<span class="festival-badge" style="margin-bottom:.5rem;display:inline-block">رایگان در جشنواره</span>@endif
+                    <div class="price-amount {{ $festivalActive ? 'festival-price-old' : '' }}">{{ number_format($singlePrice) }}</div>
                     <div class="price-period">تومان</div>
                 </div>
                 <p class="card-desc">باز کردن فهرست فیلترشده برای یک پروژه. مناسب برای کاستینگ‌های اتفاقی.</p>
@@ -322,7 +333,8 @@
             <div class="pricing-card">
                 <h3>بسته ۵ دسترسی</h3>
                 <div class="price-block">
-                    <div class="price-amount">{{ number_format($bundle5Price) }}</div>
+                    @if($festivalActive)<span class="festival-badge" style="margin-bottom:.5rem;display:inline-block">رایگان در جشنواره</span>@endif
+                    <div class="price-amount {{ $festivalActive ? 'festival-price-old' : '' }}">{{ number_format($bundle5Price) }}</div>
                     <div class="price-period">تومان</div>
                 </div>
                 <p class="card-desc">مناسب برای پروژه‌های متعدد. پنج بار دسترسی به فهرست‌های فیلترشده.</p>
@@ -334,7 +346,8 @@
                 <span class="pricing-badge">بهترین ارزش</span>
                 <h3>بسته ۱۰ دسترسی</h3>
                 <div class="price-block">
-                    <div class="price-amount">{{ number_format($bundle10Price) }}</div>
+                    @if($festivalActive)<span class="festival-badge" style="margin-bottom:.5rem;display:inline-block">رایگان در جشنواره</span>@endif
+                    <div class="price-amount {{ $festivalActive ? 'festival-price-old' : '' }}">{{ number_format($bundle10Price) }}</div>
                     <div class="price-period">تومان</div>
                 </div>
                 <p class="card-desc" style="color:rgba(255,255,255,.8)">بهترین قیمت برای استودیوها. ده دسترسی کامل برای پروژه‌های مختلف.</p>
@@ -362,6 +375,20 @@
         </div>
     </div>
 </section>
+
+@if($festivalActive)
+{{-- ═══ FAQ کوتاه جشنواره ═══ --}}
+<section style="max-width:680px;margin:1rem auto 0;padding:0 1.5rem">
+    <div style="background:#fff;border:1px solid #ece7dd;border-radius:14px;padding:1.5rem 1.75rem;box-shadow:0 2px 12px rgba(0,0,0,.05)">
+        <h3 style="color:var(--color-primary);font-size:1.15rem;margin-bottom:.6rem">بعد از پایان جشنواره چه می‌شود؟</h3>
+        <p style="color:var(--color-muted);font-size:.95rem;line-height:1.9;margin:0">
+            با پایان جشنواره ({{ $festivalEndsFa }})، اشتراک رایگانِ جشنواره به‌پایان می‌رسد و برای ادامهٔ حضور،
+            تهیهٔ یکی از پلن‌های بالا لازم است. نگران نباشید — <strong style="color:var(--color-primary)">هیچ مبلغی به‌صورت خودکار از شما کسر نمی‌شود</strong>؛
+            انتخاب و پرداخت کاملاً با خودتان است.
+        </p>
+    </div>
+</section>
+@endif
 
 {{-- ═══ FOOTER NOTE ═══ --}}
 <div class="pricing-note">

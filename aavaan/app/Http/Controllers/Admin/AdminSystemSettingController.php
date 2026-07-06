@@ -23,6 +23,10 @@ class AdminSystemSettingController extends Controller {
                 SystemSetting::set($key, $request->input($key));
             }
         }
+
+        // کش وضعیت جشنواره کوتاه است ولی برای اعمال فوری تغییرِ ادمین، همان‌جا پاک می‌شود.
+        \App\Support\Festival::forgetCache();
+
         $this->logAdminActivity('system_settings_updated', 'تنظیمات سیستم به‌روزرسانی شد.');
         return back()->with('success', 'تنظیمات سیستم ذخیره شد.');
     }

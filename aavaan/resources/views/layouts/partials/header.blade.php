@@ -10,7 +10,6 @@
             <a href="{{ route('how-it-works') }}" style="color:#ccc;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='var(--color-accent)'" onmouseout="this.style.color='#ccc'">نحوه کار</a>
             <a href="{{ route('pricing') }}"      style="color:#ccc;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='var(--color-accent)'" onmouseout="this.style.color='#ccc'">تعرفه‌ها</a>
             <a href="{{ route('blog') }}"         style="color:#ccc;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='var(--color-accent)'" onmouseout="this.style.color='#ccc'">وبلاگ</a>
-            <a href="{{ route('support.index') }}" style="color:#ccc;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='var(--color-accent)'" onmouseout="this.style.color='#ccc'">پشتیبانی</a>
         </nav>
 
         <div style="display:flex;gap:.75rem;align-items:center;">
@@ -38,7 +37,6 @@
         <a href="{{ route('how-it-works') }}" style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">نحوه کار</a>
         <a href="{{ route('pricing') }}"      style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">تعرفه‌ها</a>
         <a href="{{ route('blog') }}"         style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">وبلاگ</a>
-        <a href="{{ route('support.index') }}" style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">پشتیبانی</a>
         <a href="{{ route('honarbaz.landing') }}" class="honarbaz-nav-btn" style="display:inline-block;margin:.75rem 0;">🎭 هنرباز</a>
         @auth
             @if(auth()->user()->isArtist())

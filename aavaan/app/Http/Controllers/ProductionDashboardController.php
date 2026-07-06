@@ -182,10 +182,12 @@ class ProductionDashboardController extends Controller
             + count($attrFilters)
             + ($request->boolean('verified_only') ? 1 : 0);
 
+        $festivalActive = \App\Support\Festival::active();
+
         return view('dashboard.production.search', compact(
             'artists', 'unlockedIds', 'access', 'hasPaidAccess',
             'categories', 'definitionsByCategory', 'cardData',
-            'currentJalaliYear', 'activeFilterCount'
+            'currentJalaliYear', 'activeFilterCount', 'festivalActive'
         ));
     }
 
