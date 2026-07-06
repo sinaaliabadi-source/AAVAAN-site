@@ -1,6 +1,11 @@
 <?php
 
 return [
+    // سوییچ اصلی نمایش ماژول هنرباز در بخش عمومی سایت.
+    // پیش‌فرض false یعنی پنهان؛ routeها و لینک‌های عمومی register/render نمی‌شوند.
+    // پنل ادمین مستقل از این فلگ همیشه فعال است.
+    'enabled' => env('HONARBAZ_ENABLED', false),
+
     'program_slug' => 'honarbaz',
 
     'vote_cooldown_hours'             => 24,

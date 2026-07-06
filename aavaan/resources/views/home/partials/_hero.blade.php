@@ -47,7 +47,8 @@
                 </div>
             </div>
 
-            {{-- اسلاید ۳ — هنرباز --}}
+            @if(config('honarbaz.enabled'))
+            {{-- اسلاید ۳ — هنرباز (پشت فلگ honarbaz.enabled) --}}
             <div class="swiper-slide hero-slide hero-slide--honarbaz">
                 <div class="container hero-slide-inner">
                     <div class="hero-motif hero-motif--emoji" aria-hidden="true">🎭</div>
@@ -58,6 +59,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
         </div>
         <div class="swiper-pagination"></div>

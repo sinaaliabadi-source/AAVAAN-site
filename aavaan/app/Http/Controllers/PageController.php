@@ -73,6 +73,11 @@ class PageController extends Controller
             ->get()
             ->groupBy('category');
 
+        // وقتی ماژول هنرباز پنهان است، دستهٔ سوالات هنرباز هم در صفحهٔ عمومی نمایش داده نشود.
+        if (! config('honarbaz.enabled')) {
+            $faqs = $faqs->filter(fn ($items, $category) => $category !== 'honarbaz');
+        }
+
         return view('pages.faq', compact('faqs'));
     }
 

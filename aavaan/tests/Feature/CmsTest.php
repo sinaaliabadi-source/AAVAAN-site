@@ -70,9 +70,23 @@ class CmsTest extends TestCase
 
     public function test_faq_page_renders_from_cms(): void
     {
+        // ماژول هنرباز به‌صورت پیش‌فرض پنهان است؛ دستهٔ سوالات هنرباز نباید نمایش داده شود.
         $this->get(route('faq'))
             ->assertOk()
             ->assertSee('سوالات متداول')
+            ->assertDontSee('هنرباز چیست؟');
+    }
+
+    public function test_faq_page_shows_honarbaz_category_when_enabled(): void
+    {
+        // در محیط واقعی، فلگ روشن یعنی routeهای هنرباز هم register شده‌اند
+        // (هدر به route('honarbaz.landing') لینک می‌دهد)، پس هر دو را همگام می‌کنیم.
+        config(['honarbaz.enabled' => true]);
+        $this->app['router']->middleware('web')->group(base_path('routes/web.php'));
+        $this->app['router']->getRoutes()->refreshNameLookups();
+
+        $this->get(route('faq'))
+            ->assertOk()
             ->assertSee('هنرباز چیست؟');
     }
 

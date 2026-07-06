@@ -13,7 +13,9 @@
         </nav>
 
         <div style="display:flex;gap:.75rem;align-items:center;">
+            @if(config('honarbaz.enabled'))
             <a href="{{ route('honarbaz.landing') }}" class="honarbaz-nav-btn">🎭 هنرباز</a>
+            @endif
             @auth
                 @if(auth()->user()->isArtist())
                     <a href="{{ route('artist.dashboard') }}" class="btn btn-accent btn-sm">پنل هنرمند</a>
@@ -37,7 +39,9 @@
         <a href="{{ route('how-it-works') }}" style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">نحوه کار</a>
         <a href="{{ route('pricing') }}"      style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">تعرفه‌ها</a>
         <a href="{{ route('blog') }}"         style="display:block;color:#ccc;padding:.5rem 0;border-bottom:1px solid #333;">وبلاگ</a>
+        @if(config('honarbaz.enabled'))
         <a href="{{ route('honarbaz.landing') }}" class="honarbaz-nav-btn" style="display:inline-block;margin:.75rem 0;">🎭 هنرباز</a>
+        @endif
         @auth
             @if(auth()->user()->isArtist())
                 <a href="{{ route('artist.dashboard') }}" style="display:block;color:var(--color-accent);padding:.5rem 0;">پنل هنرمند</a>

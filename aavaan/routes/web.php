@@ -71,16 +71,21 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // ═══════════════════════════════════════════════════
 // هنرباز — برنامه استعدادیابی کودکان (عمومی)
+// ماژول موقتاً پشت فلگ config('honarbaz.enabled') پنهان شده است.
+// وقتی فلگ خاموش باشد این routeها اصلاً register نمی‌شوند و 404 می‌دهند.
+// توجه: routeهای گروه admin.honarbaz.* مستقل و همیشه فعال‌اند (پایین‌تر).
 // ═══════════════════════════════════════════════════
-Route::get('/honarbaz', [HonarbazController::class, 'landing'])->name('honarbaz.landing');
-Route::get('/honarbaz/register', [HonarbazController::class, 'registerForm'])->name('honarbaz.register');
-Route::post('/honarbaz/register', [HonarbazController::class, 'registerSubmit'])
-    ->name('honarbaz.register.submit')->middleware('throttle:honarbaz-register');
-Route::get('/honarbaz/contestants', [HonarbazController::class, 'contestants'])->name('honarbaz.contestants');
-Route::post('/honarbaz/vote', [HonarbazController::class, 'vote'])
-    ->name('honarbaz.vote')->middleware('throttle:honarbaz-vote');
-Route::post('/honarbaz/vote/verify', [HonarbazController::class, 'verifyVote'])
-    ->name('honarbaz.vote.verify')->middleware('throttle:honarbaz-vote');
+if (config('honarbaz.enabled')) {
+    Route::get('/honarbaz', [HonarbazController::class, 'landing'])->name('honarbaz.landing');
+    Route::get('/honarbaz/register', [HonarbazController::class, 'registerForm'])->name('honarbaz.register');
+    Route::post('/honarbaz/register', [HonarbazController::class, 'registerSubmit'])
+        ->name('honarbaz.register.submit')->middleware('throttle:honarbaz-register');
+    Route::get('/honarbaz/contestants', [HonarbazController::class, 'contestants'])->name('honarbaz.contestants');
+    Route::post('/honarbaz/vote', [HonarbazController::class, 'vote'])
+        ->name('honarbaz.vote')->middleware('throttle:honarbaz-vote');
+    Route::post('/honarbaz/vote/verify', [HonarbazController::class, 'verifyVote'])
+        ->name('honarbaz.vote.verify')->middleware('throttle:honarbaz-vote');
+}
 Route::get('/profile/{username}', [ProfileController::class, 'show'])->name('profile.show');
 
 // امتیازدهی و نظرات هنرمند (فقط تیم تولید با دسترسی)
