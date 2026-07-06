@@ -74,6 +74,11 @@ class ArtistSubscriptionController extends Controller
 
     public function pay(Request $request)
     {
+        // در دورهٔ جشنوارهٔ افتتاح عضویت رایگان است و پرداختی لازم نیست؛ POST مستقیم هم مسدود می‌شود.
+        if (Festival::active()) {
+            return back()->with('info', 'در دوره جشنواره افتتاح نیازی به پرداخت نیست.');
+        }
+
         $validated = $request->validate([
             'plan'          => 'required|in:monthly,yearly',
             'discount_code' => 'nullable|string|max:50',

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'پیگیری تیکت')
+@section('title', 'پیگیری تیکت — آوان')
 
 @section('content')
 <div style="max-width:460px;margin:0 auto;padding:3rem 1.5rem">

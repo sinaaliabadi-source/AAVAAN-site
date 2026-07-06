@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'تیکت ' . $ticket->ticket_number)
+@section('title', 'تیکت ' . $ticket->ticket_number . ' — آوان')
 
 @push('styles')
 <style>

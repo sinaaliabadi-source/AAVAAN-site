@@ -23,7 +23,7 @@
 
 @extends('layouts.app')
 
-@section('title', $artistName . ($fieldLabel ? ' | ' . $fieldLabel : '') . ' | آوان')
+@section('title', $artistName . ($fieldLabel ? ' — ' . $fieldLabel : '') . ' — آوان')
 @section('meta-description', \Illuminate\Support\Str::limit($metaDesc, 155))
 
 @push('styles')

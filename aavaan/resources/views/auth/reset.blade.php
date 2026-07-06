@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'تنظیم رمز عبور جدید')
+@section('title', 'تنظیم رمز عبور جدید — آوان')
 
 @section('content')
 <div style="min-height:calc(100vh - 64px);display:flex;align-items:flex-start;justify-content:center;padding:4rem 1rem;background:radial-gradient(ellipse at 60% 0%,#e8e0ce 0%,var(--color-bg) 60%);">

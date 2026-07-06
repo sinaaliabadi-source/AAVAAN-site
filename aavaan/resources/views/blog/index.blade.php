@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', ($pageHeading ?? 'مجله آوان') . ' | آوان')
+@section('title', ($pageHeading ?? 'مجله آوان') . ' — آوان')
 @section('meta-description', 'مجله آوان — آموزش هنری، اخبار صنعت سینما و داستان موفقیت هنرمندان')
 
 @push('styles')

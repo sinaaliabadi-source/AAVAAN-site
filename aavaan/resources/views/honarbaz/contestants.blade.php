@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'شرکت‌کنندگان هنرباز')
+@section('title', 'شرکت‌کنندگان هنرباز — آوان')
 @section('meta-description', 'فهرست شرکت‌کنندگان تأییدشده برنامه استعدادیابی هنرباز و رأی‌گیری مردمی.')
 
 @push('styles')

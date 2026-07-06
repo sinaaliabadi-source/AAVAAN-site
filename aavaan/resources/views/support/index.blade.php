@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'پشتیبانی')
+@section('title', 'پشتیبانی — آوان')
 @section('meta-description', 'مرکز پشتیبانی آوان — سوالات متداول و ثبت تیکت')
 
 @push('styles')

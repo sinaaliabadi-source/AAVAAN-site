@@ -86,8 +86,9 @@ class AuthController extends Controller
 
         if ($user->isArtist()) {
             ArtistProfile::create([
-                'user_id' => $user->id,
-                'field'   => $validated['field'],
+                'user_id'  => $user->id,
+                'username' => ArtistProfile::generateUniqueUsername($validated['name']),
+                'field'    => $validated['field'],
             ]);
             // توجه: اشتراک جشنواره فقط پس از «تأیید ایمیل» ساخته می‌شود (در EmailVerificationController)،
             // نه هنگام ثبت‌نام؛ تا حساب تأییدنشده در نتایج ظاهر نشود.

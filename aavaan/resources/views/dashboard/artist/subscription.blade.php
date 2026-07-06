@@ -56,16 +56,14 @@
     </div>
 
     @if($festivalActive)
+    {{-- در دورهٔ جشنواره فرم و دکمهٔ پرداخت نمایش داده نمی‌شود؛ فقط پیام اطلاع‌رسانی. --}}
     <div style="margin:1.25rem 0;padding:1rem;border:1px dashed #ecdfbf;border-radius:10px;background:#faf6ec">
         <p style="font-size:.9rem;color:#6a5a2e;margin:0">
             <span class="festival-badge">جشنواره</span>
-            در دورهٔ جشنواره نیازی به پرداخت نیست. اگر مایل‌اید از همین حالا اشتراک بلندمدت (پس از جشنواره) تهیه کنید، می‌توانید از گزینه‌های زیر استفاده کنید.
+            در دوره جشنواره افتتاح نیازی به پرداخت نیست. اشتراک شما تا پایان جشنواره رایگان و فعال است.
         </p>
     </div>
-    <details style="margin-bottom:.5rem">
-        <summary style="cursor:pointer;font-weight:700;color:var(--color-primary)">مشاهدهٔ پلن‌های پرداختی</summary>
-        <div style="margin-top:1rem">
-    @endif
+    @else
     <h2 style="margin:1.25rem 0 1.5rem">خرید / تمدید اشتراک</h2>
     <form action="{{ route('artist.subscription.pay') }}" method="POST">
         @csrf
@@ -91,9 +89,6 @@
         </div>
         <button type="submit" class="btn btn-accent" style="margin-top:1.5rem">پرداخت از طریق درگاه</button>
     </form>
-    @if($festivalActive)
-        </div>
-    </details>
     @endif
 </div>
 

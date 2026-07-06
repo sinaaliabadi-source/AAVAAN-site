@@ -17,11 +17,8 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
-        // زبان از پیش‌فرض مسیر (/fa، /en) تعیین می‌شود؛ پیش‌فرض فارسی.
-        $locale = $request->route()->defaults['locale'] ?? config('app.locale', 'fa');
-        if (! in_array($locale, ['fa', 'en'], true)) {
-            $locale = 'fa';
-        }
+        // فعلاً سایت تک‌زبانه (فارسی) است؛ مسیرهای زبان انگلیسی حذف شده‌اند.
+        $locale = 'fa';
         app()->setLocale($locale);
 
         // هنرمندان برگزیده: فقط دارندگان «تیک آبی آوان» (نشان برگزیدگیِ ادمین) و پروفایل فعال.

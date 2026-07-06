@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'تیکت‌های من')
+@section('title', 'تیکت‌های من — آوان')
 
 @push('styles')
 <style>

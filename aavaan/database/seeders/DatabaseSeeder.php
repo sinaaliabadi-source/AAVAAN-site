@@ -12,10 +12,13 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // کاربر تستی فقط در محیط غیرproduction ساخته می‌شود تا در سرور واقعی حساب پیش‌فرض ایجاد نشود.
+        if (! app()->environment('production')) {
+            User::factory()->create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+            ]);
+        }
 
         $this->call([
             SpecialtyCategoriesSeeder::class,

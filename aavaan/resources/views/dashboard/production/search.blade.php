@@ -475,15 +475,23 @@
                         {{-- اکشن --}}
                         <div class="cf-card-actions" style="display:flex;flex-direction:column;gap:.4rem">
                             @if($unlocked)
-                                <a href="{{ route('profile.show', $artist->username) }}" class="btn btn-primary btn-sm btn-block">
-                                    مشاهده پروفایل کامل
-                                </a>
+                                @if(!empty($artist->username))
+                                    <a href="{{ route('profile.show', $artist->username) }}" class="btn btn-primary btn-sm btn-block">
+                                        مشاهده پروفایل کامل
+                                    </a>
+                                @else
+                                    <button type="button" class="btn btn-primary btn-sm btn-block" disabled>پروفایل در دسترس نیست</button>
+                                @endif
                             @else
                                 {{-- تیک‌آبی: لینک پروفیل عمومی مجاز است (هویت عمومی)، اطلاعات تماس همچنان نیازمند unlock --}}
                                 @if($isBlue)
-                                    <a href="{{ route('profile.show', $artist->username) }}" class="btn btn-outline btn-sm btn-block">
-                                        مشاهده پروفایل
-                                    </a>
+                                    @if(!empty($artist->username))
+                                        <a href="{{ route('profile.show', $artist->username) }}" class="btn btn-outline btn-sm btn-block">
+                                            مشاهده پروفایل
+                                        </a>
+                                    @else
+                                        <button type="button" class="btn btn-outline btn-sm btn-block" disabled>پروفایل در دسترس نیست</button>
+                                    @endif
                                 @endif
 
                                 @if($festivalActive)

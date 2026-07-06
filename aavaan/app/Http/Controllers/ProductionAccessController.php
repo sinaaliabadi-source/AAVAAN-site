@@ -32,6 +32,11 @@ class ProductionAccessController extends Controller
 
     public function buy(Request $request)
     {
+        // در دورهٔ جشنوارهٔ افتتاح خرید دسترسی لازم نیست؛ POST مستقیم هم مسدود می‌شود.
+        if (Festival::active()) {
+            return back()->with('info', 'در دوره جشنواره افتتاح نیازی به پرداخت نیست.');
+        }
+
         $validated = $request->validate(['access_type' => 'required|in:single,bundle_5,bundle_10']);
         $prices    = config('aavaan.production_access');
         $bundleMap = ['single' => 1, 'bundle_5' => 5, 'bundle_10' => 10];
@@ -98,6 +103,12 @@ class ProductionAccessController extends Controller
         $user      = auth()->user();
         $profileId = $request->input('artist_profile_id');
         $profile   = ArtistProfile::where('is_active', true)->findOrFail($profileId);
+
+        // پروفایل بدون username قابل نمایش نیست؛ پیش از هر ثبت لاگ یا مصرف اعتبار متوقف می‌شویم
+        // تا اعتبار تیم تولید بی‌دلیل هدر نرود و لینک مرده ساخته نشود.
+        if (empty($profile->username)) {
+            return back()->with('error', 'پروفایل این هنرمند هنوز کامل نشده و در دسترس نیست. اعتباری از شما کسر نشد.');
+        }
 
         if (ProductionAccessLog::where('production_user_id', $user->id)->where('artist_profile_id', $profileId)->exists()) {
             return redirect()->route('profile.show', $profile->username)->with('info', 'این هنرمند قبلاً باز شده است.');

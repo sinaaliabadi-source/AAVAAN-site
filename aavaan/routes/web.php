@@ -42,14 +42,15 @@ use App\Http\Controllers\Admin\CmsFaqController;
 use App\Http\Controllers\Admin\CmsMediaController;
 use Illuminate\Support\Facades\Route;
 
+// نقشهٔ سایت XML (سئو)
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
 Route::get('/payment/success', fn() => view('payment.success'))->name('payment.success');
 Route::get('/payment/failed', fn() => view('payment.failed'))->name('payment.failed');
 
 // صفحه‌ی اصلی — دوزبانه و سئو-دوست با مسیرهای مجزا برای هر زبان.
 // «/» به‌صورت پیش‌فرض فارسی است تا همه‌ی لینک‌های route('home') موجود سالم بمانند.
-Route::get('/', [HomeController::class, 'index'])->defaults('locale', 'fa')->name('home');
-Route::get('/fa', [HomeController::class, 'index'])->defaults('locale', 'fa')->name('home.fa');
-Route::get('/en', [HomeController::class, 'index'])->defaults('locale', 'en')->name('home.en');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // API — تراکم هنرمندان فعال به تفکیک شهر (برای نقشه‌ی صفحه‌ی اصلی)
 Route::get('/api/talent-density', [TalentDensityController::class, 'index'])->name('api.talent-density');

@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="@yield('meta-description', 'آوان — پلتفرم تخصصی کاستینگ هنرمندان ایران')">
-    <title>@yield('title', 'آوان') — پلتفرم کاستینگ هنرمندان ایران</title>
+    {{-- الگوی یکسان تایتل: هر صفحه «عنوان صفحه — آوان» و پیش‌فرض (صفحهٔ اصلی) «آوان — پلتفرم کاستینگ هنرمندان ایران». --}}
+    <title>@yield('title', 'آوان — پلتفرم کاستینگ هنرمندان ایران')</title>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="shortcut icon" href="{{ asset('favicon.svg') }}"  type="image/svg+xml">
+    <link rel="shortcut icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="alternate icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     <style>
         @font-face {
             font-family: 'YekanBakh';

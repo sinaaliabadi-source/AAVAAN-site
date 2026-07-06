@@ -119,9 +119,12 @@
         @foreach($recentLogs as $log)
         @php $ap = $log->artistProfile; @endphp
         @if($ap)
-        <a href="{{ route('profile.show', $ap->username ?? '#') }}"
+        @php $hasProfileLink = !empty($ap->username); @endphp
+        {{-- اگر پروفایل username نداشته باشد، ردیف به لینک مرده تبدیل نمی‌شود؛ به‌جای آن غیرقابل‌کلیک می‌ماند. --}}
+        <{{ $hasProfileLink ? 'a' : 'div' }}
+           @if($hasProfileLink) href="{{ route('profile.show', $ap->username) }}" @endif
            style="display:flex;align-items:center;gap:.85rem;padding:.65rem .85rem;background:#faf7f2;border-radius:8px;text-decoration:none;color:inherit;transition:background .15s"
-           onmouseover="this.style.background='#f0ede6'" onmouseout="this.style.background='#faf7f2'">
+           @if($hasProfileLink) onmouseover="this.style.background='#f0ede6'" onmouseout="this.style.background='#faf7f2'" @endif>
             <div style="width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--color-primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.95rem;color:var(--color-accent)">
                 @if($ap->avatar)
                     <img src="{{ $ap->avatar_url }}" style="width:100%;height:100%;object-fit:cover" alt="">
@@ -133,8 +136,12 @@
                 <div style="font-weight:600;font-size:.88rem;color:var(--color-primary)">{{ $ap->user->name }}</div>
                 <div class="text-sm text-muted">{{ $ap->field }}{{ $ap->city ? ' · ' . $ap->city : '' }}</div>
             </div>
-            <div class="text-sm text-muted" style="white-space:nowrap">{{ $log->accessed_at->diffForHumans() }}</div>
-        </a>
+            @if($hasProfileLink)
+                <div class="text-sm text-muted" style="white-space:nowrap">{{ $log->accessed_at->diffForHumans() }}</div>
+            @else
+                <div class="text-sm text-muted" style="white-space:nowrap">پروفایل در دسترس نیست</div>
+            @endif
+        </{{ $hasProfileLink ? 'a' : 'div' }}>
         @endif
         @endforeach
     </div>

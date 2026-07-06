@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'ثبت‌نام در هنرباز')
+@section('title', 'ثبت‌نام در هنرباز — آوان')
 @section('meta-description', 'فرم ثبت‌نام رایگان در برنامه استعدادیابی هنرباز؛ ویژه کودکان و نوجوانان.')
 
 @push('styles')

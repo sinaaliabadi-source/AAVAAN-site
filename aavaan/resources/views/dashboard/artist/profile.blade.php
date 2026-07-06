@@ -247,7 +247,7 @@
         <div style="display:flex;align-items:flex-end;gap:1rem;flex-wrap:wrap">
             <div class="form-group" style="flex:1;min-width:220px;margin-bottom:0">
                 <label>فایل ویدیو
-                    <span class="form-hint" style="display:inline;margin-right:.3rem">(mp4/mov/webm، حداکثر ۱۰۰ مگابایت، حداکثر ۹۰ ثانیه)</span>
+                    <span class="form-hint" style="display:inline;margin-right:.3rem">(mp4/mov/webm، حداکثر ۵۰ مگابایت، حداکثر ۹۰ ثانیه)</span>
                 </label>
                 <input type="file" name="reel" class="form-control" accept=".mp4,.mov,.webm" id="reel-input">
             </div>
@@ -391,8 +391,8 @@
             if (!f) { reelInfo.style.display = 'none'; return; }
             var mb = (f.size / 1048576).toFixed(1);
             reelInfo.style.display = 'block';
-            if (f.size > 104857600) {
-                reelInfo.textContent = 'حجم فایل (' + mb + ' MB) بیشتر از ۱۰۰ مگابایت است.';
+            if (f.size > 52428800) {
+                reelInfo.textContent = 'حجم فایل (' + mb + ' MB) بیشتر از ۵۰ مگابایت است.';
                 reelInfo.style.color = '#c0392b';
                 if (reelBtn) reelBtn.disabled = true;
             } else {

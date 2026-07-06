@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', __('home.title'))
+@section('title', 'آوان — پلتفرم کاستینگ هنرمندان ایران')
 @section('meta-description', __('home.meta_description'))
 
 @push('styles')
@@ -273,14 +273,7 @@
 
 @section('content')
 
-{{-- سوییچ زبان: بین مسیرهای /fa و /en لینک می‌دهد (سئو-دوست) --}}
-<div class="lang-switch-bar">
-    <a class="lang-switch"
-       href="{{ ($locale ?? app()->getLocale()) === 'en' ? route('home.fa') : route('home.en') }}"
-       hreflang="{{ ($locale ?? app()->getLocale()) === 'en' ? 'fa' : 'en' }}" rel="alternate">
-        🌐 {{ __('home.lang_switch') }}
-    </a>
-</div>
+{{-- سایت فعلاً تک‌زبانه (فارسی) است؛ سوییچ زبان تا فاز بعد حذف شده. --}}
 
 @include('home.partials._hero')
 @include('home.partials._map')

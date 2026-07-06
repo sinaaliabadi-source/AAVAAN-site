@@ -55,7 +55,7 @@ class AdminSearchService
             ->get()
             ->map(fn(User $u) => [
                 'label' => $u->name . ' — ' . $u->email,
-                'url'   => route('admin.users.show', $u->id),
+                'url'   => route('admin.users.edit', $u->id),
                 'meta'  => $u->role,
             ])
             ->toArray();

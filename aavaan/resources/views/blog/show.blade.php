@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', ($post->meta_title ?: $post->title) . ' | آوان')
+@section('title', ($post->meta_title ?: $post->title) . ' — آوان')
 @section('meta-description', $post->meta_description ?: \Illuminate\Support\Str::limit(strip_tags($post->excerpt ?: $post->content), 155))
 
 @push('styles')

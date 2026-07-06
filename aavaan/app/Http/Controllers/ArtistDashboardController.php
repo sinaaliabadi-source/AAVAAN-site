@@ -270,11 +270,11 @@ class ArtistDashboardController extends Controller
         }
 
         $request->validate([
-            'reel' => 'required|file|mimes:mp4,mov,webm|max:102400',
+            'reel' => 'required|file|mimes:mp4,mov,webm|max:51200',
         ], [
             'reel.required' => 'فایل ویدیو الزامی است.',
             'reel.mimes'    => 'فرمت ویدیو باید mp4، mov یا webm باشد.',
-            'reel.max'      => 'حجم ویدیو نباید بیشتر از ۱۰۰ مگابایت باشد.',
+            'reel.max'      => 'حجم ویدیو نباید بیشتر از ۵۰ مگابایت باشد.',
         ]);
 
         $dir = public_path("uploads/{$user->id}/reels");
