@@ -91,22 +91,34 @@ class BlueTickTest extends TestCase
         $this->assertStringContainsString(self::BLUE_NAME, $html);
     }
 
-    /** بخش «هنرمندان برگزیده» صفحهٔ اصلی فقط دارندگان تیک آبی را نشان می‌دهد. */
-    public function test_home_featured_section_only_shows_blue_tick_artists(): void
+    /**
+     * کروسل هنرمندانِ صفحهٔ اصلی همهٔ هنرمندانِ فعال را (چه تیک‌آبی چه عادی) نشان می‌دهد،
+     * اما فقط با عکس و تخصص. نام واقعی صرفاً برای هنرمندانِ تیک‌آبی (هویت عمومی) می‌آید؛
+     * نام هنرمندانِ بدون تیک آبی برای حفظ کستینگ ناشناس نمایش داده نمی‌شود.
+     */
+    public function test_home_featured_section_shows_all_active_artists(): void
     {
-        $this->makeArtist(self::NORMAL_NAME, 'normal-home', false);
-        $this->makeArtist(self::BLUE_NAME, 'blue-home', true);
+        $normal = $this->makeArtist(self::NORMAL_NAME, 'normal-home', false);
+        $blue   = $this->makeArtist(self::BLUE_NAME, 'blue-home', true);
 
         $html = $this->get(route('home'))->assertOk()->getContent();
 
+        // مارک‌آپ کروسل (نه گرید قدیمی) رندر شده باشد.
+        $this->assertStringContainsString('featured-swiper', $html);
+        // هنرمند تیک‌آبی با نام واقعی می‌آید.
         $this->assertStringContainsString(self::BLUE_NAME, $html);
+        // نام واقعیِ هنرمندِ بدون تیک آبی نباید لو برود.
         $this->assertStringNotContainsString(self::NORMAL_NAME, $html);
+        // اما کارتِ هنرمندِ عادی هم رندر شده (لینک پروفایلش موجود است).
+        $this->assertStringContainsString('normal-home', $html);
     }
 
-    /** بخش برگزیدگان در نبودِ هیچ هنرمند تیک‌آبی اصلاً رندر نمی‌شود. */
-    public function test_home_featured_section_hidden_when_no_blue_tick_artists(): void
+    /** کروسل هنرمندان در نبودِ هیچ هنرمندِ فعال اصلاً رندر نمی‌شود. */
+    public function test_home_featured_section_hidden_when_no_active_artists(): void
     {
-        $this->makeArtist(self::NORMAL_NAME, 'normal-only', false);
+        // هنرمند غیرفعال نباید بخش را فعال کند.
+        $inactive = $this->makeArtist(self::NORMAL_NAME, 'inactive-only', false);
+        $inactive->update(['is_active' => false]);
 
         $html = $this->get(route('home'))->assertOk()->getContent();
 

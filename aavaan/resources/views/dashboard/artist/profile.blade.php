@@ -14,6 +14,14 @@
 <div class="card" id="profile-info">
     <div class="card-title">👤 اطلاعات پروفایل</div>
 
+    {{-- توضیح ستارهٔ طلایی: این موارد اجباری نیستند ولی برای تماس لازم‌اند --}}
+    <div class="alert alert-info" style="margin-bottom:1.25rem">
+        <span class="req-soft" style="font-size:1.05rem;line-height:1">★</span>
+        <div class="text-sm">
+            پرکردن این موارد الزامی نیست، اما برای این‌که تیم‌های تولید بتوانند با شما تماس بگیرند لازم است این اطلاعات (شهر، سال تولد و شماره تماس) در پروفایل شما موجود باشد.
+        </div>
+    </div>
+
     @if($errors->has('field') || $errors->has('username') || $errors->has('bio') || $errors->has('avatar') || $errors->has('email_contact'))
         <div class="alert alert-error">✕ {{ $errors->first() }}</div>
     @endif
@@ -63,12 +71,12 @@
                 @error('field')<span class="form-error">{{ $message }}</span>@enderror
             </div>
             <div class="form-group">
-                <label>شهر</label>
+                <label>شهر <span class="req-soft">★</span></label>
                 <input type="text" name="city" class="form-control"
                        value="{{ old('city', $profile?->city) }}" placeholder="مثلاً: تهران">
             </div>
             <div class="form-group">
-                <label>سال تولد (شمسی)</label>
+                <label>سال تولد (شمسی) <span class="req-soft">★</span></label>
                 <input type="number" name="birth_year" class="form-control"
                        value="{{ old('birth_year', $profile?->birth_year) }}"
                        min="1300" max="1410" placeholder="مثلاً: 1370" dir="ltr">
@@ -115,7 +123,7 @@
         </div>
         <div class="grid-2">
             <div class="form-group">
-                <label>شماره تماس</label>
+                <label>شماره تماس <span class="req-soft">★</span></label>
                 <input type="tel" name="phone_contact" class="form-control"
                        value="{{ old('phone_contact', $profile?->phone_contact) }}"
                        placeholder="۰۹۱۲ …" dir="ltr">

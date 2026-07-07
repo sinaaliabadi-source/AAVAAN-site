@@ -9,17 +9,14 @@
 @section('content')
 
 @php
-    $completeness = 0;
-    $hints = [];
+    // منبع واحد منطق تکمیل پروفایل: ArtistProfile::completionData()
     if ($profile) {
-        if ($profile->field)        { $completeness += 20; } else { $hints[] = 'رشته هنری'; }
-        if ($profile->city)         { $completeness += 10; } else { $hints[] = 'شهر'; }
-        if ($profile->bio)          { $completeness += 20; } else { $hints[] = 'بیوگرافی'; }
-        if ($profile->avatar)       { $completeness += 20; } else { $hints[] = 'تصویر پروفایل'; }
-        if ($profile->mainReel())   { $completeness += 15; } else { $hints[] = 'ویدیوی ریل'; }
-        if ($profile->phone_contact || $profile->email_contact) { $completeness += 15; } else { $hints[] = 'اطلاعات تماس'; }
+        $completion   = $profile->completionData();
+        $completeness = $completion['percent'];
+        $hints        = $completion['hints'];
     } else {
-        $hints = ['رشته هنری', 'شهر', 'بیوگرافی', 'تصویر پروفایل', 'ویدیوی ریل', 'اطلاعات تماس'];
+        $completeness = 0;
+        $hints = ['رشته هنری', 'شهر', 'سال تولد', 'بیوگرافی', 'تصویر پروفایل', 'ویدیوی ریل', 'اطلاعات تماس'];
     }
     $barColor = $completeness >= 80 ? 'var(--color-success)' : 'var(--color-accent)';
 @endphp

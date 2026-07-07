@@ -21,15 +21,14 @@ class HomeController extends Controller
         $locale = 'fa';
         app()->setLocale($locale);
 
-        // هنرمندان برگزیده: فقط دارندگان «تیک آبی آوان» (نشان برگزیدگیِ ادمین) و پروفایل فعال.
-        // هویت این هنرمندان عمومی است، پس نام واقعی و لینک پروفایل نمایش داده می‌شود.
-        // اگر هیچ هنرمند تیک‌آبی‌داری نباشد، بخش برگزیدگان اصلاً رندر نمی‌شود.
+        // هنرمندان برگزیده: نمونه‌ای تصادفی از همهٔ هنرمندانِ فعال (نه فقط تیک‌آبی‌ها)
+        // برای نمایش در کروسل صفحهٔ اصلی. هویت این هنرمندان عمومی است، پس نام واقعی و
+        // لینک پروفایل نمایش داده می‌شود. شرط is_active حفظ می‌شود تا پروفایل‌های
+        // غیرفعال/ناقص نمایش داده نشوند. اگر هیچ هنرمندی نباشد، بخش اصلاً رندر نمی‌شود.
         $featuredArtists = ArtistProfile::with(['user.primarySpecialty.category'])
             ->where('is_active', true)
-            ->where('has_blue_tick', true)
-            ->orderByDesc('blue_tick_granted_at')
-            ->orderByDesc('profile_views')
-            ->limit(8)
+            ->inRandomOrder()
+            ->limit(12)
             ->get();
 
         $festivalActive = \App\Support\Festival::active();

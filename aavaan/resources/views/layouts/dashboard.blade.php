@@ -29,6 +29,8 @@
             --sidebar-w: 260px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* جلوگیری از اسکرول افقی و جابه‌جایی صفحه در موبایل */
+        html, body { overflow-x: hidden; max-width: 100vw; }
         body {
             font-family: 'IRANSansX', 'YekanBakh', Tahoma, sans-serif;
             background: var(--color-bg);
@@ -37,6 +39,7 @@
             line-height: 1.75;
             font-size: 15px;
         }
+        img, video, iframe { max-width: 100%; }
         h1, h2, h3, h4, h5 {
             font-family: 'YekanBakh', Tahoma, sans-serif;
             line-height: 1.4;
@@ -188,6 +191,8 @@
             font-weight: 600; font-size: .85rem; color: var(--color-primary);
         }
         .form-group label .req { color: #c0392b; margin-right: .1rem; }
+        /* ستارهٔ نرم طلایی — برای فیلدهای اختیاری ولی «مهم برای تماس» (نه اجباری) */
+        .form-group label .req-soft { color: var(--color-accent); margin-right: .1rem; }
         .form-control {
             width: 100%; padding: .6rem .85rem;
             border: 1.5px solid #d5cfc4; border-radius: 7px;
@@ -238,11 +243,21 @@
             .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
         }
         @media (max-width: 680px) {
-            .layout { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; }
-            .sidebar-nav { width: 100%; display: flex; flex-wrap: wrap; padding: .5rem; }
-            .sidebar-nav a { padding: .5rem .75rem; border-right: none; border-bottom: 2px solid transparent; flex: 1; justify-content: center; text-align: center; }
-            .sidebar-nav a.active { border-bottom-color: var(--color-accent); border-right: none; }
+            /* در موبایل سایدبار به یک منوی کشویی (drawer) از سمت راست تبدیل می‌شود */
+            .sidebar {
+                position: fixed;
+                top: 0; right: 0;
+                height: 100vh;
+                width: 260px;
+                flex-direction: column;
+                z-index: 50;
+                transform: translateX(100%);
+                transition: transform .25s ease;
+            }
+            .sidebar.open { transform: translateX(0); }
+            /* دکمهٔ همبرگری و بک‌دراپ فقط در موبایل دیده می‌شوند */
+            #sidebar-toggle { display: block !important; }
+            #sidebar-backdrop.open { display: block !important; }
             .topbar { padding: .75rem 1rem; }
             .page-body { padding: 1rem; }
             .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
@@ -313,9 +328,15 @@
         </div>
     </aside>
 
+    {{-- بک‌دراپ نیمه‌شفاف پشت منوی کشویی موبایل --}}
+    <div id="sidebar-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;"></div>
+
     <div class="main">
         <div class="topbar">
-            <span class="topbar-title">@yield('page-title', 'داشبورد')</span>
+            <div style="display:flex;gap:.6rem;align-items:center;">
+                <button id="sidebar-toggle" aria-label="منو" style="display:none;background:none;border:none;cursor:pointer;color:var(--color-primary);font-size:1.5rem;line-height:1;">☰</button>
+                <span class="topbar-title">@yield('page-title', 'داشبورد')</span>
+            </div>
             <div style="display:flex;gap:.5rem;align-items:center;">
                 @yield('topbar-actions')
             </div>
@@ -332,6 +353,35 @@
     </div>
 </div>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{{-- منوی کشویی موبایل — JS خام (مستقل از Alpine که با defer بارگذاری می‌شود) --}}
+<script>
+(function () {
+    var toggle   = document.getElementById('sidebar-toggle');
+    var backdrop = document.getElementById('sidebar-backdrop');
+    var sidebar  = document.querySelector('.sidebar');
+    if (!toggle || !backdrop || !sidebar) return;
+
+    function openDrawer() {
+        sidebar.classList.add('open');
+        backdrop.classList.add('open');
+    }
+    function closeDrawer() {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('open');
+    }
+
+    toggle.addEventListener('click', function () {
+        sidebar.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+    backdrop.addEventListener('click', closeDrawer);
+    // با کلیک روی هر لینک منو، drawer بسته شود
+    document.querySelectorAll('.sidebar-nav a').forEach(function (link) {
+        link.addEventListener('click', closeDrawer);
+    });
+    // در بارگذاری صفحه، drawer بسته است
+    closeDrawer();
+})();
+</script>
 @stack('scripts')
 </body>
 </html>

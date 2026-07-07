@@ -39,6 +39,8 @@
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
+        /* جلوگیری از اسکرول افقی و جابه‌جایی صفحه در موبایل */
+        html, body { overflow-x: hidden; max-width: 100vw; }
 
         body {
             font-family: 'IRANSansX', 'YekanBakh', Tahoma, Arial, sans-serif;
@@ -58,7 +60,8 @@
 
         a { color: var(--color-accent); text-decoration: none; }
         a:hover { text-decoration: underline; }
-        img { max-width: 100%; display: block; }
+        img, video, iframe { max-width: 100%; }
+        img { display: block; }
 
         /* دسترس‌پذیری: حالت فوکوس برای پیمایش با کیبورد */
         a:focus-visible,

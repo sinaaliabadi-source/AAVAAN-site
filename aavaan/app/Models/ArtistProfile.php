@@ -92,4 +92,27 @@ class ArtistProfile extends Model
         return $this->portfolioVideos()->where('is_reel', true)->first()
             ?? $this->portfolioVideos()->first();
     }
+
+    /** درصد تکمیل پروفایل + فهرست موارد ناقص. منبع واحد این منطق. */
+    public function completionData(): array
+    {
+        $items = [
+            ['ok' => (bool) $this->field,        'weight' => 15, 'label' => 'رشته هنری'],
+            ['ok' => (bool) $this->city,         'weight' => 10, 'label' => 'شهر'],
+            ['ok' => (bool) $this->birth_year,   'weight' => 10, 'label' => 'سال تولد'],
+            ['ok' => (bool) $this->bio,          'weight' => 15, 'label' => 'بیوگرافی'],
+            ['ok' => (bool) $this->avatar,       'weight' => 20, 'label' => 'تصویر پروفایل'],
+            ['ok' => (bool) $this->mainReel(),   'weight' => 15, 'label' => 'ویدیوی ریل'],
+            ['ok' => (bool) ($this->phone_contact || $this->email_contact),
+                                                 'weight' => 15, 'label' => 'اطلاعات تماس'],
+        ];
+
+        $percent = array_sum(array_map(fn($i) => $i['ok'] ? $i['weight'] : 0, $items));
+        $hints   = array_values(array_map(
+            fn($i) => $i['label'],
+            array_filter($items, fn($i) => ! $i['ok'])
+        ));
+
+        return ['percent' => $percent, 'hints' => $hints];
+    }
 }

@@ -50,7 +50,8 @@
 @if($accesses->count())
 <div class="card">
     <h3 style="margin-bottom:1rem">دسترسی‌های فعال</h3>
-    <table style="width:100%;border-collapse:collapse;font-size:.88rem">
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.88rem;min-width:420px">
         <thead>
             <tr style="border-bottom:2px solid #e5e7eb">
                 <th style="text-align:right;padding:.4rem">نوع</th>
@@ -70,6 +71,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 </div>
 @endif
 @endsection
