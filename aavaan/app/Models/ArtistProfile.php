@@ -82,10 +82,10 @@ class ArtistProfile extends Model
 
     public function getAvatarUrlAttribute(): string
     {
-        // اگر هنرمند عکس پروفایل نگذاشته باشد، favicon برندِ آوان به‌عنوان تصویر پیش‌فرض استفاده می‌شود.
+        // اگر هنرمند عکس پروفایل نگذاشته باشد، لوگوی برندِ آوان به‌عنوان تصویر پیش‌فرض استفاده می‌شود.
         return $this->avatar
             ? asset('uploads/' . $this->avatar)
-            : asset('favicon.svg');
+            : asset('images/logo.webp');
     }
 
     public function mainReel(): ?PortfolioVideo
