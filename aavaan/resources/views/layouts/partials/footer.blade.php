@@ -33,7 +33,7 @@
     </div>
     <div class="container" style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #333; text-align: center; font-size: 0.85rem;">
         {{-- کپی‌رایت تا پایان سال ۱۴۰۵ --}}
-        <div>&copy; تمامی حقوق تا پایان ۱۴۰۵ برای آوان محفوظ است</div>
+        <div>&copy; تمامی حقوق برای آوان محفوظ است | ۱۴۰۵ ©</div>
         {{-- اعتبار طراحی — لینک به SF Systems --}}
         <div style="margin-top: .5rem;">
             طراحی: <a href="https://apps.sinafarahani.com" target="_blank" rel="noopener" style="color: var(--color-accent);">SF Systems</a>
