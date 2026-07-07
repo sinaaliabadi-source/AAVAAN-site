@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'داشبورد') | آوان</title>
+
+    {{-- تگ‌های PWA (مانیفست، آیکن‌ها، متاتگ‌های iOS و ثبت Service Worker) --}}
+    @include('partials.pwa')
+
     <style>
         @font-face {
             font-family: 'YekanBakh';

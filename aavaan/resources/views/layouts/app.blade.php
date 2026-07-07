@@ -10,6 +10,10 @@
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="shortcut icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="alternate icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+
+    {{-- تگ‌های PWA (مانیفست، آیکن‌ها، متاتگ‌های iOS و ثبت Service Worker) --}}
+    @include('partials.pwa')
+
     <style>
         @font-face {
             font-family: 'YekanBakh';

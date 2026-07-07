@@ -1,0 +1,32 @@
+{
+    "name": "آوان — پلتفرم اتصال هنرمندان و تیم‌های تولید",
+    "short_name": "آوان",
+    "description": "آوان؛ پلتفرم تخصصی اتصال هنرمندان به تیم‌های تولید و کاستینگ. زمانش رسید.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#F6F1E7",
+    "theme_color": "#1F2A44",
+    "lang": "fa-IR",
+    "dir": "rtl",
+    "icons": [
+        {
+            "src": "/images/pwa/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/pwa/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/pwa/icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
