@@ -110,23 +110,23 @@
     .featured-foot .btn {
         min-width: 60%;
     }
-    /* کروسل هنرمندان — فضای کافی برای فلش‌ها و نقاط صفحه‌بندی
-       padding-bottom بزرگ‌تر تا نقاط pagination زیر کارت‌ها بنشیند و
-       با آن‌ها تداخل نکند. */
+    /* کروسل هنرمندان — کمی فضای افقی برای فلش‌ها */
     .featured-swiper {
-        padding: .5rem .25rem 3.75rem;
+        padding: .5rem .25rem 0;
     }
     .featured-swiper .swiper-slide {
         height: auto;
         display: flex;
-        padding-bottom: .25rem;
     }
     .featured-swiper .swiper-slide .artist-card {
         width: 100%;
     }
-    /* نقاط صفحه‌بندی را کمی پایین‌تر می‌بریم تا با کارت‌ها فاصله بگیرند */
+    /* نقاط صفحه‌بندی به‌جای شناور بودن روی کارت‌ها (حالت پیش‌فرض Swiper)،
+       به‌صورت جریان عادی زیر اسلایدر قرار می‌گیرند تا هرگز با کارت‌ها
+       تداخل نکنند. */
     .featured-swiper .swiper-pagination {
-        bottom: .5rem;
+        position: static;
+        margin-top: 1.5rem;
     }
     .featured-swiper .swiper-pagination-bullet {
         margin: 0 5px;
