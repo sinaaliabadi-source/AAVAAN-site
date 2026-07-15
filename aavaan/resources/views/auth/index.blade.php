@@ -65,6 +65,21 @@
 .register-form-wrap.open { max-height: 900px; }
 .divider { display: flex; align-items: center; gap: .75rem; margin: 1.2rem 0; color: var(--color-muted); font-size: .83rem; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--color-border); }
+.contact-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    background: #f5f0e8;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: .7rem .85rem;
+    margin-bottom: 1.1rem;
+    font-size: .83rem;
+    line-height: 1.7;
+    color: var(--color-primary);
+}
+.contact-hint-icon { flex-shrink: 0; line-height: 1.7; }
+.contact-hint b { color: var(--color-accent); }
 .pw-wrap { position: relative; }
 .pw-wrap .pw-toggle {
     position: absolute;
@@ -184,20 +199,27 @@
                                        value="{{ old('name') }}" autocomplete="name" required>
                                 @error('name')<span class="form-error">{{ $message }}</span>@enderror
                             </div>
-                            <div class="form-group">
-                                <label for="reg-email">ایمیل <span style="color:var(--color-muted);font-weight:400">(یا شماره موبایل)</span></label>
-                                <input type="email" id="reg-email" name="email"
-                                       class="form-control @error('email') is-invalid @enderror"
-                                       value="{{ old('email') }}" autocomplete="email" placeholder="example@email.com">
-                                @error('email')<span class="form-error">{{ $message }}</span>@enderror
+                            <div class="contact-hint">
+                                <span class="contact-hint-icon">ℹ️</span>
+                                <span>راه ارتباطی خود را وارد کنید. لازم نیست هر دو را پر کنید؛ وارد کردن <b>حداقل یکی</b> از ایمیل یا شماره موبایل کافی است.</span>
                             </div>
                             <div class="form-group">
-                                <label for="reg-phone">شماره موبایل <span style="color:var(--color-muted);font-weight:400">(یا ایمیل)</span></label>
+                                <label for="reg-email">📧 ایمیل</label>
+                                <input type="email" id="reg-email" name="email"
+                                       class="form-control @error('email') is-invalid @enderror"
+                                       value="{{ old('email') }}" autocomplete="email" inputmode="email"
+                                       dir="ltr" style="text-align:left" placeholder="example@email.com">
+                                @error('email')<span class="form-error">{{ $message }}</span>@enderror
+                                <span style="font-size:.78rem;color:var(--color-muted)">نشانی ایمیل معتبر، مثل: name@gmail.com</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-phone">📱 شماره موبایل</label>
                                 <input type="tel" id="reg-phone" name="phone"
                                        class="form-control @error('phone') is-invalid @enderror"
-                                       value="{{ old('phone') }}" autocomplete="tel" placeholder="09xxxxxxxxx">
+                                       value="{{ old('phone') }}" autocomplete="tel" inputmode="numeric"
+                                       dir="ltr" style="text-align:left" placeholder="09123456789">
                                 @error('phone')<span class="form-error">{{ $message }}</span>@enderror
-                                <span style="font-size:.78rem;color:var(--color-muted)">حداقل یکی از ایمیل یا موبایل الزامی است</span>
+                                <span style="font-size:.78rem;color:var(--color-muted)">شماره موبایل ۱۱ رقمی، مثل: ۰۹۱۲۳۴۵۶۷۸۹</span>
                             </div>
                             <div class="form-group" id="field-group" style="{{ old('role') === 'production' ? 'display:none' : '' }}">
                                 <label for="reg-field">رشته هنری</label>
